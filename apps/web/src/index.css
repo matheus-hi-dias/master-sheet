@@ -25,7 +25,7 @@
   );
 }
 
-@custom-variant light (&:where(.light, .light *));
+@custom-variant light (&:is(.light *));
 
 @layer base {
   @variant light {
@@ -48,6 +48,15 @@
     color: var(--color-text-main);
     transition-property: background-color, color, border-color;
     transition-duration: 300ms;
+  }
+
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px var(--color-bg-panel) inset !important;
+    -webkit-text-fill-color: var(--color-text-main) !important;
+    transition: background-color 5000s ease-in-out 0s;
   }
 }
 
