@@ -1,33 +1,103 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
   Pressable,
   ScrollView,
-  SafeAreaView,
   KeyboardAvoidingView,
   Platform,
+  TextInput,
+  Alert,
 } from 'react-native';
-import { useRouter } from 'expo-router';
 import { GemLogo } from '../components/GemLogo';
 import { Input } from '../components/Input';
 import { Button } from '../components/Button';
-import { AuraBackground } from '../components/AuraBackground';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useMutation } from '@tanstack/react-query';
+import { api } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 
 export default function Login() {
-  const [tab, setTab] = useState('login');
-  const router = useRouter();
+  const [tab, setTab] = useState<'login' | 'register'>('login');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [errors, setErrors] = useState<{ email?: string; password?: string; name?: string }>({});
 
-  const handleLogin = () => {
-    router.replace('/(tabs)');
+  const { login } = useAuth();
+  const passwordRef = useRef<TextInput>(null);
+
+  const loginMutation = useMutation({
+    mutationFn: async () => {
+      const response = await api.post('/auth/login', { email, password });
+      return response.data;
+    },
+    onSuccess: async (data: any) => {
+      if (data && data.access_token) {
+        await login(data.access_token);
+      }
+    },
+    onError: (error: any) => {
+      Alert.alert(
+        'Erro ao entrar',
+        error.response?.data?.message ||
+          'Verifique suas credenciais e tente novamente.',
+      );
+    },
+  });
+
+  const registerMutation = useMutation({
+    mutationFn: async () => {
+      const response = await api.post('/auth/register', {
+        name,
+        email,
+        password,
+      });
+      return response.data;
+    },
+    onSuccess: async () => {
+      setTab('login');
+      Alert.alert('Conta criada!', 'Você já pode entrar na plataforma.');
+    },
+    onError: (error: any) => {
+      Alert.alert(
+        'Erro ao criar conta',
+        error.response?.data?.message || 'Tente novamente mais tarde.',
+      );
+    },
+  });
+
+  const handleSubmit = () => {
+    setErrors({});
+    let newErrors: { email?: string; password?: string; name?: string } = {};
+
+    if (!email.trim()) {
+      newErrors.email = 'E-mail é obrigatório';
+    }
+    if (!password) {
+      newErrors.password = 'Senha é obrigatória';
+    }
+
+    if (tab === 'register') {
+      if (!name.trim()) {
+        newErrors.name = 'Nome é obrigatório';
+      }
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    if (tab === 'login') {
+      loginMutation.mutate();
+    } else {
+      registerMutation.mutate();
+    }
   };
 
   return (
     <SafeAreaView className="flex-1 bg-bg-app">
-      {/* 1. O Fundo de Aura */}
-      {/* <AuraBackground /> */}
-
-      {/* 2. Ajuste para o teclado não cobrir os inputs */}
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         className="flex-1"
@@ -47,7 +117,7 @@ export default function Login() {
               <Text className="font-display font-black text-2xl text-gold tracking-widest mt-3">
                 Master-Sheet
               </Text>
-              <Text className="text-[10px] text-text-muted tracking-[4px] uppercase mt-1">
+              <Text className="text-[10px] text-text-muted tracking-[4px] uppercase mt-1 text-center">
                 Sua plataforma de fichas de RPG
               </Text>
             </View>
@@ -57,7 +127,10 @@ export default function Login() {
               {['login', 'register'].map(t => (
                 <Pressable
                   key={t}
-                  onPress={() => setTab(t)}
+                  onPress={() => {
+                    setTab(t as 'login' | 'register');
+                    setErrors({});
+                  }}
                   className={`flex-1 py-3 items-center ${tab === t ? 'bg-gold' : 'bg-transparent'}`}
                 >
                   <Text
@@ -72,31 +145,51 @@ export default function Login() {
             {/* Form */}
             <View className="gap-1">
               {tab === 'register' && (
-                <Input label="Nome" placeholder="Seu nome de aventureiro" />
+                <Input
+                  label="Nome"
+                  placeholder="Seu nome de aventureiro"
+                  value={name}
+                  onChangeText={setName}
+                  returnKeyType="next"
+                  error={errors.name}
+                />
               )}
               <Input
                 label="E-mail"
                 keyboardType="email-address"
                 autoCapitalize="none"
                 placeholder="joao@email.com"
+                value={email}
+                onChangeText={setEmail}
+                returnKeyType="next"
+                onSubmitEditing={() => passwordRef.current?.focus()}
+                error={errors.email}
               />
-              <Input label="Senha" secureTextEntry placeholder="••••••••" />
-              {tab === 'register' && (
-                <Input
-                  label="Confirmar Senha"
-                  secureTextEntry
-                  placeholder="••••••••"
-                />
-              )}
+              <Input
+                ref={passwordRef}
+                label="Senha"
+                secureTextEntry
+                placeholder="••••••••"
+                value={password}
+                onChangeText={setPassword}
+                returnKeyType="done"
+                onSubmitEditing={handleSubmit}
+                error={errors.password}
+              />
             </View>
 
             <Button
               variant="gold"
               size="lg"
               className="w-full mt-4"
-              onPress={handleLogin}
+              onPress={handleSubmit}
+              disabled={loginMutation.isPending || registerMutation.isPending}
             >
-              {tab === 'login' ? '⚔️ Entrar na Plataforma' : '📜 Criar Conta'}
+              {loginMutation.isPending || registerMutation.isPending
+                ? 'Carregando...'
+                : tab === 'login'
+                  ? '⚔️ Entrar na Plataforma'
+                  : '📜 Criar Conta'}
             </Button>
 
             <Text className="text-center text-[10px] text-text-muted mt-6 leading-4">
