@@ -7,6 +7,7 @@
 generator client {
   provider = "prisma-client"
   output = "../src/generated/prisma"
+  moduleFormat  = "cjs"
 }
 
 datasource db {
@@ -32,6 +33,7 @@ model Template {
   author      User     @relation(fields: [authorId], references: [id])
   authorId    String
   sheets      Sheet[]
+  tags        Tag[]
 }
 
 model Sheet {
@@ -42,4 +44,12 @@ model Sheet {
   userId     String
   template   Template @relation(fields: [templateId], references: [id])
   templateId String
+  tags       Tag[]
+}
+
+model Tag {
+  id        String     @id @default(uuid())
+  name      String     @unique
+  templates Template[]
+  sheets    Sheet[]
 }
