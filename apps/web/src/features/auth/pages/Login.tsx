@@ -3,11 +3,13 @@ import { useForm, type FieldErrors } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { Swords, Scroll } from 'lucide-react';
 
 import { GemLogo } from '../../../components/ui/GemLogo';
 import { Input } from '../../../components/ui/Input';
 import { Button } from '../../../components/ui/Button';
 import { useAuthStore } from '../../../store/useAuthStore';
+import { fetchApi } from '../../../lib/api';
 import {
   loginSchema,
   registerSchema,
@@ -17,6 +19,7 @@ import {
 
 export function Login() {
   const [tab, setTab] = useState<'login' | 'register'>('login');
+  const [isLoading, setIsLoading] = useState(false);
   const loginFn = useAuthStore(s => s.login);
   const navigate = useNavigate();
 
@@ -29,16 +32,51 @@ export function Login() {
     resolver: zodResolver(tab === 'login' ? loginSchema : registerSchema),
   });
 
-  const onSubmit = (data: LoginFormData | RegisterFormData) => {
-    console.log('Form data to dispatch:', data);
-    if (tab === 'login') {
-      toast.success('Bem-vindo de volta, Herói!');
-      loginFn('mocked-jwt-token');
-      navigate('/dashboard');
-    } else {
-      toast.success('Conta criada com sucesso! Redirecionando...');
-      loginFn('mocked-jwt-token');
-      navigate('/dashboard');
+  const onSubmit = async (data: LoginFormData | RegisterFormData) => {
+    setIsLoading(true);
+    try {
+      if (tab === 'login') {
+        const payload = data as LoginFormData;
+        const res = await fetchApi('/auth/login', {
+          method: 'POST',
+          body: JSON.stringify({
+            email: payload.email,
+            password: payload.password,
+          }),
+        });
+        
+        loginFn(res.access_token, res.user);
+        toast.success('Bem-vindo de volta, Herói!');
+        navigate('/fichas');
+      } else {
+        const payload = data as RegisterFormData;
+        // First register
+        await fetchApi('/auth/register', {
+          method: 'POST',
+          body: JSON.stringify({
+            name: payload.name,
+            email: payload.email,
+            password: payload.password,
+          }),
+        });
+        
+        // Then auto-login
+        const res = await fetchApi('/auth/login', {
+          method: 'POST',
+          body: JSON.stringify({
+            email: payload.email,
+            password: payload.password,
+          }),
+        });
+        
+        loginFn(res.access_token, res.user);
+        toast.success('Conta criada com sucesso! Redirecionando...');
+        navigate('/fichas');
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Erro na autenticação.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -126,10 +164,23 @@ export function Login() {
           <Button
             variant="gold"
             size="lg"
-            className="w-full mt-2"
+            className="w-full mt-2 flex items-center justify-center gap-2"
             type="submit"
+            disabled={isLoading}
           >
-            {tab === 'login' ? '⚔️ Entrar na Plataforma' : '📜 Criar Conta'}
+            {isLoading ? (
+              'Aguarde...'
+            ) : tab === 'login' ? (
+              <>
+                <Swords size={16} />
+                Entrar na Plataforma
+              </>
+            ) : (
+              <>
+                <Scroll size={16} />
+                Criar Conta
+              </>
+            )}
           </Button>
         </form>
 

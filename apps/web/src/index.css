@@ -25,21 +25,19 @@
   );
 }
 
-@custom-variant light (&:is(.light *));
+@custom-variant light (&:is(.light, .light *));
 
 @layer base {
-  @variant light {
-    :root {
-      --color-bg-app: #faf9f6;
-      --color-bg-panel: #f0efea;
-      --color-bg-card: #ffffff;
-      --color-text-main: #2d3436;
-      --color-text-muted: #636e72;
-      --color-gold: #b8860b;
-      --color-gold-dim: #8b6914;
-      --color-border: #dcd7c9;
-      --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
+  :root.light {
+    --color-bg-app: #faf9f6;
+    --color-bg-panel: #f0efea;
+    --color-bg-card: #ffffff;
+    --color-text-main: #2d3436;
+    --color-text-muted: #636e72;
+    --color-gold: #b8860b;
+    --color-gold-dim: #8b6914;
+    --color-border: #dcd7c9;
+    --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
 
   body {

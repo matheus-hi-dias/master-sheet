@@ -4,7 +4,9 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
 
 import { Login } from './features/auth/pages/Login';
-import { Dashboard } from './features/dashboard/pages/Dashboard';
+import { FichasPage } from './features/dashboard/pages/Dashboard';
+import { TemplatesHub } from './features/templates/pages/TemplatesHub';
+import { DashboardLayout } from './components/layout/DashboardLayout';
 import { useAuthStore } from './store/useAuthStore';
 import { useThemeStore } from './store/useThemeStore';
 import { useEffect } from 'react';
@@ -21,7 +23,7 @@ const ProtectedRoute = ({ children }: { children: ReactNode }) => {
 // Login Route Wrapper (Redirect to dashboard if already logged in)
 const PublicRoute = ({ children }: { children: ReactNode }) => {
   const isAuth = useAuthStore(s => s.isAuthenticated);
-  if (isAuth) return <Navigate to="/dashboard" replace />;
+  if (isAuth) return <Navigate to="/fichas" replace />;
   return children;
 };
 
@@ -86,14 +88,17 @@ function App() {
               </PublicRoute>
             }
           />
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
+          
+          {/* Protected Layout wrapper */}
+          <Route element={
+            <ProtectedRoute>
+              <DashboardLayout />
+            </ProtectedRoute>
+          }>
+            <Route path="/fichas" element={<FichasPage />} />
+            <Route path="/templates" element={<TemplatesHub />} />
+          </Route>
+          
         </Routes>
       </BrowserRouter>
       </ThemeProvider>
