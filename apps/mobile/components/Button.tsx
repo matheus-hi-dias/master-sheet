@@ -48,11 +48,15 @@ export function Button({
       className={`${base} ${sizes[size]} ${variants[variant]} ${className}`}
       {...props}
     >
-      <Text
-        className={`${textSizes[size]} ${textVariants[variant]} font-body font-bold uppercase tracking-widest`}
-      >
-        {children}
-      </Text>
+      {typeof children === 'string' ? (
+        <Text
+          className={`${textSizes[size]} ${textVariants[variant]} font-body font-bold uppercase tracking-widest`}
+        >
+          {children}
+        </Text>
+      ) : (
+        children
+      )}
     </Pressable>
   );
 }

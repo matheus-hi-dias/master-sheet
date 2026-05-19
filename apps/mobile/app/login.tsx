@@ -13,6 +13,7 @@ import { GemLogo } from '../components/GemLogo';
 import { Input } from '../components/Input';
 import { Button } from '../components/Button';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Swords, Scroll } from 'lucide-react-native';
 import { useMutation } from '@tanstack/react-query';
 import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -23,6 +24,7 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [errors, setErrors] = useState<{ email?: string; password?: string; name?: string }>({});
+  const [apiError, setApiError] = useState<string | null>(null);
 
   const { login } = useAuth();
   const passwordRef = useRef<TextInput>(null);
@@ -38,11 +40,12 @@ export default function Login() {
       }
     },
     onError: (error: any) => {
-      Alert.alert(
-        'Erro ao entrar',
-        error.response?.data?.message ||
-          'Verifique suas credenciais e tente novamente.',
-      );
+      const msg = typeof error.response?.data?.message === 'string'
+        ? error.response.data.message
+        : Array.isArray(error.response?.data?.message)
+        ? error.response.data.message[0]
+        : 'Verifique suas credenciais e tente novamente.';
+      setApiError(msg);
     },
   });
 
@@ -57,18 +60,22 @@ export default function Login() {
     },
     onSuccess: async () => {
       setTab('login');
+      setApiError(null);
       Alert.alert('Conta criada!', 'Você já pode entrar na plataforma.');
     },
     onError: (error: any) => {
-      Alert.alert(
-        'Erro ao criar conta',
-        error.response?.data?.message || 'Tente novamente mais tarde.',
-      );
+      const msg = typeof error.response?.data?.message === 'string'
+        ? error.response.data.message
+        : Array.isArray(error.response?.data?.message)
+        ? error.response.data.message[0]
+        : 'Não foi possível criar a conta. Tente novamente.';
+      setApiError(msg);
     },
   });
 
   const handleSubmit = () => {
     setErrors({});
+    setApiError(null);
     let newErrors: { email?: string; password?: string; name?: string } = {};
 
     if (!email.trim()) {
@@ -130,6 +137,7 @@ export default function Login() {
                   onPress={() => {
                     setTab(t as 'login' | 'register');
                     setErrors({});
+                    setApiError(null);
                   }}
                   className={`flex-1 py-3 items-center ${tab === t ? 'bg-gold' : 'bg-transparent'}`}
                 >
@@ -149,7 +157,7 @@ export default function Login() {
                   label="Nome"
                   placeholder="Seu nome de aventureiro"
                   value={name}
-                  onChangeText={setName}
+                  onChangeText={(val) => { setName(val); setApiError(null); }}
                   returnKeyType="next"
                   error={errors.name}
                 />
@@ -160,7 +168,7 @@ export default function Login() {
                 autoCapitalize="none"
                 placeholder="joao@email.com"
                 value={email}
-                onChangeText={setEmail}
+                onChangeText={(val) => { setEmail(val); setApiError(null); }}
                 returnKeyType="next"
                 onSubmitEditing={() => passwordRef.current?.focus()}
                 error={errors.email}
@@ -171,25 +179,45 @@ export default function Login() {
                 secureTextEntry
                 placeholder="••••••••"
                 value={password}
-                onChangeText={setPassword}
+                onChangeText={(val) => { setPassword(val); setApiError(null); }}
                 returnKeyType="done"
                 onSubmitEditing={handleSubmit}
                 error={errors.password}
               />
             </View>
 
+            {apiError && (
+              <View className="bg-danger/10 border border-danger/30 rounded p-2.5 mt-1 mb-2">
+                <Text className="text-danger text-xs text-center font-bold">
+                  {apiError}
+                </Text>
+              </View>
+            )}
+
             <Button
               variant="gold"
               size="lg"
-              className="w-full mt-4"
+              className="w-full mt-4 flex-row items-center justify-center gap-2"
               onPress={handleSubmit}
               disabled={loginMutation.isPending || registerMutation.isPending}
             >
-              {loginMutation.isPending || registerMutation.isPending
-                ? 'Carregando...'
-                : tab === 'login'
-                  ? '⚔️ Entrar na Plataforma'
-                  : '📜 Criar Conta'}
+              {loginMutation.isPending || registerMutation.isPending ? (
+                'Carregando...'
+              ) : tab === 'login' ? (
+                <View className="flex-row items-center justify-center gap-2">
+                  <Swords size={16} color="#121212" />
+                  <Text className="text-[13px] text-[#121212] font-body font-bold uppercase tracking-widest">
+                    Entrar na Plataforma
+                  </Text>
+                </View>
+              ) : (
+                <View className="flex-row items-center justify-center gap-2">
+                  <Scroll size={16} color="#121212" />
+                  <Text className="text-[13px] text-[#121212] font-body font-bold uppercase tracking-widest">
+                    Criar Conta
+                  </Text>
+                </View>
+              )}
             </Button>
 
             <Text className="text-center text-[10px] text-text-muted mt-6 leading-4">
