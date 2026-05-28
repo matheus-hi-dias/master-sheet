@@ -24,6 +24,17 @@ This Turborepo includes the following packages/apps:
 
 Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
 
+## Auth Contract
+
+The auth flow is shared across the API, web app, and mobile app with the following rules:
+
+- Access tokens are short-lived and stay in memory only.
+- Refresh tokens are rotated on use and revoked on logout.
+- The web app stores the refresh token in an HttpOnly, Secure, SameSite cookie.
+- The mobile app stores the refresh token in secure device storage and restores sessions on bootstrap when the refresh token is still valid.
+- Email verification and password reset links are issued by the API; in development, the mail layer falls back to logging when SMTP is not configured.
+- The API rejects expired, revoked, or replayed tokens and applies temporary lockout after repeated failed logins.
+
 ### Utilities
 
 This Turborepo has some additional tools already setup for you:

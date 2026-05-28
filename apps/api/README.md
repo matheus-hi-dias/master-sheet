@@ -1,98 +1,461 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+<div align="center">
+  <img src="../../public/assets/logo.png" alt="Master Sheet Logo" width="100" height="100" />
+  <h1>Master Sheet API</h1>
+  <p><strong>Secure, scalable backend for the Master Sheet RPG companion app</strong></p>
+  
+  [![NestJS](https://img.shields.io/badge/NestJS-11.x-red?logo=nestjs)](https://nestjs.com)
+  [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?logo=typescript)](https://www.typescriptlang.org)
+  [![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748)](https://prisma.io)
+  [![Node.js](https://img.shields.io/badge/Node.js-20%2B-green?logo=node.js)](https://nodejs.org)
+</div>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+---
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 🎯 Overview
 
-## Description
+Master Sheet API handles authentication, user management, email verification, and password recovery for both web and mobile clients. Built with enterprise-grade security, token rotation, rate limiting, and comprehensive test coverage.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## ✨ Features
 
-## Project setup
+<table>
+<tr>
+<td width="50%">
+
+### 🔐 Authentication
+
+- JWT access tokens (short-lived, configurable)
+- Rotating refresh tokens with history
+- Platform-specific flows (web/mobile)
+- Email verification (one-click + API)
+- Password reset with single-use tokens
+- Account lockout after failed attempts
+
+</td>
+<td width="50%">
+
+### 🛡️ Security
+
+- Bcrypt password hashing
+- SHA-256 token storage (hashed)
+- Token revocation & replay detection
+- 15-minute account lockout (5 failures)
+- Helmet security headers
+- Input validation (class-validator)
+- Rate limiting on auth routes
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+### 📧 Email Delivery
+
+- Nodemailer SMTP support
+- Console fallback (dev mode)
+- Configurable templates
+- One-click links
+- Automatic encoding
+
+</td>
+<td width="50%">
+
+### 🏗️ Built For Scale
+
+- Modular NestJS architecture
+- PostgreSQL + Prisma ORM
+- Jest unit & e2e tests
+- TypeScript strict mode
+- Docker-ready
+
+</td>
+</tr>
+</table>
+
+## 🛠️ Tech Stack
+
+| Layer         | Technology                              |
+| ------------- | --------------------------------------- |
+| **Runtime**   | Node.js 20+                             |
+| **Framework** | NestJS 11.x                             |
+| **Language**  | TypeScript 5.x (strict mode)            |
+| **Database**  | PostgreSQL 12+                          |
+| **ORM**       | Prisma                                  |
+| **Testing**   | Jest + Supertest                        |
+| **Security**  | bcrypt, JWT, helmet, express-rate-limit |
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Node.js 20+ | pnpm 8+ | PostgreSQL 12+
+
+### 1️⃣ Installation
 
 ```bash
-$ pnpm install
+cd apps/api
+pnpm install
 ```
 
-## Compile and run the project
+### 2️⃣ Environment
+
+Copy `.env.example` to `.env`:
 
 ```bash
-# development
-$ pnpm run start
+# Core
+DATABASE_URL="postgresql://user:password@localhost:5432/master_sheet"
+JWT_SECRET="your-secret-key-32-chars-min"
 
-# watch mode
-$ pnpm run start:dev
+# Email (optional, falls back to console)
+SMTP_HOST="smtp.gmail.com"
+SMTP_PORT=587
+SMTP_USER="your-email@gmail.com"
+SMTP_PASS="your-app-password"
+SMTP_FROM="noreply@mastersheet.com"
 
-# production mode
-$ pnpm run start:prod
+# Frontend URLs
+FRONTEND_URL="http://localhost:5173"
+EMAIL_VERIFY_REDIRECT_BASE="http://localhost:5173"
+
+# Debug (dev only)
+AUTH_DEBUG_TOKENS=true
 ```
 
-## Run tests
+### 3️⃣ Run
 
 ```bash
-# unit tests
-$ pnpm run test
+# Development (auto-reload)
+pnpm run start:dev
 
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
+# Production
+pnpm run start:prod
 ```
 
-## Deployment
+🎉 API ready at `http://localhost:3000`
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+---
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+## 🧪 Testing
 
 ```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
+# Unit tests
+pnpm run test
+
+# Watch mode
+pnpm run test:watch
+
+# E2E tests (requires DATABASE_URL)
+pnpm run test:e2e
+
+# Coverage
+pnpm run test:cov
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+---
 
-## Resources
+## 📚 API Documentation
 
-Check out a few resources that may come in handy when working with NestJS:
+### 🔑 Authentication Endpoints
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+<details>
+<summary><b>POST /auth/register</b> — Create a new account</summary>
 
-## Support
+**Request:**
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```json
+{
+  "email": "user@example.com",
+  "password": "Password123!",
+  "name": "John Doe"
+}
+```
 
-## Stay in touch
+**Password Rules:** 8+ chars, uppercase, lowercase, digit, special char  
+**Response:** `201` with verification token (debug mode)
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+</details>
 
-## License
+<details>
+<summary><b>POST /auth/login</b> — Authenticate user</summary>
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+**Request:**
+
+```json
+{
+  "email": "user@example.com",
+  "password": "Password123!"
+}
+```
+
+**Response:** `201` with access token + refresh token (cookie or body)
+
+</details>
+
+<details>
+<summary><b>GET /auth/verify-email?token=TOKEN</b> — One-click verification (browser)</summary>
+
+**Redirects to:** `http://localhost:5173/email-verified?status=success`
+
+Or with `Accept: application/json` header:
+
+```json
+{ "status": "success" }
+```
+
+</details>
+
+<details>
+<summary><b>POST /auth/verify-email</b> — Verify via API</summary>
+
+**Request:**
+
+```json
+{ "token": "TOKEN_HERE" }
+```
+
+**Response:**
+
+```json
+{ "message": "Email verified successfully." }
+```
+
+</details>
+
+<details>
+<summary><b>POST /auth/refresh</b> — Get new access token</summary>
+
+Rotates refresh token automatically.  
+**Response:** `201` with new access + refresh tokens
+
+</details>
+
+<details>
+<summary><b>POST /auth/logout</b> — Revoke session</summary>
+
+**Request:**
+
+```json
+{ "refreshToken": "TOKEN_HERE" }
+```
+
+</details>
+
+<details>
+<summary><b>POST /auth/password-reset/request</b> — Send reset email</summary>
+
+**Request:**
+
+```json
+{ "email": "user@example.com" }
+```
+
+</details>
+
+<details>
+<summary><b>POST /auth/password-reset/confirm</b> — Reset password</summary>
+
+**Request:**
+
+```json
+{
+  "token": "TOKEN_HERE",
+  "password": "NewPassword123!"
+}
+```
+
+</details>
+
+<details>
+<summary><b>GET /auth/me</b> — Get current user (protected)</summary>
+
+**Headers:**
+
+```
+Authorization: Bearer ACCESS_TOKEN
+```
+
+**Response:**
+
+```json
+{
+  "id": "user-uuid",
+  "email": "user@example.com",
+  "name": "John Doe",
+  "emailVerified": true
+}
+```
+
+</details>
+
+---
+
+## 🗄️ Database
+
+### Migrations
+
+```bash
+# Apply pending migrations (dev)
+pnpm exec prisma migrate dev --name add_feature
+
+# Reset and replay all
+pnpm exec prisma migrate reset
+
+# Check status
+pnpm exec prisma migrate status
+```
+
+### Prisma Studio
+
+```bash
+pnpm exec prisma studio
+# Opens at http://localhost:5555
+```
+
+---
+
+## 📁 Project Structure
+
+```
+src/
+├── auth/
+│   ├── auth.controller.ts        # HTTP routes
+│   ├── auth.service.ts           # Business logic
+│   ├── jwt-auth.guard.ts         # JWT protection
+│   ├── jwt.strategy.ts           # JWT config
+│   ├── decorators/               # @GetCurrentUser, etc
+│   ├── dto/                      # Request validation
+│   ├── types/                    # TypeScript types
+│   └── auth.module.ts
+├── mail/
+│   ├── mail.service.ts
+│   └── mail.module.ts
+├── prisma/
+│   ├── prisma.service.ts
+│   └── prisma.module.ts
+└── main.ts
+```
+
+---
+
+## 🤝 Contributing
+
+### Workflow
+
+1. **Create a branch**
+
+   ```bash
+   git checkout -b feat/my-feature
+   # or
+   git checkout -b fix/bug-name
+   ```
+
+2. **Make changes** — follow [Code Style](#code-style)
+
+3. **Write tests** — unit tests required for auth changes
+
+4. **Test locally**
+
+   ```bash
+   pnpm run test
+   pnpm run test:e2e
+   ```
+
+5. **Commit** — use [Conventional Commits](https://www.conventionalcommits.org)
+
+   ```bash
+   git commit -m "feat(auth): add two-factor authentication"
+   ```
+
+6. **Push & create PR** — include test instructions
+
+### Code Style
+
+- ✅ TypeScript strict mode (enforced)
+- ✅ ESLint config ([eslint-config](../../packages/eslint-config))
+- ✅ Prettier on commit (Husky)
+- ✅ Max 300 lines per file
+- ✅ Comprehensive test coverage
+
+### Example: Add a New Endpoint
+
+**1. Create DTO** (`src/auth/dto/verify-two-factor.dto.ts`):
+
+```typescript
+import { IsString } from 'class-validator';
+
+export class VerifyTwoFactorDto {
+  @IsString()
+  code: string;
+}
+```
+
+**2. Update Service** (`src/auth/auth.service.ts`):
+
+```typescript
+async verifyTwoFactor(dto: VerifyTwoFactorDto) {
+  // Implement logic
+}
+```
+
+**3. Add Controller Route** (`src/auth/auth.controller.ts`):
+
+```typescript
+@Post('verify-2fa')
+@ApiOperation({ summary: 'Verify two-factor code' })
+async verifyTwoFactor(@Body() dto: VerifyTwoFactorDto) {
+  return this.authService.verifyTwoFactor(dto);
+}
+```
+
+**4. Test** (`src/auth/auth.service.spec.ts`):
+
+```typescript
+it('should verify two-factor code', async () => {
+  const result = await service.verifyTwoFactor({ code: '123456' });
+  expect(result).toBeDefined();
+});
+```
+
+---
+
+## 🐛 Troubleshooting
+
+| Issue                        | Solution                                                                       |
+| ---------------------------- | ------------------------------------------------------------------------------ |
+| **Tests fail with `TS5103`** | Ensure `tsconfig.json` has `"types": ["node", "jest"]`                         |
+| **Email not sending**        | Check SMTP vars or see console output (dev mode)                               |
+| **Token shows invalid**      | May be expired (24h TTL) or already used. Check database.                      |
+| **Account locked**           | Wait 15 min or run: `UPDATE users SET lockoutUntil = null WHERE email = '...'` |
+| **DB connection fails**      | Verify `DATABASE_URL` points to correct database                               |
+
+---
+
+## 📝 Environment Reference
+
+See `.env.example` for full list. Common variables:
+
+```bash
+# JWT
+JWT_SECRET                  # Min 32 chars
+JWT_ACCESS_EXPIRES_IN       # Seconds (default: 900 = 15m)
+JWT_REFRESH_EXPIRES_IN      # Seconds (default: 604800 = 7d)
+
+# Email
+SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM
+
+# URLs
+APP_URL                     # http://localhost:3000
+FRONTEND_URL                # http://localhost:5173
+EMAIL_VERIFY_REDIRECT_BASE  # Where to redirect after email verification
+
+# Debug
+AUTH_DEBUG_TOKENS           # true/false (returns tokens in responses)
+NODE_ENV                    # development/production
+```
+
+---
+
+## 📄 License
+
+MIT

@@ -3,6 +3,7 @@ import {
   ConflictException,
   UnauthorizedException,
   NotFoundException,
+  Logger,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
@@ -20,6 +21,7 @@ import type {
 import { RequestPasswordResetDto } from './dto/request-password-reset.dto';
 import { ConfirmPasswordResetDto } from './dto/confirm-password-reset.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
+import { MailService } from '../mail/mail.service';
 
 type RequestMeta = {
   ip?: string;
@@ -60,11 +62,13 @@ type ServiceResult = {
 export class AuthService {
   private readonly refreshCookieName = 'master-sheet-refresh-token';
   private readonly failedLoginThreshold = 5;
+  private readonly logger = new Logger(AuthService.name);
 
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
     private config: ConfigService,
+    private mailService: MailService,
   ) {}
 
   private get accessTokenTtlSeconds() {
@@ -153,6 +157,7 @@ export class AuthService {
     meta: RequestMeta,
     clientPlatform: ClientPlatform,
   ): Promise<SessionArtifacts> {
+    void clientPlatform;
     const refreshTokenJti = randomUUID();
     const refreshToken = await this.jwtService.signAsync(
       {
@@ -313,6 +318,8 @@ export class AuthService {
     clientPlatform: ClientPlatform,
     _meta: RequestMeta,
   ) {
+    void clientPlatform;
+    void _meta;
     const userExists = await this.prisma.user.findUnique({
       where: { email: user.email },
     });
@@ -334,6 +341,11 @@ export class AuthService {
 
     const verificationToken = await this.issueEmailVerificationToken(
       newUser.id,
+    );
+
+    await this.mailService.sendVerificationEmail(
+      newUser.email,
+      verificationToken,
     );
 
     return {
@@ -431,6 +443,8 @@ export class AuthService {
       tokenInput.refreshToken ??
       this.parseCookie(tokenInput.cookieHeader, this.refreshCookieName);
 
+    void _clientPlatform;
+
     if (!refreshToken) {
       return { message: 'Sessão encerrada com sucesso.' };
     }
@@ -454,8 +468,12 @@ export class AuthService {
         where: { tokenHash },
       });
 
-    if (!verificationToken || verificationToken.expiresAt < new Date()) {
+    if (!verificationToken) {
       throw new UnauthorizedException('Invalid verification token.');
+    }
+
+    if (verificationToken.expiresAt < new Date()) {
+      throw new UnauthorizedException('Verification token expired.');
     }
 
     await this.prisma.user.update({
@@ -480,6 +498,8 @@ export class AuthService {
     }
 
     const resetToken = await this.issuePasswordResetToken(user.id);
+
+    await this.mailService.sendPasswordResetEmail(user.email, resetToken);
 
     return {
       message: 'If the account exists, a reset token was generated.',

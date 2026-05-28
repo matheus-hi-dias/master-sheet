@@ -4,6 +4,7 @@ import {
   Body,
   UseGuards,
   Get,
+  Query,
   Headers,
   Req,
   Res,
@@ -15,6 +16,7 @@ import {
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
+import { ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -29,7 +31,10 @@ import type { ActiveUser, ClientPlatform } from './types/auth.types';
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private config: ConfigService,
+  ) {}
 
   private resolvePlatform(platform?: string): ClientPlatform {
     return platform === 'mobile' ? 'mobile' : 'web';
@@ -144,6 +149,52 @@ export class AuthController {
   @ApiOperation({ summary: 'Valida o token de verificação de e-mail.' })
   async verifyEmail(@Body() dto: VerifyEmailDto) {
     return this.authService.verifyEmail(dto);
+  }
+
+  @Get('verify-email')
+  @ApiOperation({
+    summary: 'Verifica o e-mail por link e redireciona para a UI.',
+  })
+  async verifyEmailGet(
+    @Req() request: Request,
+    @Query('token') token: string,
+    @Res() res: Response,
+    @Query('redirect') redirect?: string,
+  ) {
+    const wantsJson = request.accepts(['json', 'html']) === 'json';
+    const redirectBase =
+      redirect ||
+      this.config.get<string>('EMAIL_VERIFY_REDIRECT_BASE') ||
+      this.config.get<string>('FRONTEND_URL') ||
+      this.config.get<string>('APP_URL') ||
+      'http://localhost:3000';
+
+    const target = `${redirectBase.replace(/\/$/, '')}/email-verified`;
+
+    const respond = (status: 'success' | 'expired' | 'invalid') => {
+      if (wantsJson) {
+        return res.status(200).json({ status });
+      }
+
+      return res.redirect(`${target}?status=${status}`);
+    };
+
+    if (!token) {
+      return respond('invalid');
+    }
+
+    try {
+      await this.authService.verifyEmail({ token });
+      return respond('success');
+    } catch (err) {
+      // Map known verification errors to specific statuses
+      const message = (err as Error).message || '';
+      if (message.toLowerCase().includes('expired')) {
+        return respond('expired');
+      }
+
+      return respond('invalid');
+    }
   }
 
   @Post('password-reset/request')
