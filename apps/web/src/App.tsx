@@ -4,6 +4,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
 
 import { Login } from './features/auth/pages/Login';
+import EmailVerified from './features/auth/pages/EmailVerified';
+import EmailVerify from './features/auth/pages/EmailVerify';
 import { Dashboard } from './features/dashboard/pages/Dashboard';
 import { useAuthStore } from './store/useAuthStore';
 import { useThemeStore } from './store/useThemeStore';
@@ -27,7 +29,7 @@ const PublicRoute = ({ children }: { children: ReactNode }) => {
 
 // Hybrid Theme Engine Listener
 function ThemeProvider({ children }: { children: ReactNode }) {
-  const theme = useThemeStore((s) => s.theme);
+  const theme = useThemeStore(s => s.theme);
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -40,14 +42,16 @@ function ThemeProvider({ children }: { children: ReactNode }) {
     };
 
     if (theme === 'system') {
-      const systemPrefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+      const systemPrefersLight = window.matchMedia(
+        '(prefers-color-scheme: light)',
+      ).matches;
       applyTheme(systemPrefersLight ? 'light' : 'dark');
 
       const mediaQuery = window.matchMedia('(prefers-color-scheme: light)');
       const handleChange = (e: MediaQueryListEvent) => {
         applyTheme(e.matches ? 'light' : 'dark');
       };
-      
+
       mediaQuery.addEventListener('change', handleChange);
       return () => mediaQuery.removeEventListener('change', handleChange);
     } else {
@@ -58,7 +62,9 @@ function ThemeProvider({ children }: { children: ReactNode }) {
   // Pass system/resolved theme to Sonner Toaster context
   const getSonnerTheme = () => {
     if (theme === 'system') {
-      return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+      return window.matchMedia('(prefers-color-scheme: light)').matches
+        ? 'light'
+        : 'dark';
     }
     return theme;
   };
@@ -72,30 +78,38 @@ function ThemeProvider({ children }: { children: ReactNode }) {
 }
 
 function App() {
+  // Attempt silent refresh on app startup to bootstrap auth state
+  useEffect(() => {
+    // call bootstrap from the zustand store
+    useAuthStore.getState().bootstrap();
+  }, []);
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Navigate to="/login" replace />} />
-          <Route
-            path="/login"
-            element={
-              <PublicRoute>
-                <Login />
-              </PublicRoute>
-            }
-          />
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
-      </BrowserRouter>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route
+              path="/login"
+              element={
+                <PublicRoute>
+                  <Login />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/email-verified" element={<EmailVerified />} />
+            <Route path="/email-verify" element={<EmailVerify />} />
+            <Route path="/verify-email" element={<EmailVerify />} />
+          </Routes>
+        </BrowserRouter>
       </ThemeProvider>
     </QueryClientProvider>
   );

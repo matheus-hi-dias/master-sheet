@@ -2,6 +2,17 @@
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
+## Auth
+
+The web client uses the API's cookie-based refresh flow.
+
+- Access tokens remain in memory only.
+- Refresh tokens are returned by the API in an HttpOnly, Secure, SameSite cookie.
+- The client should silently call the refresh endpoint on startup when the cookie is present.
+- Logout must clear the in-memory access token and invalidate the refresh cookie through the API.
+
+Email verification and password reset continue to happen through API-issued links.
+
 Currently, two official plugins are available:
 
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh

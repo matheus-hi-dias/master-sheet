@@ -11,9 +11,12 @@ import { useAuthStore } from '../../../store/useAuthStore';
 import {
   loginSchema,
   registerSchema,
+  passwordRulesText,
   type LoginFormData,
   type RegisterFormData,
 } from '../schemas/authSchema';
+import { api } from '../../../services/api';
+import { PasswordStrengthMeter } from '../components/PasswordStrengthMeter';
 
 export function Login() {
   const [tab, setTab] = useState<'login' | 'register'>('login');
@@ -23,22 +26,36 @@ export function Login() {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
     reset,
   } = useForm<LoginFormData | RegisterFormData>({
     resolver: zodResolver(tab === 'login' ? loginSchema : registerSchema),
   });
 
-  const onSubmit = (data: LoginFormData | RegisterFormData) => {
-    console.log('Form data to dispatch:', data);
-    if (tab === 'login') {
-      toast.success('Bem-vindo de volta, Herói!');
-      loginFn('mocked-jwt-token');
-      navigate('/dashboard');
-    } else {
-      toast.success('Conta criada com sucesso! Redirecionando...');
-      loginFn('mocked-jwt-token');
-      navigate('/dashboard');
+  const passwordValue = String(watch('password') ?? '');
+
+  const onSubmit = async (data: LoginFormData | RegisterFormData) => {
+    try {
+      if (tab === 'login') {
+        const d = data as LoginFormData;
+        await loginFn(d.email, d.password);
+        toast.success('Bem-vindo de volta, Herói!');
+        navigate('/dashboard');
+      } else {
+        const d = data as RegisterFormData;
+        await api.auth.register({
+          name: d.name,
+          email: d.email,
+          password: d.password,
+        });
+        // after register, attempt login
+        await loginFn(d.email, d.password);
+        toast.success('Conta criada com sucesso! Redirecionando...');
+        navigate('/dashboard');
+      }
+    } catch (err: any) {
+      toast.error(err?.message || 'Erro ao processar requisição');
     }
   };
 
@@ -106,9 +123,14 @@ export function Login() {
             label="Senha"
             type="password"
             placeholder="••••••••"
+            tooltip={passwordRulesText}
             {...register('password')}
             error={errors.password?.message}
           />
+
+          {tab === 'register' && (
+            <PasswordStrengthMeter password={passwordValue} />
+          )}
 
           {tab === 'register' && (
             <Input
