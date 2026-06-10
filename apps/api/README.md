@@ -447,7 +447,19 @@ SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM
 # URLs
 APP_URL                     # http://localhost:3000
 FRONTEND_URL                # http://localhost:5173
-EMAIL_VERIFY_REDIRECT_BASE  # Where to redirect after email verification
+EMAIL_VERIFY_URL            # Default: {{APP_URL}}/auth/verify-email?token={{token}}
+EMAIL_VERIFY_REDIRECT_BASE  # Where to redirect after email verification. Defaults to FRONTEND_URL.
+
+### Configuration for Environments
+
+| Variable | Development | Staging | Production |
+| --- | --- | --- | --- |
+| `APP_URL` | `http://localhost:3000` | `https://api.staging.example.com` | `https://api.example.com` |
+| `FRONTEND_URL` | `http://localhost:5173` | `https://app.staging.example.com` | `https://app.example.com` |
+| `EMAIL_VERIFY_URL` | (Use default) | (Use default) | (Use default) |
+| `EMAIL_VERIFY_REDIRECT_BASE` | (Use default) | (Use default) | (Use default) |
+
+*Note: Use `EMAIL_VERIFY_URL` if you want to bypass the API's one-click flow and send users directly to a frontend verification page.*
 
 # Debug
 AUTH_DEBUG_TOKENS           # true/false (returns tokens in responses)

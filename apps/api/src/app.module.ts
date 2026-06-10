@@ -32,6 +32,12 @@ import { ThrottlerGuard } from '@nestjs/throttler';
           .truthy('true')
           .falsy('false')
           .default(false),
+        SMTP_SERVICE: Joi.string().optional(),
+        SMTP_HOST: Joi.string().optional(),
+        SMTP_PORT: Joi.number().optional(),
+        SMTP_USER: Joi.string().optional(),
+        SMTP_PASSWORD: Joi.string().optional(),
+        SMTP_SECURE: Joi.boolean().truthy('true').falsy('false').default(false),
       }),
     }),
     ThrottlerModule.forRoot([

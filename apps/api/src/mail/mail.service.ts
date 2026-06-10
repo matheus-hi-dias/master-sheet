@@ -26,9 +26,7 @@ export class MailService {
     const host = this.config.get<string>('SMTP_HOST');
     const port = this.config.get<number>('SMTP_PORT');
     const user = this.config.get<string>('SMTP_USER');
-    const pass =
-      this.config.get<string>('SMTP_PASSWORD') ??
-      this.config.get<string>('SMTP_PASS');
+    const pass = this.config.get<string>('SMTP_PASSWORD');
 
     if (service && user && pass) {
       this.transporter = nodemailer.createTransport({
@@ -81,18 +79,21 @@ export class MailService {
   }
 
   async sendVerificationEmail(to: string, token: string) {
-    const template =
-      this.config.get<string>('EMAIL_VERIFY_URL') ||
+    const urlOne = this.config.get<string>('EMAIL_VERIFY_URL');
+    const RawUrl =
+      this.config.get<string>('EMAIL_VERIFY_REDIRECT_BASE') ||
       `${this.config.get<string>('APP_URL') ?? 'http://localhost:3000'}/auth/verify-email?token={{token}}`;
-    const url = template
-      .replace('{{token}}', encodeURIComponent(token))
-      .replace('{token}', encodeURIComponent(token));
+    const urlTwo = RawUrl.replace(
+      '{{token}}',
+      encodeURIComponent(token),
+    ).replace('{token}', encodeURIComponent(token));
 
     return this.sendMail({
       to,
       subject: 'Verify your email',
-      text: `Verify your email by visiting: ${url}`,
-      html: `<p>Verify your email by clicking <a href="${url}">here</a></p>`,
+      text: `Verify your email on Master Sheet`,
+      html: `<p>Verify your email by visiting our page ${urlOne} and pasting your token ${token}.<br/>
+      Or clicking <a href="${urlTwo}">here</a></p>`,
     });
   }
 
