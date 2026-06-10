@@ -13,9 +13,37 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.mastersheet.app",
+      "associatedDomains": [
+        "applinks:api.mastersheet.com",
+        "applinks:mastersheet.com"
+      ]
     },
     "android": {
+      "package": "com.mastersheet.app",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "api.mastersheet.com",
+              "pathPrefix": "/auth/verify-email"
+            },
+            {
+              "scheme": "https",
+              "host": "mastersheet.com",
+              "pathPrefix": "/email-verified"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ],
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
