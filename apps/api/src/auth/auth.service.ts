@@ -82,6 +82,11 @@ export class AuthService {
   }
 
   private get debugTokensEnabled() {
+    const isProduction =
+      this.config.get<string>('NODE_ENV') === 'production';
+    if (isProduction) {
+      return false;
+    }
     return this.config.get<boolean>('AUTH_DEBUG_TOKENS') ?? false;
   }
 
@@ -236,20 +241,42 @@ export class AuthService {
     const tokenHash = this.hashToken(refreshToken);
     const record = await this.prisma.refreshToken.findUnique({
       where: { tokenHash },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            emailVerified: true,
+          },
+        },
+      },
     });
 
-    if (
-      !record ||
-      record.revoked ||
-      record.jti !== payload.jti ||
-      record.expiresAt < new Date()
-    ) {
+    if (!record) {
       throw new UnauthorizedException('Invalid refresh token.');
     }
 
-    const user = await this.getUserSummary(record.userId);
+    if (record.revoked) {
+      await this.prisma.refreshToken.updateMany({
+        where: { userId: record.userId, revoked: false },
+        data: { revoked: true },
+      });
+      this.logger.warn(
+        `Refresh token reuse detected for userId: ${record.userId}. Revoking all active user sessions.`,
+      );
+      throw new UnauthorizedException('Invalid refresh token.');
+    }
 
-    return { record, user };
+    if (record.jti !== payload.jti || record.expiresAt < new Date()) {
+      throw new UnauthorizedException('Invalid refresh token.');
+    }
+
+    if (!record.user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return { record, user: record.user };
   }
 
   private async clearFailedLogins(userId: string) {

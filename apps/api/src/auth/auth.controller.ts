@@ -40,6 +40,35 @@ export class AuthController {
     return platform === 'mobile' ? 'mobile' : 'web';
   }
 
+  private sanitizeRedirectUrl(redirectUrl?: string): string {
+    const configuredBase =
+      this.config.get<string>('EMAIL_VERIFY_REDIRECT_BASE') ||
+      this.config.get<string>('FRONTEND_URL') ||
+      this.config.get<string>('APP_URL') ||
+      'http://localhost:3000';
+
+    if (!redirectUrl) {
+      return configuredBase;
+    }
+
+    if (redirectUrl.startsWith('/') && !redirectUrl.startsWith('//')) {
+      return `${configuredBase.replace(/\/$/, '')}${redirectUrl}`;
+    }
+
+    try {
+      const targetUrl = new URL(redirectUrl);
+      const allowedUrl = new URL(configuredBase);
+
+      if (targetUrl.origin === allowedUrl.origin) {
+        return redirectUrl;
+      }
+    } catch {
+      // Invalid URL format
+    }
+
+    return configuredBase;
+  }
+
   @Post('register')
   @ApiOperation({ summary: 'Registra um novo usuário no sistema.' })
   @ApiResponse({ status: 201, description: 'Usuário registrado com sucesso.' })
@@ -162,14 +191,10 @@ export class AuthController {
     @Query('redirect') redirect?: string,
   ) {
     const wantsJson = request.accepts(['json', 'html']) === 'json';
-    const redirectBase =
-      redirect ||
-      this.config.get<string>('EMAIL_VERIFY_REDIRECT_BASE') ||
-      this.config.get<string>('FRONTEND_URL') ||
-      this.config.get<string>('APP_URL') ||
-      'http://localhost:3000';
-
-    const target = `${redirectBase.replace(/\/$/, '')}/email-verified`;
+    const redirectBase = this.sanitizeRedirectUrl(redirect);
+    const target = redirectBase.endsWith('/email-verified')
+      ? redirectBase
+      : `${redirectBase.replace(/\/$/, '')}/email-verified`;
 
     const respond = (status: 'success' | 'expired' | 'invalid') => {
       if (wantsJson) {

@@ -217,6 +217,12 @@ describe('AuthService', () => {
       revoked: false,
       jti: 'refresh-jti-1',
       expiresAt: new Date(Date.now() + 60_000),
+      user: {
+        id: baseUser.id,
+        email: baseUser.email,
+        name: baseUser.name,
+        emailVerified: true,
+      },
     });
     prismaMock.refreshToken.update.mockResolvedValue({});
     prismaMock.refreshToken.updateMany.mockResolvedValue({ count: 1 });
@@ -394,5 +400,41 @@ describe('AuthService', () => {
         {},
       ),
     ).rejects.toThrow('Account temporarily locked.');
+  });
+
+  it('revokes all user sessions when a revoked refresh token reuse is detected', async () => {
+    jwtServiceMock.verifyAsync.mockResolvedValue({
+      sub: baseUser.id,
+      email: baseUser.email,
+      typ: 'refresh',
+      jti: 'reused-jti',
+    });
+    prismaMock.refreshToken.findUnique.mockResolvedValue({
+      id: 'revoked-record-id',
+      userId: baseUser.id,
+      revoked: true,
+      jti: 'reused-jti',
+      expiresAt: new Date(Date.now() + 60_000),
+      user: {
+        id: baseUser.id,
+        email: baseUser.email,
+        name: baseUser.name,
+        emailVerified: true,
+      },
+    });
+    prismaMock.refreshToken.updateMany.mockResolvedValue({ count: 2 });
+
+    await expect(
+      service.refresh(
+        { refreshToken: 'revoked-token-value' },
+        'web',
+        {},
+      ),
+    ).rejects.toThrow(UnauthorizedException);
+
+    expect(prismaMock.refreshToken.updateMany).toHaveBeenCalledWith({
+      where: { userId: baseUser.id, revoked: false },
+      data: { revoked: true },
+    });
   });
 });
