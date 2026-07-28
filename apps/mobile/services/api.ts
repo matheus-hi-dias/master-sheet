@@ -6,14 +6,14 @@ export const api = axios.create({
 });
 
 api.interceptors.request.use(
-  async (config) => {
+  async config => {
     const token = await SecureStore.getItemAsync('master-sheet-jwt');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => {
+  error => {
     return Promise.reject(error);
-  }
+  },
 );

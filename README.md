@@ -24,6 +24,40 @@ This Turborepo includes the following packages/apps:
 
 Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
 
+## Auth Contract
+
+The auth flow is shared across the API, web app, and mobile app with the following rules:
+
+- Access tokens are short-lived and stay in memory only.
+- Refresh tokens are rotated on use and revoked on logout.
+- The web app stores the refresh token in an HttpOnly, Secure, SameSite cookie.
+- The mobile app stores the refresh token in secure device storage and restores sessions on bootstrap when the refresh token is still valid.
+- Email verification and password reset links are issued by the API; in development, the mail layer falls back to logging when SMTP is not configured.
+- The API rejects expired, revoked, or replayed tokens and applies temporary lockout after repeated failed logins.
+
+### One-click Email Verification
+
+The system supports a one-click verification flow where the user clicks a link in their email and is automatically verified and redirected to the appropriate landing page.
+
+#### Configuration
+
+- `EMAIL_VERIFY_URL`: The full URL template used in verification emails.
+  - **One-click (Default)**: `${API_URL}/auth/verify-email?token={{token}}`
+  - **Frontend-mediated**: `${FRONTEND_URL}/email-verify?token={{token}}`
+- `EMAIL_VERIFY_REDIRECT_BASE`: The base URL where the API redirects the user after verification. Defaults to `FRONTEND_URL` or `APP_URL`.
+- `APP_URL`: The base URL of the API.
+- `FRONTEND_URL`: The base URL of the web application.
+
+#### Redirect Behavior
+
+When a user hits `GET /auth/verify-email?token=...`, the API processes the token and redirects to:
+`${EMAIL_VERIFY_REDIRECT_BASE}/email-verified?status=<status>&message=<optional-message>`
+
+**Status values:**
+- `success`: Email verified successfully.
+- `expired`: Token has expired (24h TTL).
+- `invalid`: Token is invalid, already used, or not found.
+
 ### Utilities
 
 This Turborepo has some additional tools already setup for you:
