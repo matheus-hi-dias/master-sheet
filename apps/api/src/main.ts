@@ -51,6 +51,7 @@ async function bootstrap() {
     .split(',')
     .map((origin) => origin.trim())
     .filter(Boolean);
+  console.log('CORS origins:', origins);
 
   app.enableCors({
     origin: (
@@ -61,7 +62,7 @@ async function bootstrap() {
         callback(null, true);
         return;
       }
-
+      console.log(`CORS origin not allowed: ${origin}`);
       callback(new Error('CORS origin not allowed'));
     },
     credentials: true,

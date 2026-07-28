@@ -442,7 +442,7 @@ JWT_ACCESS_EXPIRES_IN       # Seconds (default: 900 = 15m)
 JWT_REFRESH_EXPIRES_IN      # Seconds (default: 604800 = 7d)
 
 # Email
-SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM
+SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_FROM
 
 # URLs
 APP_URL                     # http://localhost:3000

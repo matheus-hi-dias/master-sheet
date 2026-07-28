@@ -1,7 +1,22 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { useRouter, useSegments } from 'expo-router';
-import { jwtDecode } from 'jwt-decode';
+function jwtDecode<T = any>(token: string): T {
+  try {
+    const base64Url = token.split('.')[1];
+    if (!base64Url) return {} as T;
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  } catch {
+    return {} as T;
+  }
+}
 
 interface AuthContextType {
   isAuthenticated: boolean;
