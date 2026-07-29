@@ -18,6 +18,7 @@ import {
 import type { Request, Response } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service';
+import { Throttle } from '@nestjs/throttler';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
@@ -70,6 +71,7 @@ export class AuthController {
   }
 
   @Post('register')
+  @Throttle({ strictAuth: { limit: 3, ttl: 60000 } })
   @ApiOperation({ summary: 'Registra um novo usuário no sistema.' })
   @ApiResponse({ status: 201, description: 'Usuário registrado com sucesso.' })
   @ApiResponse({ status: 409, description: 'E-mail indisponível.' })
@@ -85,6 +87,7 @@ export class AuthController {
   }
 
   @Post('login')
+  @Throttle({ strictAuth: { limit: 5, ttl: 60000 } })
   @ApiOperation({ summary: 'Autentica o usuário e retorna o token JWT.' })
   @ApiResponse({ status: 201, description: 'Login feito com sucesso.' })
   @ApiResponse({ status: 401, description: 'Credenciais inválidas.' })
@@ -115,6 +118,7 @@ export class AuthController {
   }
 
   @Post('refresh')
+  @Throttle({ tokenRefresh: { limit: 60, ttl: 60000 } })
   @ApiOperation({
     summary: 'Rotaciona o refresh token e retorna um novo access token.',
   })
@@ -153,6 +157,7 @@ export class AuthController {
   }
 
   @Post('logout')
+  @Throttle({ strictAuth: { limit: 30, ttl: 60000 } })
   @ApiOperation({ summary: 'Revoga a sessão atual do usuário.' })
   @ApiResponse({ status: 200, description: 'Sessão encerrada com sucesso.' })
   async logout(
@@ -175,12 +180,14 @@ export class AuthController {
   }
 
   @Post('verify-email')
+  @Throttle({ strictAuth: { limit: 5, ttl: 60000 } })
   @ApiOperation({ summary: 'Valida o token de verificação de e-mail.' })
   async verifyEmail(@Body() dto: VerifyEmailDto) {
     return this.authService.verifyEmail(dto);
   }
 
   @Get('verify-email')
+  @Throttle({ strictAuth: { limit: 5, ttl: 60000 } })
   @ApiOperation({
     summary: 'Verifica o e-mail por link e redireciona para a UI.',
   })
@@ -223,6 +230,7 @@ export class AuthController {
   }
 
   @Post('password-reset/request')
+  @Throttle({ passwordReset: { limit: 3, ttl: 3600000 } })
   @ApiOperation({ summary: 'Gera um token de redefinição de senha.' })
   async requestPasswordReset(@Body() dto: RequestPasswordResetDto) {
     return this.authService.requestPasswordReset(dto);

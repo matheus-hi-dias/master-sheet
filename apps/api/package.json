@@ -31,7 +31,6 @@
     "@prisma/adapter-pg": "^7.4.2",
     "@prisma/client": "^7.4.2",
     "bcrypt": "^6.0.0",
-    "express-rate-limit": "^6.7.0",
     "helmet": "^8.1.0",
     "joi": "^18.0.2",
     "nodemailer": "^6.9.4",
