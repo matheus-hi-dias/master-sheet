@@ -2,7 +2,6 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import helmet from 'helmet';
-import rateLimit from 'express-rate-limit';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import type { NextFunction, Request, Response } from 'express';
 
@@ -71,62 +70,6 @@ async function bootstrap() {
   });
 
   app.use(helmet());
-  // Per-route rate limiters for sensitive auth endpoints
-  const loginLimiter = rateLimit({
-    windowMs: 60 * 1000, // 1 minute
-    max: 5,
-    standardHeaders: true,
-    legacyHeaders: false,
-    message: 'Too many login attempts, please try again later.',
-  });
-
-  const registerLimiter = rateLimit({
-    windowMs: 60 * 1000,
-    max: 3,
-    standardHeaders: true,
-    legacyHeaders: false,
-    message: 'Too many registration attempts, please try again later.',
-  });
-
-  const refreshLimiter = rateLimit({
-    windowMs: 60 * 1000,
-    max: 60,
-    standardHeaders: true,
-    legacyHeaders: false,
-    message: 'Too many token refresh attempts, please try again later.',
-  });
-
-  const logoutLimiter = rateLimit({
-    windowMs: 60 * 1000,
-    max: 30,
-    standardHeaders: true,
-    legacyHeaders: false,
-    message: 'Too many logout attempts, please try again later.',
-  });
-
-  const verifyEmailLimiter = rateLimit({
-    windowMs: 60 * 1000,
-    max: 5,
-    standardHeaders: true,
-    legacyHeaders: false,
-    message: 'Too many verification attempts, please try again later.',
-  });
-
-  const passwordResetRequestLimiter = rateLimit({
-    windowMs: 60 * 60 * 1000, // 1 hour
-    max: 3,
-    standardHeaders: true,
-    legacyHeaders: false,
-    message: 'Too many password reset requests, please try again later.',
-  });
-
-  // Mount limiters on specific auth routes
-  app.use('/auth/login', loginLimiter);
-  app.use('/auth/register', registerLimiter);
-  app.use('/auth/refresh', refreshLimiter);
-  app.use('/auth/logout', logoutLimiter);
-  app.use('/auth/verify-email', verifyEmailLimiter);
-  app.use('/auth/password-reset/request', passwordResetRequestLimiter);
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

@@ -41,8 +41,24 @@ import { APP_GUARD } from '@nestjs/core';
     }),
     ThrottlerModule.forRoot([
       {
+        name: 'default',
         ttl: 60_000,
         limit: 120,
+      },
+      {
+        name: 'strictAuth',
+        ttl: 60_000,
+        limit: 5,
+      },
+      {
+        name: 'passwordReset',
+        ttl: 3_600_000,
+        limit: 3,
+      },
+      {
+        name: 'tokenRefresh',
+        ttl: 60_000,
+        limit: 60,
       },
     ]),
     AuthModule,
