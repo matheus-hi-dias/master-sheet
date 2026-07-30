@@ -44,7 +44,7 @@ export function Login() {
         const d = data as LoginFormData;
         await loginFn(d.email, d.password);
         toast.success('Bem-vindo de volta, Herói!');
-        navigate('/dashboard');
+        navigate('/fichas');
       } else {
         const d = data as RegisterFormData;
         await api.auth.register({
@@ -55,7 +55,7 @@ export function Login() {
         // after register, attempt login
         await loginFn(d.email, d.password);
         toast.success('Conta criada com sucesso! Redirecionando...');
-        navigate('/dashboard');
+        navigate('/fichas');
       }
     } catch (err: any) {
       toast.error(err?.message || 'Erro ao processar requisição');
