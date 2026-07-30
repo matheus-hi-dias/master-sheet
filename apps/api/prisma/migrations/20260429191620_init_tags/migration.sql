@@ -9,24 +9,26 @@ CREATE TABLE "Tag" (
 -- CreateTable
 CREATE TABLE "_SheetToTag" (
     "A" TEXT NOT NULL,
-    "B" TEXT NOT NULL,
-
-    CONSTRAINT "_SheetToTag_AB_pkey" PRIMARY KEY ("A","B")
+    "B" TEXT NOT NULL
 );
 
 -- CreateTable
 CREATE TABLE "_TagToTemplate" (
     "A" TEXT NOT NULL,
-    "B" TEXT NOT NULL,
-
-    CONSTRAINT "_TagToTemplate_AB_pkey" PRIMARY KEY ("A","B")
+    "B" TEXT NOT NULL
 );
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Tag_name_key" ON "Tag"("name");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "_SheetToTag_AB_unique" ON "_SheetToTag"("A", "B");
+
+-- CreateIndex
 CREATE INDEX "_SheetToTag_B_index" ON "_SheetToTag"("B");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "_TagToTemplate_AB_unique" ON "_TagToTemplate"("A", "B");
 
 -- CreateIndex
 CREATE INDEX "_TagToTemplate_B_index" ON "_TagToTemplate"("B");

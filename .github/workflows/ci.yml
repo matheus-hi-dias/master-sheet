@@ -30,30 +30,17 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Lint all packages
-        run: pnpm lint || pnpm run lint
-        continue-on-error: false
+      - name: Lint all packages (turbo)
+        run: pnpm turbo run lint
 
-      - name: Run tests
-        run: pnpm test || pnpm run test
-        continue-on-error: false
+      - name: Run tests (turbo)
+        run: pnpm turbo run test
 
-      - name: Build all packages
-        run: pnpm build || pnpm run build
-        continue-on-error: false
+      - name: Build all packages (turbo)
+        run: pnpm turbo run build
 
-      - name: Audit dependencies
-        run: pnpm audit --audit-level=high || true
-
-      - name: Upload build artifacts
-        if: success()
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-artifacts
-          path: |
-            apps/**/dist
-            packages/**/dist
-            web/dist
+      - name: Check types (turbo)
+        run: pnpm turbo run check-types
 
   codeql:
     name: Analyze (CodeQL)
@@ -65,7 +52,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [ 'javascript', 'typescript' ]
+        language: ['javascript', 'typescript']
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

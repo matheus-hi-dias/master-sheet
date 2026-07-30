@@ -13,9 +13,12 @@ import { fetchApi } from '../../../lib/api';
 import {
   loginSchema,
   registerSchema,
+  passwordRulesText,
   type LoginFormData,
   type RegisterFormData,
 } from '../schemas/authSchema';
+import { api } from '../../../services/api';
+import { PasswordStrengthMeter } from '../components/PasswordStrengthMeter';
 
 export function Login() {
   const [tab, setTab] = useState<'login' | 'register'>('login');
@@ -26,57 +29,36 @@ export function Login() {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
     reset,
   } = useForm<LoginFormData | RegisterFormData>({
     resolver: zodResolver(tab === 'login' ? loginSchema : registerSchema),
   });
 
+  const passwordValue = String(watch('password') ?? '');
+
   const onSubmit = async (data: LoginFormData | RegisterFormData) => {
-    setIsLoading(true);
     try {
       if (tab === 'login') {
-        const payload = data as LoginFormData;
-        const res = await fetchApi('/auth/login', {
-          method: 'POST',
-          body: JSON.stringify({
-            email: payload.email,
-            password: payload.password,
-          }),
-        });
-        
-        loginFn(res.access_token, res.user);
+        const d = data as LoginFormData;
+        await loginFn(d.email, d.password);
         toast.success('Bem-vindo de volta, Herói!');
-        navigate('/fichas');
+        navigate('/dashboard');
       } else {
-        const payload = data as RegisterFormData;
-        // First register
-        await fetchApi('/auth/register', {
-          method: 'POST',
-          body: JSON.stringify({
-            name: payload.name,
-            email: payload.email,
-            password: payload.password,
-          }),
+        const d = data as RegisterFormData;
+        await api.auth.register({
+          name: d.name,
+          email: d.email,
+          password: d.password,
         });
-        
-        // Then auto-login
-        const res = await fetchApi('/auth/login', {
-          method: 'POST',
-          body: JSON.stringify({
-            email: payload.email,
-            password: payload.password,
-          }),
-        });
-        
-        loginFn(res.access_token, res.user);
+        // after register, attempt login
+        await loginFn(d.email, d.password);
         toast.success('Conta criada com sucesso! Redirecionando...');
-        navigate('/fichas');
+        navigate('/dashboard');
       }
     } catch (err: any) {
-      toast.error(err.message || 'Erro na autenticação.');
-    } finally {
-      setIsLoading(false);
+      toast.error(err?.message || 'Erro ao processar requisição');
     }
   };
 
@@ -144,9 +126,14 @@ export function Login() {
             label="Senha"
             type="password"
             placeholder="••••••••"
+            tooltip={passwordRulesText}
             {...register('password')}
             error={errors.password?.message}
           />
+
+          {tab === 'register' && (
+            <PasswordStrengthMeter password={passwordValue} />
+          )}
 
           {tab === 'register' && (
             <Input
