@@ -4,7 +4,6 @@ services:
   db:
     image: postgres:15-alpine
     container_name: master_sheet_db
-    restart: always
     env_file:
       - .env
     environment:
