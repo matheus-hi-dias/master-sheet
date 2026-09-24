@@ -1,13 +1,17 @@
 schema: spec-driven
 
-# Project context (optional)
-# This is shown to AI when creating artifacts.
-# Add your tech stack, conventions, style guides, domain knowledge, etc.
-# Example:
-#   context: |
-#     Tech stack: TypeScript, React, Node.js
-#     We use conventional commits
-#     Domain: e-commerce platform
+# Project context, shown to AI when creating OpenSpec artifacts.
+context: |
+  Master-Sheet is an ultra-flexible multi-system RPG character sheet ecosystem (D&D 5e, Vampire V5, Tormenta 20, Call of Cthulhu 7e, custom homebrews) built as a Turborepo + pnpm monorepo:
+
+    - apps/api: NestJS 11 REST API, Prisma 7 + PostgreSQL, Passport-JWT auth, bcrypt, @nestjs/throttler, class-validator/transformer, Joi env validation.
+    - apps/web: React 19 + Vite 7 SPA, Tailwind CSS 4, React Query, React Hook Form + Zod, Zustand, React Router 7, lucide-react, sonner.
+    - apps/mobile: React Native + Expo 55, NativeWind, Expo Router, React Query, expo-secure-store.
+    - packages/: ui, eslint-config, typescript-config.
+
+  Core concept: a Template defines a dynamic JSON structure (tabs/sections/fields/formulas) that a Sheet instantiates, storing real values in JSON. Tags have dual scope (global Template tags vs private Sheet tags). All primary keys are UUID v4. pnpm is the only package manager; Conventional Commits are required.
+
+  Persistent capability specs live in openspec/specs/; product/UX docs live in docs/.
 
 # Per-artifact rules (optional)
 # Add custom rules for specific artifacts.
