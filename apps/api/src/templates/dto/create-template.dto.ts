@@ -1,11 +1,16 @@
 import {
-  IsString,
-  IsBoolean,
-  IsOptional,
-  IsObject,
   IsArray,
+  IsBoolean,
+  IsInt,
+  IsOptional,
+  IsString,
+  MaxLength,
+  Min,
+  ValidateNested,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { TemplateStructureDto } from './template-structure.dto';
 
 export class CreateTemplateDto {
   @ApiProperty({ example: 'D&D 5e Character Sheet' })
@@ -17,9 +22,25 @@ export class CreateTemplateDto {
   @IsOptional()
   description?: string;
 
-  @ApiProperty({ description: 'JSON structure of the template' })
-  @IsObject()
-  structure: Record<string, any>;
+  @ApiProperty({
+    description: 'Structured DSL describing tabs, sections and fields',
+    type: TemplateStructureDto,
+  })
+  @ValidateNested()
+  @Type(() => TemplateStructureDto)
+  structure: TemplateStructureDto;
+
+  @ApiPropertyOptional({ example: 'dnd5e', maxLength: 64 })
+  @IsString()
+  @MaxLength(64)
+  @IsOptional()
+  system?: string;
+
+  @ApiPropertyOptional({ example: 1, minimum: 1 })
+  @IsInt()
+  @Min(1)
+  @IsOptional()
+  version?: number;
 
   @ApiPropertyOptional({ default: false })
   @IsBoolean()
