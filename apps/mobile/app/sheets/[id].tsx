@@ -1,22 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   View,
   Text,
   ScrollView,
   Pressable,
   ActivityIndicator,
-  TextInput,
   Alert,
   KeyboardAvoidingView,
   Platform,
+  Modal,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { api } from '@/services/api';
-import { Dices, AlertTriangle } from 'lucide-react-native';
-
-const TABS = ['Atributos', 'Perícias', 'Equipamento', 'Anotações'];
+import { fetchTemplateDetail } from '@/services/templates';
+import { Dices, AlertTriangle, X } from 'lucide-react-native';
+import type { TemplateStructure } from '@/types/template';
+import { structureDefaultValues, toNumber } from '@/lib/defaults';
+import { evaluateFormula } from '@/lib/formula';
+import { DynamicSheetRenderer } from '@/components/sheet/DynamicSheetRenderer';
 
 interface SheetData {
   id: string;
@@ -24,8 +27,59 @@ interface SheetData {
   data: Record<string, any>;
   template?: {
     name: string;
-    structure?: any;
+    structure?: TemplateStructure;
   };
+}
+
+interface DiceAttribute {
+  id: string;
+  label: string;
+  value: number;
+}
+
+function collectDiceAttributes(
+  structure: TemplateStructure | undefined,
+  values: Record<string, unknown>,
+): DiceAttribute[] {
+  if (!structure) return [];
+
+  const attributes: DiceAttribute[] = [];
+  const numericTypes = new Set(['number', 'dots', 'checkbox']);
+
+  for (const tab of structure.tabs) {
+    for (const section of tab.sections) {
+      for (const field of section.fields) {
+        if (field.type === 'repeater') continue;
+
+        if (field.type === 'formula') {
+          try {
+            const context: Record<string, number> = {};
+            for (const dep of field.dependencies) {
+              context[dep] = toNumber(values[dep]);
+            }
+            attributes.push({
+              id: field.id,
+              label: field.label,
+              value: evaluateFormula(field.expression, context),
+            });
+          } catch {
+            // Formulas with unresolved dependencies are skipped.
+          }
+          continue;
+        }
+
+        if (numericTypes.has(field.type)) {
+          attributes.push({
+            id: field.id,
+            label: field.label,
+            value: toNumber(values[field.id]),
+          });
+        }
+      }
+    }
+  }
+
+  return attributes;
 }
 
 export default function SheetViewScreen() {
@@ -33,46 +87,38 @@ export default function SheetViewScreen() {
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  const [activeTab, setActiveTab] = useState('Atributos');
+  const [activeTabId, setActiveTabId] = useState<string | null>(null);
   const [localData, setLocalData] = useState<Record<string, any>>({});
   const [saveStatus, setSaveStatus] = useState<'saved' | 'saving'>('saved');
+  const [rollOpen, setRollOpen] = useState(false);
 
-  // Busca a ficha do banco ou simula se for mock local
   const isMock = typeof id === 'string' && id.startsWith('mock-');
 
   const {
     data: sheet,
     isLoading,
     isError,
+    refetch,
   } = useQuery<SheetData>({
     queryKey: ['sheet', id],
     queryFn: async () => {
       if (isMock) {
-        // Busca info do template para montar mock rico
         let tmplName = 'Sistema Customizado';
+        let structure: TemplateStructure | undefined;
+
         if (templateId) {
           try {
-            const res = await api.get(`/templates/${templateId}`);
-            tmplName = res.data.name;
-          } catch (e) {}
+            const detail = await fetchTemplateDetail(String(templateId));
+            tmplName = detail.name;
+            structure = detail.structure;
+          } catch {}
         }
+
         return {
           id: id as string,
           name: 'Personagem em Treinamento',
-          data: {
-            FOR: '14',
-            DES: '16',
-            CON: '13',
-            INT: '10',
-            SAB: '12',
-            CAR: '8',
-            HP: '24',
-            MP: '10',
-            Equipamento:
-              '• Espada Longa (1d8)\n• Cota de Malha\n• Mochila de Aventureiro',
-            Anotações: 'Iniciando a jornada nas cavernas do desespero...',
-          },
-          template: { name: tmplName },
+          data: {},
+          template: { name: tmplName, structure },
         };
       }
       const response = await api.get(`/sheets/${id}`);
@@ -80,12 +126,31 @@ export default function SheetViewScreen() {
     },
   });
 
+  const structure = sheet?.template?.structure;
+  const tabs = useMemo(() => structure?.tabs ?? [], [structure]);
+
   // Inicializa o estado local editável para optimistic UI
   useEffect(() => {
     if (sheet?.data) {
-      setLocalData(sheet.data);
+      const defaults = structure
+        ? structureDefaultValues(structure, sheet.data)
+        : sheet.data;
+      setLocalData(defaults);
+
+      const firstTab = structure?.tabs?.[0];
+      if (firstTab && activeTabId === null) {
+        setActiveTabId(firstTab.id);
+      }
     }
+    // A aba ativa é definida apenas quando o structure chega pela primeira vez.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sheet]);
+
+  useEffect(() => {
+    if (tabs.length > 0 && !tabs.some(tab => tab.id === activeTabId)) {
+      setActiveTabId(tabs[0].id);
+    }
+  }, [tabs, activeTabId]);
 
   // Mutação para Auto-save com Optimistic UI
   const updateSheetMutation = useMutation({
@@ -96,11 +161,9 @@ export default function SheetViewScreen() {
     },
     onMutate: async newData => {
       setSaveStatus('saving');
-      // Cancela queries ativas para não sobrescrever o optimistic
       await queryClient.cancelQueries({ queryKey: ['sheet', id] });
       const previousSheet = queryClient.getQueryData<SheetData>(['sheet', id]);
 
-      // Atualiza o cache otimista local
       if (previousSheet) {
         queryClient.setQueryData(['sheet', id], {
           ...previousSheet,
@@ -114,7 +177,6 @@ export default function SheetViewScreen() {
     },
     onError: (err, newData, context) => {
       setSaveStatus('saved');
-      // Rola de volta em caso de erro
       if (context?.previousSheet) {
         queryClient.setQueryData(['sheet', id], context.previousSheet);
       }
@@ -125,31 +187,33 @@ export default function SheetViewScreen() {
     },
   });
 
-  // Manipulador genérico de alteração de campo com debounce simples / disparo imediato
-  const handleFieldChange = (key: string, value: string) => {
+  const handleFieldChange = (key: string, value: any) => {
     const updated = { ...localData, [key]: value };
     setLocalData(updated);
     updateSheetMutation.mutate(updated);
   };
 
-  // Rolagem rápida via FAB
-  const handleQuickRoll = () => {
+  const diceAttributes = useMemo(
+    () => collectDiceAttributes(structure, localData),
+    [structure, localData],
+  );
+
+  const handleRoll = (attribute: DiceAttribute) => {
+    setRollOpen(false);
     const d20 = Math.floor(Math.random() * 20) + 1;
-    let modifier = 0;
-    // Tenta extrair modificador baseado na aba ou atributo
-    const forVal = parseInt(localData.FOR || '10', 10);
-    modifier = Math.floor((forVal - 10) / 2);
-    const total = d20 + modifier;
+    const total = d20 + attribute.value;
 
     Alert.alert(
-      '🎲 Rolagem Rápida (d20)',
-      `Resultado do Dado: ${d20}\nModificador (FOR): ${modifier >= 0 ? '+' : ''}${modifier}\n\n✦ Total: ${total}`,
+      '🎲 Teste de Atributo',
+      `${attribute.label} (mod ${attribute.value >= 0 ? '+' : ''}${attribute.value})\n\nDado: ${d20}\n✦ Total: ${total}`,
       [{ text: 'Incrível!' }],
     );
   };
 
   const sheetName = sheet?.name || localData?.name || 'Ficha do Aventureiro';
   const systemName = sheet?.template?.name || 'Sistema Dinâmico';
+
+  const activeTab = tabs.find(tab => tab.id === activeTabId);
 
   return (
     <SafeAreaView edges={['top']} className="flex-1 bg-bg-app">
@@ -159,10 +223,7 @@ export default function SheetViewScreen() {
       >
         {/* Cabeçalho */}
         <View className="px-4 pt-3 pb-3 bg-bg-panel border-b border-border flex-row items-center justify-between">
-          <Pressable
-            onPress={() => router.back()}
-            className="p-2 -ml-2 active:opacity-60"
-          >
+          <Pressable onPress={() => router.back()} className="p-2 -ml-2 active:opacity-60">
             <Text className="text-gold font-bold text-base">◀ Voltar</Text>
           </Pressable>
 
@@ -182,37 +243,6 @@ export default function SheetViewScreen() {
           </View>
         </View>
 
-        {/* Abas Deslizáveis / Segmentadas */}
-        <View className="bg-bg-panel/50 border-b border-border">
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ paddingHorizontal: 12 }}
-          >
-            {TABS.map(tab => {
-              const isActive = activeTab === tab;
-              return (
-                <Pressable
-                  key={tab}
-                  onPress={() => setActiveTab(tab)}
-                  className={`py-3 px-4 border-b-2 transition-all ${
-                    isActive ? 'border-gold' : 'border-transparent'
-                  }`}
-                >
-                  <Text
-                    className={`text-xs font-bold uppercase tracking-wider ${
-                      isActive ? 'text-gold' : 'text-text-muted'
-                    }`}
-                  >
-                    {tab}
-                  </Text>
-                </Pressable>
-              );
-            })}
-          </ScrollView>
-        </View>
-
-        {/* Conteúdo Dinâmico da Aba */}
         {isLoading ? (
           <View className="flex-1 items-center justify-center">
             <ActivityIndicator size="large" color="#D4AF37" />
@@ -223,127 +253,136 @@ export default function SheetViewScreen() {
             <Text className="font-display font-bold text-base text-danger text-center">
               Ficha Inacessível
             </Text>
+            <Pressable
+              onPress={() => refetch()}
+              className="mt-4 border border-gold px-4 py-2 rounded-card"
+            >
+              <Text className="text-gold text-xs font-bold uppercase tracking-widest">
+                Tentar novamente
+              </Text>
+            </Pressable>
+          </View>
+        ) : tabs.length === 0 ? (
+          <View className="flex-1 items-center justify-center p-6">
+            <AlertTriangle size={40} color="#D4AF37" className="mb-3" />
+            <Text className="font-display font-bold text-base text-text-main text-center mb-1">
+              Modelo sem estrutura
+            </Text>
+            <Text className="text-xs text-text-muted text-center">
+              O template desta ficha ainda não possui abas configuradas.
+            </Text>
           </View>
         ) : (
-          <ScrollView
-            contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
-          >
-            {activeTab === 'Atributos' && (
-              <View className="gap-4">
-                <Text className="text-[10px] font-bold text-gold uppercase tracking-widest mb-1 border-b border-border pb-1">
-                  ✦ Atributos Principais
-                </Text>
-                <View className="flex-row flex-wrap justify-between gap-y-4">
-                  {[
-                    { key: 'FOR', label: 'Força' },
-                    { key: 'DES', label: 'Destreza' },
-                    { key: 'CON', label: 'Constituição' },
-                    { key: 'INT', label: 'Inteligência' },
-                    { key: 'SAB', label: 'Sabedoria' },
-                    { key: 'CAR', label: 'Carisma' },
-                  ].map(attr => (
-                    <View
-                      key={attr.key}
-                      className="w-[48%] bg-bg-card border border-border rounded-card p-3"
+          <>
+            {/* Abas Deslizáveis do template */}
+            <View className="bg-bg-panel/50 border-b border-border">
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ paddingHorizontal: 12 }}
+              >
+                {tabs.map(tab => {
+                  const isActive = tab.id === activeTabId;
+                  return (
+                    <Pressable
+                      key={tab.id}
+                      onPress={() => setActiveTabId(tab.id)}
+                      className={`py-3 px-4 border-b-2 transition-all ${
+                        isActive ? 'border-gold' : 'border-transparent'
+                      }`}
                     >
-                      <Text className="text-[10px] text-text-muted font-bold uppercase tracking-wider mb-1.5 text-center">
-                        {attr.label}
+                      <Text
+                        className={`text-xs font-bold uppercase tracking-wider ${
+                          isActive ? 'text-gold' : 'text-text-muted'
+                        }`}
+                      >
+                        {tab.label}
                       </Text>
-                      <TextInput
-                        value={localData[attr.key] || ''}
-                        onChangeText={val => handleFieldChange(attr.key, val)}
-                        keyboardType="numeric"
-                        maxLength={3}
-                        className="font-display font-bold text-xl text-center text-gold py-1 bg-bg-panel/50 rounded border border-border/50"
-                      />
-                    </View>
-                  ))}
-                </View>
+                    </Pressable>
+                  );
+                })}
+              </ScrollView>
+            </View>
 
-                <Text className="text-[10px] font-bold text-gold uppercase tracking-widest mt-4 mb-1 border-b border-border pb-1">
-                  ✦ Recursos
-                </Text>
-                <View className="flex-row justify-between">
-                  <View className="w-[48%] bg-bg-card border border-border rounded-card p-3">
-                    <Text className="text-[10px] text-danger font-bold uppercase tracking-wider mb-1.5 text-center">
-                      Pontos de Vida (HP)
-                    </Text>
-                    <TextInput
-                      value={localData.HP || ''}
-                      onChangeText={val => handleFieldChange('HP', val)}
-                      keyboardType="numeric"
-                      className="font-display font-bold text-lg text-center text-text-main py-1 bg-bg-panel/50 rounded"
-                    />
-                  </View>
-                  <View className="w-[48%] bg-bg-card border border-border rounded-card p-3">
-                    <Text className="text-[10px] text-[#3498db] font-bold uppercase tracking-wider mb-1.5 text-center">
-                      Pontos de Mana (MP)
-                    </Text>
-                    <TextInput
-                      value={localData.MP || ''}
-                      onChangeText={val => handleFieldChange('MP', val)}
-                      keyboardType="numeric"
-                      className="font-display font-bold text-lg text-center text-text-main py-1 bg-bg-panel/50 rounded"
-                    />
-                  </View>
-                </View>
-              </View>
-            )}
-
-            {activeTab === 'Perícias' && (
-              <View className="bg-bg-card border border-border rounded-card p-4">
-                <Text className="text-xs text-text-muted italic text-center py-8">
-                  Nenhuma perícia mapeada para este nível ainda. Use atalhos de
-                  rolagens com os atributos principais.
-                </Text>
-              </View>
-            )}
-
-            {activeTab === 'Equipamento' && (
-              <View className="gap-2">
-                <Text className="text-[10px] font-bold text-gold uppercase tracking-widest mb-1 border-b border-border pb-1">
-                  ✦ Inventário e Carga
-                </Text>
-                <TextInput
-                  multiline
-                  numberOfLines={8}
-                  textAlignVertical="top"
-                  value={localData.Equipamento || ''}
-                  onChangeText={val => handleFieldChange('Equipamento', val)}
-                  placeholder="Liste suas armas, armaduras e itens..."
-                  placeholderTextColor="#888888"
-                  className="bg-bg-card border border-border rounded-card p-3 text-text-main font-body min-h-[160px] text-xs leading-relaxed"
+            <ScrollView
+              contentContainerStyle={{ padding: 16, paddingBottom: 110 }}
+              showsVerticalScrollIndicator={false}
+            >
+              {activeTab ? (
+                <DynamicSheetRenderer
+                  tab={activeTab}
+                  values={localData}
+                  onChange={handleFieldChange}
                 />
-              </View>
-            )}
-
-            {activeTab === 'Anotações' && (
-              <View className="gap-2">
-                <Text className="text-[10px] font-bold text-gold uppercase tracking-widest mb-1 border-b border-border pb-1">
-                  ✦ Diário de Campanha
-                </Text>
-                <TextInput
-                  multiline
-                  numberOfLines={10}
-                  textAlignVertical="top"
-                  value={localData.Anotações || ''}
-                  onChangeText={val => handleFieldChange('Anotações', val)}
-                  placeholder="Escreva segredos, missões e pistas..."
-                  placeholderTextColor="#888888"
-                  className="bg-bg-card border border-border rounded-card p-3 text-text-main font-body min-h-[220px] text-xs leading-relaxed"
-                />
-              </View>
-            )}
-          </ScrollView>
+              ) : null}
+            </ScrollView>
+          </>
         )}
 
-        {/* Floating Action Button (FAB) Global */}
-        <Pressable
-          onPress={handleQuickRoll}
-          className="absolute bottom-6 right-6 w-16 h-16 rounded-full bg-gold items-center justify-center shadow-card border-2 border-gold-dim active:scale-95 transition-all"
+        {/* Floating Action Button (FAB) Rolagem Contextual */}
+        {tabs.length > 0 && diceAttributes.length > 0 && (
+          <Pressable
+            onPress={() => setRollOpen(true)}
+            className="absolute bottom-6 right-6 w-16 h-16 rounded-full bg-gold items-center justify-center shadow-card border-2 border-gold-dim active:scale-95 transition-all"
+          >
+            <Dices size={28} color="#121212" />
+          </Pressable>
+        )}
+
+        {/* Modal contextual de atributos */}
+        <Modal
+          visible={rollOpen}
+          transparent
+          animationType="slide"
+          onRequestClose={() => setRollOpen(false)}
         >
-          <Dices size={28} color="#121212" />
-        </Pressable>
+          <View className="flex-1 justify-end bg-black/60">
+            <Pressable
+              className="absolute inset-0"
+              onPress={() => setRollOpen(false)}
+            />
+            <View className="bg-bg-panel border-t border-border rounded-t-3xl max-h-[70%]">
+              <View className="items-center py-2.5">
+                <View className="w-10 h-1 rounded-full bg-border" />
+              </View>
+              <View className="flex-row items-center px-5 pb-3">
+                <Dices size={16} color="#D4AF37" />
+                <Text className="ml-2 font-display font-bold text-sm text-text-main uppercase tracking-widest">
+                  Roletar Atributo
+                </Text>
+                <Pressable
+                  onPress={() => setRollOpen(false)}
+                  className="ml-auto p-1"
+                  hitSlop={8}
+                >
+                  <X size={18} color="#888888" />
+                </Pressable>
+              </View>
+
+              <ScrollView
+                contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 28, gap: 8 }}
+              >
+                {diceAttributes.map(attribute => (
+                  <Pressable
+                    key={attribute.id}
+                    onPress={() => handleRoll(attribute)}
+                    className="bg-bg-card border border-border rounded-card px-4 py-3 flex-row items-center active:border-gold/60"
+                  >
+                    <Text className="text-sm font-bold text-text-main flex-1">
+                      {attribute.label}
+                    </Text>
+                    <View className="bg-gold/10 border border-gold/30 px-2.5 py-1 rounded-full">
+                      <Text className="text-[11px] text-gold font-bold tabular-nums">
+                        {attribute.value >= 0 ? '+' : ''}
+                        {attribute.value}
+                      </Text>
+                    </View>
+                  </Pressable>
+                ))}
+              </ScrollView>
+            </View>
+          </View>
+        </Modal>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
