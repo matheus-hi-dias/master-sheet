@@ -9,7 +9,6 @@ import { GemLogo } from '../../../components/ui/GemLogo';
 import { Input } from '../../../components/ui/Input';
 import { Button } from '../../../components/ui/Button';
 import { useAuthStore } from '../../../store/useAuthStore';
-import { fetchApi } from '../../../lib/api';
 import {
   loginSchema,
   registerSchema,
@@ -39,6 +38,7 @@ export function Login() {
   const passwordValue = String(watch('password') ?? '');
 
   const onSubmit = async (data: LoginFormData | RegisterFormData) => {
+    setIsLoading(true);
     try {
       if (tab === 'login') {
         const d = data as LoginFormData;
@@ -57,8 +57,14 @@ export function Login() {
         toast.success('Conta criada com sucesso! Redirecionando...');
         navigate('/fichas');
       }
-    } catch (err: any) {
-      toast.error(err?.message || 'Erro ao processar requisição');
+    } catch (err: unknown) {
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : 'Erro ao processar requisição',
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 

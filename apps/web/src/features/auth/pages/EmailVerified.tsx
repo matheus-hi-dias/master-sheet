@@ -30,7 +30,7 @@ export function EmailVerified() {
     try {
       await api.auth.resendVerification({ email: email.trim() });
       toast.success('Link de verificação reenviado!');
-    } catch (e) {
+    } catch {
       toast.error('Erro ao reenviar o link');
     }
   };
