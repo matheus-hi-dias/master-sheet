@@ -55,6 +55,8 @@ function RootLayoutNav() {
             <Stack.Screen name="(tabs)" options={{ gestureEnabled: false }} />
 
             <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+
+            <Stack.Screen name="builder" options={{ animation: 'slide_from_right' }} />
           </Stack>
         </ThemeProvider>
       </AuthProvider>
