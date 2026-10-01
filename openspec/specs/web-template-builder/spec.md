@@ -1,5 +1,8 @@
-## ADDED Requirements
+# web-template-builder Specification
 
+## Purpose
+TBD - created by archiving change multi-system-rpg-template-engine. Update Purpose after archive.
+## Requirements
 ### Requirement: Tabbed Templates Discovery Hub
 The web application SHALL provide a tabbed Templates Hub allowing users to toggle between "Community Gallery" (public & official templates) and "My Templates" (user-created private & published templates) with debounced search, system filters, and dynamic tag filtering.
 
@@ -21,3 +24,19 @@ The web application SHALL provide a visual template builder with a two-pane layo
 #### Scenario: Raw JSON Import and Export
 - **WHEN** the user imports a valid template DSL JSON via the builder import modal
 - **THEN** the visual builder parses the JSON and populates all tabs, sections, and fields in the canvas and live preview
+
+### Requirement: Clarified Formula Authoring
+The web builder's field inspector SHALL make formula references legible: dependency chips SHALL display the field label together with its id, the expression SHALL be accompanied by an id→label readout, dependency candidates SHALL be limited to numeric field types, the field id SHALL be editable (with a generate-from-label action), and the inline preview SHALL evaluate the expression against the structure's seeded default values rather than an empty context.
+
+#### Scenario: Proofreading a Formula Expression
+- **WHEN** the user inserts one or more dependency chips into a formula expression
+- **THEN** the inspector renders a readout translating each id back to its field label so the expression is human-readable
+
+#### Scenario: Previewing a Formula With Seeded Values
+- **WHEN** the user is editing a valid formula expression
+- **THEN** the inspector shows the computed numeric result using the dependency values seeded from the structure defaults
+
+#### Scenario: Readable Dependency Chips
+- **WHEN** the user opens the dependency candidate list for a formula field
+- **THEN** only numeric-capable fields (`number`, `dots`, `checkbox`) are offered and each chip shows its label alongside its id
+

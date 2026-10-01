@@ -17,7 +17,8 @@ Master-Sheet is conceived as a multi-system RPG character sheet ecosystem, but c
   - Build the Dynamic Form Engine interpreting `Template.structure` with reactive formula recalculation.
   - Create the Visual Template Builder (`/templates/builder`) with a 2-pane UI (layout canvas + interactive live preview) and raw JSON import/export.
 - **Frontend Mobile (Expo + NativeWind):**
-  - Upgrade mobile templates gallery with search, system filters, and preview bottom sheets.
+  - Upgrade mobile templates gallery with search, system filters, preview bottom sheets, and a segmented scope toggle ("Explorar" vs "Meus modelos") fetching user-authored templates via `scope=mine`.
+  - Add a creator-lite Mobile Template Builder as a stack route (not a new tab): drill-down structure navigator (tabs → sections → fields) with chevron reorder, metadata editing, bottom-sheet field inspector (including formula deps + inline evaluation and repeater `itemSchema`), live preview reusing the dynamic sheet renderer, and persistence through the existing template API with inline validation.
   - Update sheet screen (`/sheets/[id]`) to dynamically render `template.structure.tabs`, supporting native steppers, touchable dot counters, and repeaters.
   - Implement a contextual dice roller floating action button (FAB) that populates attributes from the active sheet structure.
 
@@ -28,6 +29,7 @@ Master-Sheet is conceived as a multi-system RPG character sheet ecosystem, but c
 - `template-management`: Full template lifecycle, forking lineage, dependency-aware deletion protection, server-side pagination, search, and filtering.
 - `web-template-builder`: Visual drag/configure template builder with live preview and dynamic form mapping on Web.
 - `mobile-dynamic-sheets`: Dynamic native sheet rendering based on template structure and contextual dice roller on Mobile.
+- `mobile-template-builder`: Creator-lite mobile template builder with drill-down structure editing, bottom-sheet field configuration, and dynamic preview.
 
 ### Modified Capabilities
 <!-- None -->
@@ -41,4 +43,4 @@ Master-Sheet is conceived as a multi-system RPG character sheet ecosystem, but c
   - `DELETE /templates/:id` (dependency check with existing sheets).
   - `POST /templates` and `PATCH /templates/:id` (validated against the new DSL schema).
 - **Web App:** New route `/templates/builder`, new template detail drawer component, dynamic form mapper component, updated `TemplatesHub.tsx`.
-- **Mobile App:** Updated `app/(tabs)/templates.tsx`, overhauled `app/sheets/[id].tsx` from static D&D fields to dynamic tab/field rendering.
+- **Mobile App:** Updated `app/(tabs)/templates.tsx` (segmented "Explorar" vs "Meus modelos" scope, `scope=mine`), new builder stack route with bottom-sheet field config, preview modal, and inline validation, overhauled `app/sheets/[id].tsx` from static D&D fields to dynamic tab/field rendering.
