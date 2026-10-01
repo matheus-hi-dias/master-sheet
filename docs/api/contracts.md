@@ -35,6 +35,10 @@ Everything under `/templates` applies `JwtAuthGuard` at the controller level; ow
 | `PATCH`  | `/templates/:id`    | Update template (owner only).                         | `UpdateTemplateDto` / `OwnerGuard` |
 | `DELETE` | `/templates/:id`    | Delete template; returns `204` (owner only).          | `OwnerGuard`                  |
 
+### Structure Id Convention
+
+Field `id`s are the canonical reference for formula `expression` identifiers and `dependencies`, and are the keys persisted in `Sheet.data`. Builders generate human-readable, label-derived (slugified, deduplicated) ids for new fields and keep formula references in sync when a still-auto id changes; externally supplied ids are preserved. This is a client-side convention — the API validates ids only as `string` (dependencies must resolve to existing numeric fields, depth-1, acyclic).
+
 ## Sheets Module — Planned
 
 The `Sheet` model exists in `apps/api/prisma/schema.prisma`, but no controller/service is implemented yet. Planned surface (per `openspec/changes/multi-system-rpg-template-engine/` and screen docs):
