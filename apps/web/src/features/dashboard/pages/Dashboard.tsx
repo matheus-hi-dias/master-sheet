@@ -1,19 +1,17 @@
 import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../../../store/useAuthStore';
 import { Button } from '../../../components/ui/Button';
 import { PageHeader } from '../../../components/ui/PageHeader';
 
 import { FileText } from 'lucide-react';
 
 export function FichasPage() {
-  const user = useAuthStore(s => s.user);
   const navigate = useNavigate();
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 animate-fade-in">
       <PageHeader
         title="Fichas"
-        subtitle={`Bem-vindo(a) de volta, ${user?.name || 'Aventureiro'}! Suas fichas recentes estão aqui.`}
+        subtitle="Bem-vindo(a) de volta, Aventureiro! Suas fichas recentes estão aqui."
       />
 
       <div className="flex flex-col items-center justify-center py-20 text-center border border-dashed border-border rounded-card bg-bg-panel/50">

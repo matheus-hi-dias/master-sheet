@@ -7,14 +7,21 @@ import { LogOut, Sun, Moon, FileText, FolderOpen, Wrench } from 'lucide-react';
 const NAV_LINKS = [
   { id: '/fichas', icon: <FileText size={18} />, label: 'Fichas' },
   { id: '/templates', icon: <FolderOpen size={18} />, label: 'Modelos' },
-  { id: '/builder', icon: <Wrench size={18} />, label: 'Builder' },
+  { id: '/templates/builder', icon: <Wrench size={18} />, label: 'Builder' },
 ];
 
 export function Sidebar() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const { theme, setTheme } = useThemeStore();
-  const { user, logout } = useAuthStore();
+  const logout = useAuthStore(s => s.logout);
+
+  const activeMatch = NAV_LINKS.reduce<string | null>((best, link) => {
+    const matches =
+      pathname === link.id || pathname.startsWith(`${link.id}/`);
+    if (matches && link.id.length > (best?.length ?? 0)) return link.id;
+    return best;
+  }, null);
 
   const isSystemLight =
     typeof window !== 'undefined' &&
@@ -41,8 +48,8 @@ export function Sidebar() {
     navigate('/login');
   };
 
-  const userInitial = user?.name ? user.name.charAt(0).toUpperCase() : 'A';
-  const userName = user?.name || 'Aventureiro';
+  const userInitial = 'M';
+  const userName = 'Aventureiro';
 
   return (
     <nav className="hidden lg:flex flex-col fixed top-0 left-0 bottom-0 w-[220px] bg-bg-panel border-r border-border z-[100]">
@@ -67,7 +74,7 @@ export function Sidebar() {
               'flex items-center gap-2.5 px-3 py-2.5 rounded-card ' +
               'text-[13px] font-bold uppercase tracking-[0.05em] border transition-all duration-200 ' +
               'cursor-pointer ' +
-              (pathname.startsWith(l.id)
+              (activeMatch === l.id
                 ? 'text-gold bg-[rgba(212,175,55,0.08)] border-[rgba(212,175,55,0.2)]'
                 : 'text-text-muted border-transparent hover:text-text-main hover:bg-bg-card')
             }
@@ -89,7 +96,7 @@ export function Sidebar() {
               {userName}
             </p>
             <p className="text-[10px] text-text-muted uppercase tracking-[0.1em] truncate">
-              {user?.email || 'Player'}
+              Player
             </p>
           </div>
           <button
