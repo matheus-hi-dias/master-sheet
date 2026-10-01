@@ -82,8 +82,7 @@ export class AuthService {
   }
 
   private get debugTokensEnabled() {
-    const isProduction =
-      this.config.get<string>('NODE_ENV') === 'production';
+    const isProduction = this.config.get<string>('NODE_ENV') === 'production';
     if (isProduction) {
       return false;
     }

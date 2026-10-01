@@ -361,7 +361,7 @@ describe('AuthService', () => {
         ...data,
       });
     });
-    bcrypt.compare.mockResolvedValue(false as never);
+    (bcrypt.compare as jest.Mock).mockResolvedValue(false as never);
 
     for (let attempt = 0; attempt < 5; attempt += 1) {
       await expect(
@@ -388,7 +388,7 @@ describe('AuthService', () => {
       ...baseUser,
       lockoutUntil: new Date(Date.now() + 15 * 60 * 1000),
     });
-    bcrypt.compare.mockResolvedValue(true as never);
+    (bcrypt.compare as jest.Mock).mockResolvedValue(true as never);
 
     await expect(
       service.login(
@@ -425,11 +425,7 @@ describe('AuthService', () => {
     prismaMock.refreshToken.updateMany.mockResolvedValue({ count: 2 });
 
     await expect(
-      service.refresh(
-        { refreshToken: 'revoked-token-value' },
-        'web',
-        {},
-      ),
+      service.refresh({ refreshToken: 'revoked-token-value' }, 'web', {}),
     ).rejects.toThrow(UnauthorizedException);
 
     expect(prismaMock.refreshToken.updateMany).toHaveBeenCalledWith({

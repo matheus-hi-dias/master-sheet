@@ -82,12 +82,7 @@ describe('AuthController', () => {
       const req = { accepts: jest.fn().mockReturnValue('html') } as any;
       const res = { redirect: jest.fn() } as any;
 
-      await controller.verifyEmailGet(
-        req,
-        'valid-token',
-        res,
-        '/welcome',
-      );
+      await controller.verifyEmailGet(req, 'valid-token', res, '/welcome');
 
       expect(res.redirect).toHaveBeenCalledWith(
         'http://localhost:3000/welcome/email-verified?status=success',
