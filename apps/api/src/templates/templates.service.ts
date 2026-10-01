@@ -1,7 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateTemplateDto } from './dto/create-template.dto';
 import { UpdateTemplateDto } from './dto/update-template.dto';
+import { validateFormulaDependencies } from './utils/template-structure.util';
+import type { Prisma } from '../generated/prisma/client';
 
 @Injectable()
 export class TemplatesService {
@@ -13,11 +20,24 @@ export class TemplatesService {
     );
   }
 
+  private resolveSystem(
+    structure: { system?: string },
+    system?: string,
+    fallback = 'custom',
+  ): string {
+    return (
+      system?.toLowerCase().trim() ||
+      structure?.system?.toLowerCase().trim() ||
+      fallback
+    );
+  }
+
   async create(authorId: string, createTemplateDto: CreateTemplateDto) {
-    const { tags, ...rest } = createTemplateDto;
+    const { tags, structure, system, version, ...rest } = createTemplateDto;
+
+    validateFormulaDependencies(structure);
 
     const normalizedTags = this.normalizeTags(tags);
-
     const tagConnections = normalizedTags.map((tag) => ({
       where: { name: tag },
       create: { name: tag },
@@ -26,6 +46,9 @@ export class TemplatesService {
     return this.prisma.template.create({
       data: {
         ...rest,
+        structure: structure as unknown as Prisma.InputJsonValue,
+        system: this.resolveSystem(structure, system),
+        version: version ?? structure?.version ?? 1,
         authorId,
         tags: {
           connectOrCreate: tagConnections,
@@ -33,15 +56,61 @@ export class TemplatesService {
       },
       include: {
         tags: true,
+        author: {
+          select: { id: true, name: true },
+        },
       },
     });
   }
 
-  async findAll(tags?: string, isPublic?: boolean, userId?: string) {
-    const where: any = {};
+  async findAll(
+    tags?: string,
+    isPublic?: string,
+    userId?: string,
+    search?: string,
+    system?: string,
+    scope?: string,
+    page = 1,
+    limit = 10,
+  ) {
+    const pageNumber = Math.max(1, Number(page) || 1);
+    const pageSize = Math.min(100, Math.max(1, Number(limit) || 10));
 
-    if (isPublic !== undefined) {
-      where.isPublic = isPublic;
+    const conditions: Record<string, unknown>[] = [];
+
+    if (scope === 'public') {
+      conditions.push({ isPublic: true });
+    } else if (scope === 'mine') {
+      if (!userId) {
+        conditions.push({ authorId: '' });
+      } else {
+        conditions.push({ authorId: userId });
+      }
+    } else {
+      if (isPublic !== undefined) {
+        const isPublicBool = isPublic === 'true';
+        conditions.push({ isPublic: isPublicBool });
+      }
+
+      if (userId && !(isPublic === 'true')) {
+        conditions.push({
+          OR: [{ isPublic: true }, { authorId: userId }],
+        });
+      }
+    }
+
+    if (search) {
+      const term = search.trim();
+      conditions.push({
+        OR: [
+          { name: { contains: term, mode: 'insensitive' } },
+          { description: { contains: term, mode: 'insensitive' } },
+        ],
+      });
+    }
+
+    if (system) {
+      conditions.push({ system: system.toLowerCase().trim() });
     }
 
     if (tags) {
@@ -50,31 +119,43 @@ export class TemplatesService {
         .map((t) => t.toLowerCase().trim())
         .filter(Boolean);
       if (tagList.length > 0) {
-        where.tags = {
-          some: {
-            name: { in: tagList },
+        conditions.push({
+          tags: {
+            some: {
+              name: { in: tagList },
+            },
           },
-        };
+        });
       }
     }
 
-    // Se no for para buscar apenas pblicos, o usurio s pode ver os pblicos e os seus prprios
-    if (!where.isPublic && userId) {
-      where.OR = [{ isPublic: true }, { authorId: userId }];
-    }
+    const where = conditions.length > 0 ? { AND: conditions } : {};
 
-    return this.prisma.template.findMany({
-      where,
-      include: {
-        tags: true,
-        author: {
-          select: {
-            id: true,
-            name: true,
+    const [total, data] = await Promise.all([
+      this.prisma.template.count({ where }),
+      this.prisma.template.findMany({
+        where,
+        skip: (pageNumber - 1) * pageSize,
+        take: pageSize,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          tags: true,
+          author: {
+            select: { id: true, name: true },
           },
         },
+      }),
+    ]);
+
+    return {
+      data,
+      meta: {
+        total,
+        page: pageNumber,
+        limit: pageSize,
+        totalPages: Math.ceil(total / pageSize),
       },
-    });
+    };
   }
 
   async findOne(id: string) {
@@ -83,10 +164,7 @@ export class TemplatesService {
       include: {
         tags: true,
         author: {
-          select: {
-            id: true,
-            name: true,
-          },
+          select: { id: true, name: true },
         },
       },
     });
@@ -99,9 +177,38 @@ export class TemplatesService {
   }
 
   async update(id: string, updateTemplateDto: UpdateTemplateDto) {
-    const { tags, ...rest } = updateTemplateDto;
+    const existing = await this.prisma.template.findUnique({ where: { id } });
 
-    const updateData: any = { ...rest };
+    if (!existing) {
+      throw new NotFoundException('Template not found');
+    }
+
+    const { tags, structure, system, version, ...rest } = updateTemplateDto;
+
+    const updateData: Record<string, unknown> = { ...rest };
+
+    if (structure !== undefined) {
+      validateFormulaDependencies(structure);
+
+      updateData.structure = structure;
+
+      if (system === undefined) {
+        updateData.system =
+          structure.system?.toLowerCase().trim() ?? existing.system;
+      }
+
+      if (version === undefined) {
+        updateData.version = existing.version + 1;
+      }
+    }
+
+    if (system !== undefined) {
+      updateData.system = system.toLowerCase().trim();
+    }
+
+    if (version !== undefined) {
+      updateData.version = version;
+    }
 
     if (tags !== undefined) {
       const normalizedTags = this.normalizeTags(tags);
@@ -110,10 +217,9 @@ export class TemplatesService {
         create: { name: tag },
       }));
 
-      // To update tags in Prisma we can set the relation entirely
       updateData.tags = {
-        set: [], // Clear existing relations
-        connectOrCreate: tagConnections, // Reconnect or create new ones
+        set: [],
+        connectOrCreate: tagConnections,
       };
     }
 
@@ -122,13 +228,71 @@ export class TemplatesService {
       data: updateData,
       include: {
         tags: true,
+        author: {
+          select: { id: true, name: true },
+        },
       },
     });
   }
 
   async remove(id: string) {
-    return this.prisma.template.delete({
+    const template = await this.prisma.template.findUnique({
       where: { id },
+      include: { _count: { select: { sheets: true } } },
+    });
+
+    if (!template) {
+      throw new NotFoundException('Template not found');
+    }
+
+    if (template._count.sheets > 0) {
+      throw new ConflictException(
+        'This template cannot be deleted because active character sheets depend on it',
+      );
+    }
+
+    return this.prisma.template.delete({ where: { id } });
+  }
+
+  async fork(userId: string, sourceId: string) {
+    const source = await this.prisma.template.findUnique({
+      where: { id: sourceId },
+      include: { tags: true },
+    });
+
+    if (!source) {
+      throw new NotFoundException('Template not found');
+    }
+
+    if (!source.isPublic && source.authorId !== userId) {
+      throw new ForbiddenException('You do not have access to this template');
+    }
+
+    const tagConnections = source.tags.map((tag) => ({
+      where: { name: tag.name },
+      create: { name: tag.name },
+    }));
+
+    return this.prisma.template.create({
+      data: {
+        name: `${source.name} (Copy)`,
+        description: source.description,
+        structure: source.structure as Prisma.InputJsonValue,
+        system: source.system,
+        version: source.version,
+        isPublic: false,
+        authorId: userId,
+        forkedFromId: source.id,
+        tags: {
+          connectOrCreate: tagConnections,
+        },
+      },
+      include: {
+        tags: true,
+        author: {
+          select: { id: true, name: true },
+        },
+      },
     });
   }
 }

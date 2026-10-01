@@ -1,8 +1,8 @@
 import {
   CanActivate,
   ExecutionContext,
-  Injectable,
   ForbiddenException,
+  Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -16,10 +16,9 @@ export class TemplateAccessGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context
       .switchToHttp()
-      .getRequest<Request & { user: ActiveUser }>();
+      .getRequest<Request & { user: ActiveUser; template?: unknown }>();
     const user = request.user;
     const templateId = request.params.id as string;
-    console.log(user, templateId);
 
     if (!user || !templateId) {
       return false;
@@ -27,7 +26,10 @@ export class TemplateAccessGuard implements CanActivate {
 
     const template = await this.prisma.template.findUnique({
       where: { id: templateId },
-      select: { isPublic: true, authorId: true },
+      include: {
+        tags: true,
+        author: { select: { id: true, name: true } },
+      },
     });
 
     if (!template) {
@@ -37,6 +39,9 @@ export class TemplateAccessGuard implements CanActivate {
     if (!template.isPublic && template.authorId !== user.userId) {
       throw new ForbiddenException('You do not have access to this template');
     }
+
+    // Attach the pre-fetched record so controllers/services avoid a second query.
+    request.template = template;
 
     return true;
   }
