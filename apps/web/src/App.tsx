@@ -8,6 +8,7 @@ import EmailVerified from './features/auth/pages/EmailVerified';
 import EmailVerify from './features/auth/pages/EmailVerify';
 import { FichasPage } from './features/dashboard/pages/Dashboard';
 import { TemplatesHub } from './features/templates/pages/TemplatesHub';
+import { TemplateBuilder } from './features/builder/pages/TemplateBuilder';
 import { DashboardLayout } from './components/layout/DashboardLayout';
 import { useAuthStore } from './store/useAuthStore';
 import { useThemeStore } from './store/useThemeStore';
@@ -110,6 +111,8 @@ function App() {
             >
               <Route path="/fichas" element={<FichasPage />} />
               <Route path="/templates" element={<TemplatesHub />} />
+              <Route path="/templates/builder" element={<TemplateBuilder />} />
+              <Route path="/templates/builder/:id" element={<TemplateBuilder />} />
               <Route path="/email-verified" element={<EmailVerified />} />
               <Route path="/email-verify" element={<EmailVerify />} />
               <Route path="/verify-email" element={<EmailVerify />} />
