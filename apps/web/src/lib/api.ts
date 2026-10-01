@@ -3,13 +3,13 @@ import { useAuthStore } from '../store/useAuthStore';
 const API_URL = 'http://localhost:3000';
 
 export async function fetchApi(endpoint: string, options: RequestInit = {}) {
-  const { userToken, logout } = useAuthStore.getState();
+  const { accessToken, logout } = useAuthStore.getState();
 
   const headers = new Headers(options.headers || {});
   headers.set('Content-Type', 'application/json');
 
-  if (userToken) {
-    headers.set('Authorization', `Bearer ${userToken}`);
+  if (accessToken) {
+    headers.set('Authorization', `Bearer ${accessToken}`);
   }
 
   const response = await fetch(`${API_URL}${endpoint}`, {
