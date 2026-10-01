@@ -72,3 +72,18 @@
 .animate-dice-in {
   animation: dice-in 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
+
+@keyframes drawer-in {
+  from {
+    opacity: 0.4;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-drawer-in {
+  animation: drawer-in 0.3s cubic-bezier(0.28, 0.75, 0.25, 1) forwards;
+}
