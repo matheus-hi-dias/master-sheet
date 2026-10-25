@@ -63,6 +63,6 @@
 ## 9. Verification
 
 - [x] 9.1 Run `pnpm verify:workspace && pnpm lint && pnpm check-types && pnpm test && pnpm build` on a clean checkout
-- [ ] 9.2 Confirm CI passes and that removing a script from any app makes `verify:workspace` fail
+- [x] 9.2 Confirm CI passes and that removing a script from any app makes `verify:workspace` fail
 - [x] 9.3 Confirm `docker compose up -d db` reports healthy
 - [x] 9.4 Re-run `openspec validate workspace-hygiene --type change --strict`
