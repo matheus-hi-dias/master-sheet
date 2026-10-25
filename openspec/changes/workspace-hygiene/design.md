@@ -84,7 +84,7 @@ Decision: don't force a single ESLint config on Nest; forcing it would require d
 
 ### D7 — Truthful root README
 
-Rewrite as: product summary, workspace map, prerequisites, env setup (root `.env` for Postgres, `apps/api/.env`, `apps/mobile/.env`), task table, and the *existing* auth contract section. Remove all `create-turbo` text and Next.js references.
+Rewrite as: product summary, workspace map, prerequisites, env setup (root `.env` for Postgres, `apps/api/.env`, `apps/mobile/.env`), task table, and the _existing_ auth contract section. Remove all `create-turbo` text and Next.js references.
 
 ## Risks / Trade-offs
 

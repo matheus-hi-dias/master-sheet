@@ -2,7 +2,10 @@ import { useEffect, useState } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 import { evaluateFormula } from '../../../lib/formula';
 import { cn } from '../../../lib/utils';
-import type { FieldDefinition, RepeaterFieldDefinition } from '../../templates/types/template-structure';
+import type {
+  FieldDefinition,
+  RepeaterFieldDefinition,
+} from '../../templates/types/template-structure';
 import { buildItemDefaults } from '../lib/defaults';
 import { DotTracker } from './DotTracker';
 
@@ -24,7 +27,8 @@ function evaluateInItem(
     const context: Record<string, number> = {};
     for (const dep of dependencies) {
       const value = item[dep];
-      context[dep] = typeof value === 'number' ? value : Number(value ?? 0) || 0;
+      context[dep] =
+        typeof value === 'number' ? value : Number(value ?? 0) || 0;
     }
     return evaluateFormula(expression, context);
   } catch {

@@ -1,6 +1,5 @@
-import React from 'react';
 // Note: This is a placeholder for actual E2E/Unit tests.
-// In a real environment, you would use @testing-library/react-native 
+// In a real environment, you would use @testing-library/react-native
 // and mock expo-router/api services.
 
 /*

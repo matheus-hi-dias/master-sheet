@@ -12,15 +12,14 @@ export function BottomNav() {
   const navigate = useNavigate();
 
   const activeMatch = NAV_LINKS.reduce<string | null>((best, link) => {
-    const matches =
-      pathname === link.id || pathname.startsWith(`${link.id}/`);
+    const matches = pathname === link.id || pathname.startsWith(`${link.id}/`);
     if (matches && link.id.length > (best?.length ?? 0)) return link.id;
     return best;
   }, null);
 
   return (
     <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-bg-panel border-t border-border z-[100] flex">
-      {NAV_LINKS.map(l => (
+      {NAV_LINKS.map((l) => (
         <button
           key={l.id}
           onClick={() => navigate(l.id)}

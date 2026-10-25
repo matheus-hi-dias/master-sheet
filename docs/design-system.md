@@ -8,15 +8,15 @@ The product is fundamentally **dark-first, immersive, and utility-driven**. Pane
 
 ## Color Tokens
 
-| Token                | Hex       | Usage                                                       |
-| :------------------- | :-------- | :---------------------------------------------------------- |
-| `--color-bg-app`     | `#121212` | Global application background.                              |
-| `--color-bg-panel`   | `#1A1A1B` | Supporting panels and side surfaces.                        |
-| `--color-bg-card`    | `#242424` | Foreground cards and raised boxes.                          |
-| Text primary         | `#E0E0E0` | Primary copy.                                               |
-| Text muted           | `#888888` | Secondary / muted copy.                                     |
-| `--color-gold`       | `#D4AF37` | Primary communicative identity: interactive accents and focus. |
-| Border neutral       | `#3D3D3D` | Inactive borders / dividers.                                |
+| Token              | Hex       | Usage                                                          |
+| :----------------- | :-------- | :------------------------------------------------------------- |
+| `--color-bg-app`   | `#121212` | Global application background.                                 |
+| `--color-bg-panel` | `#1A1A1B` | Supporting panels and side surfaces.                           |
+| `--color-bg-card`  | `#242424` | Foreground cards and raised boxes.                             |
+| Text primary       | `#E0E0E0` | Primary copy.                                                  |
+| Text muted         | `#888888` | Secondary / muted copy.                                        |
+| `--color-gold`     | `#D4AF37` | Primary communicative identity: interactive accents and focus. |
+| Border neutral     | `#3D3D3D` | Inactive borders / dividers.                                   |
 
 Rules:
 
@@ -31,11 +31,11 @@ Rules:
 
 ## Motion & Animation
 
-| Token                  | Behavior                                                        |
-| :--------------------- | :-------------------------------------------------------------- |
-| `animate-fade-in`      | Soft rise + fade on screen entry.                               |
-| `dice-in`              | Fake 3D rotational roll used for dice interaction feedback.     |
-| `toast-in`             | Bottom pop-up rise for global notifications.                    |
+| Token             | Behavior                                                    |
+| :---------------- | :---------------------------------------------------------- |
+| `animate-fade-in` | Soft rise + fade on screen entry.                           |
+| `dice-in`         | Fake 3D rotational roll used for dice interaction feedback. |
+| `toast-in`        | Bottom pop-up rise for global notifications.                |
 
 ## Core Components
 

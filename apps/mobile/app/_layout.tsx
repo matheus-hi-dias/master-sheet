@@ -46,7 +46,9 @@ function RootLayoutNav() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         {/* O ThemeProvider ajuda a manter as cores nativas do sistema em sincronia */}
-        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <ThemeProvider
+          value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
+        >
           <Stack screenOptions={{ headerShown: false }}>
             {/* Tela de Login definida como inicial ou independente */}
             <Stack.Screen name="login" options={{ animation: 'fade' }} />
@@ -56,7 +58,10 @@ function RootLayoutNav() {
 
             <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
 
-            <Stack.Screen name="builder" options={{ animation: 'slide_from_right' }} />
+            <Stack.Screen
+              name="builder"
+              options={{ animation: 'slide_from_right' }}
+            />
           </Stack>
         </ThemeProvider>
       </AuthProvider>

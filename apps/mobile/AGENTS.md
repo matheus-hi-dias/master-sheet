@@ -17,5 +17,5 @@ Expo 55 (React Native 0.83), NativeWind, Expo Router (file-based navigation), Re
 
 ## Commands
 
-- Start: `pnpm --filter mobile start` · Android: `pnpm --filter mobile android`
-- Clear bundler cache when needed: `pnpm --filter mobile exec expo start --clear`
+- Start: `pnpm --filter @master-sheet/mobile start` · Android: `pnpm --filter @master-sheet/mobile android`
+- Clear bundler cache when needed: `pnpm --filter @master-sheet/mobile exec expo start --clear`

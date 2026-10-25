@@ -39,8 +39,8 @@ export function DynamicFormMapper({
 
   const [activeTabId, setActiveTabId] = useState(structure.tabs[0]?.id);
 
-  const activeTab = structure.tabs.find((tab) => tab.id === activeTabId) ??
-    structure.tabs[0];
+  const activeTab =
+    structure.tabs.find((tab) => tab.id === activeTabId) ?? structure.tabs[0];
 
   return (
     <div className="flex flex-col gap-4 w-full">
@@ -86,7 +86,11 @@ export function DynamicFormMapper({
               }}
             >
               {section.fields.map((field) => (
-                <FieldInput key={field.id} field={field} form={formRef.current} />
+                <FieldInput
+                  key={field.id}
+                  field={field}
+                  form={formRef.current}
+                />
               ))}
             </div>
           </section>

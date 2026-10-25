@@ -93,7 +93,11 @@ export default function SheetsScreen() {
         </View>
       ) : isError ? (
         <View className="flex-1 items-center justify-center p-6">
-          <AlertTriangle size={48} color="#e74c3c" className="mb-3 animate-pulse" />
+          <AlertTriangle
+            size={48}
+            color="#e74c3c"
+            className="mb-3 animate-pulse"
+          />
           <Text className="font-display font-bold text-base text-danger text-center mb-1">
             Erro ao carregar fichas
           </Text>
@@ -104,7 +108,7 @@ export default function SheetsScreen() {
       ) : (
         <FlatList
           data={sheets}
-          keyExtractor={item => item.id}
+          keyExtractor={(item) => item.id}
           renderItem={renderItem}
           contentContainerStyle={{ padding: 16, flexGrow: 1 }}
           refreshControl={
@@ -117,7 +121,12 @@ export default function SheetsScreen() {
           }
           ListEmptyComponent={
             <View className="flex-1 items-center justify-center py-12">
-              <FileText size={48} color="#D4AF37" opacity={0.5} className="mb-4 animate-pulse" />
+              <FileText
+                size={48}
+                color="#D4AF37"
+                opacity={0.5}
+                className="mb-4 animate-pulse"
+              />
               <Text className="font-display font-bold text-base text-text-main text-center mb-2">
                 Nenhuma ficha criada
               </Text>

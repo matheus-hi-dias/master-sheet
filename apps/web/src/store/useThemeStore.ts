@@ -15,7 +15,7 @@ export const useThemeStore = create<ThemeState>()(
       setTheme: (theme) => set({ theme }),
     }),
     {
-      name: 'master-sheet-theme', 
-    }
-  )
+      name: 'master-sheet-theme',
+    },
+  ),
 );

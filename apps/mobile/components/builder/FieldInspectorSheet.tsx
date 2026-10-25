@@ -26,10 +26,7 @@ import {
   slugify,
   type DepCandidate,
 } from '../../lib/builder/structureOps';
-import type {
-  FieldDefinition,
-  FieldType,
-} from '../../types/template';
+import type { FieldDefinition, FieldType } from '../../types/template';
 
 interface FieldInspectorSheetProps {
   field: FieldDefinition | null;
@@ -51,8 +48,8 @@ const BROAD_TYPES: FieldType[] = [
   'repeater',
 ];
 
-const CONFIG_TYPES = BROAD_TYPES.filter(type => type !== 'repeater');
-const CHILD_TYPES = BROAD_TYPES.filter(type => type !== 'repeater');
+const CONFIG_TYPES = BROAD_TYPES.filter((type) => type !== 'repeater');
+const CHILD_TYPES = BROAD_TYPES.filter((type) => type !== 'repeater');
 
 const defaultInput =
   'bg-bg-panel border border-border rounded-card px-3 py-2.5 text-text-main font-body text-sm';
@@ -112,7 +109,7 @@ function NumberField({
       <SheetLabel>{label}</SheetLabel>
       <TextInput
         value={value === undefined || value === null ? '' : String(value)}
-        onChangeText={text =>
+        onChangeText={(text) =>
           onChange(text === '' ? undefined : Number(text))
         }
         keyboardType="numeric"
@@ -136,7 +133,7 @@ function TypeChips({
 }) {
   return (
     <View className="flex-row flex-wrap" style={{ gap: 6 }}>
-      {options.map(type => {
+      {options.map((type) => {
         const active = type === value;
         return (
           <Pressable
@@ -194,16 +191,10 @@ export function FieldInspectorSheet({
 
   const children = field.type === 'repeater' ? field.itemSchema : [];
 
-  const activeChild =
-    childIndex !== null ? children[childIndex] : null;
+  const activeChild = childIndex !== null ? children[childIndex] : null;
 
   return (
-    <Modal
-      visible
-      transparent
-      animationType="slide"
-      onRequestClose={onClose}
-    >
+    <Modal visible transparent animationType="slide" onRequestClose={onClose}>
       <View className="flex-1 justify-end bg-black/60">
         <Pressable className="absolute inset-0" onPress={onClose} />
 
@@ -251,7 +242,7 @@ export function FieldInspectorSheet({
                 <TextField
                   label="Rótulo"
                   value={activeChild.label}
-                  onChange={label =>
+                  onChange={(label) =>
                     patch({
                       itemSchema: children.map((child, index) =>
                         index === childIndex ? { ...child, label } : child,
@@ -264,7 +255,7 @@ export function FieldInspectorSheet({
                   <TypeChips
                     value={activeChild.type}
                     options={CHILD_TYPES}
-                    onSelect={type =>
+                    onSelect={(type) =>
                       patch({
                         itemSchema: children.map((child, index) =>
                           index === childIndex
@@ -281,7 +272,7 @@ export function FieldInspectorSheet({
                 </View>
                 <ChildConfig
                   field={activeChild}
-                  patch={next =>
+                  patch={(next) =>
                     patch({
                       itemSchema: children.map((child, index) =>
                         index === childIndex ? next : child,
@@ -296,7 +287,7 @@ export function FieldInspectorSheet({
                   <SheetLabel>Rótulo</SheetLabel>
                   <TextInput
                     value={field.label}
-                    onChangeText={label => patch({ label })}
+                    onChangeText={(label) => patch({ label })}
                     placeholderTextColor="#888888"
                     className={defaultInput}
                   />
@@ -307,7 +298,7 @@ export function FieldInspectorSheet({
                   <TypeChips
                     value={field.type}
                     options={CONFIG_TYPES}
-                    onSelect={type =>
+                    onSelect={(type) =>
                       onChange({
                         ...createField(type),
                         id: field.id,
@@ -322,7 +313,7 @@ export function FieldInspectorSheet({
                   <View className="flex-row items-stretch" style={{ gap: 8 }}>
                     <TextInput
                       value={field.id}
-                      onChangeText={id => patch({ id })}
+                      onChangeText={(id) => patch({ id })}
                       placeholderTextColor="#888888"
                       autoCapitalize="none"
                       autoCorrect={false}
@@ -361,14 +352,16 @@ export function FieldInspectorSheet({
                           ...children,
                           createField(
                             newChildType,
-                            children.map(child => child.id),
+                            children.map((child) => child.id),
                           ),
                         ],
                       });
                     }}
-                    onRemoveChild={childId =>
+                    onRemoveChild={(childId) =>
                       patch({
-                        itemSchema: children.filter(child => child.id !== childId),
+                        itemSchema: children.filter(
+                          (child) => child.id !== childId,
+                        ),
                       })
                     }
                   />
@@ -388,17 +381,17 @@ export function FieldInspectorSheet({
                     <NumberField
                       label="Mínimo"
                       value={field.min}
-                      onChange={min => patch({ min })}
+                      onChange={(min) => patch({ min })}
                     />
                     <NumberField
                       label="Máximo"
                       value={field.max}
-                      onChange={max => patch({ max })}
+                      onChange={(max) => patch({ max })}
                     />
                     <NumberField
                       label="Passo"
                       value={field.step}
-                      onChange={step => patch({ step })}
+                      onChange={(step) => patch({ step })}
                     />
                   </View>
                 ) : null}
@@ -408,12 +401,12 @@ export function FieldInspectorSheet({
                     <TextField
                       label="Placeholder"
                       value={field.placeholder ?? ''}
-                      onChange={placeholder => patch({ placeholder })}
+                      onChange={(placeholder) => patch({ placeholder })}
                     />
                     <NumberField
                       label="Max. caracteres"
                       value={field.maxLength}
-                      onChange={maxLength => patch({ maxLength })}
+                      onChange={(maxLength) => patch({ maxLength })}
                     />
                   </>
                 ) : null}
@@ -422,15 +415,13 @@ export function FieldInspectorSheet({
                   <NumberField
                     label="Max. pontos"
                     value={field.maxDots}
-                    onChange={maxDots => patch({ maxDots })}
+                    onChange={(maxDots) => patch({ maxDots })}
                   />
                 ) : null}
 
                 {field.type === 'checkbox' ? (
                   <Pressable
-                    onPress={() =>
-                      patch({ defaultValue: !Boolean(field.defaultValue) })
-                    }
+                    onPress={() => patch({ defaultValue: !field.defaultValue })}
                     className="flex-row items-center justify-between py-2"
                   >
                     <Text className="text-[11px] font-bold uppercase tracking-[0.14em] text-text-muted">
@@ -470,9 +461,7 @@ function FormulaConfig({
   candidates: DepCandidate[];
   labelById: Record<string, string>;
   previewContext: FormulaContext;
-  diagnostics: NonNullable<
-    ReturnType<typeof useFormulaDiagnostics>
-  >;
+  diagnostics: NonNullable<ReturnType<typeof useFormulaDiagnostics>>;
   patch: (patchProps: Partial<FieldDefinition>) => void;
 }) {
   const readout = renderExpressionWithLabels(field.expression, labelById);
@@ -483,10 +472,12 @@ function FormulaConfig({
         <SheetLabel>Expressão</SheetLabel>
         <TextInput
           value={field.expression}
-          onChangeText={expression => {
+          onChangeText={(expression) => {
             const used = extractIdentifiers(expression);
             const deps = used
-              .filter(id => candidates.some(candidate => candidate.id === id))
+              .filter((id) =>
+                candidates.some((candidate) => candidate.id === id),
+              )
               .filter((id, index, all) => all.indexOf(id) === index);
             patch({ expression, dependencies: deps });
           }}
@@ -509,7 +500,7 @@ function FormulaConfig({
         <SheetLabel>Inserir dependência</SheetLabel>
         {candidates.length > 0 ? (
           <View className="flex-row flex-wrap" style={{ gap: 6 }}>
-            {candidates.map(candidate => (
+            {candidates.map((candidate) => (
               <Pressable
                 key={candidate.id}
                 onPress={() =>
@@ -518,7 +509,9 @@ function FormulaConfig({
                       field.expression ? ' + ' : ''
                     }${candidate.id}`,
                     dependencies: [
-                      ...field.dependencies.filter(dep => dep !== candidate.id),
+                      ...field.dependencies.filter(
+                        (dep) => dep !== candidate.id,
+                      ),
                       candidate.id,
                     ],
                   })
@@ -550,7 +543,7 @@ function FormulaConfig({
             <Text className="text-[11px] text-danger flex-1">
               Desconhecidos:{' '}
               {diagnostics.unknown
-                .map(id => (labelById[id] ? `${id} (${labelById[id]})` : id))
+                .map((id) => (labelById[id] ? `${id} (${labelById[id]})` : id))
                 .join(', ')}
             </Text>
           </View>
@@ -558,7 +551,7 @@ function FormulaConfig({
         <Text className="text-[11px] text-text-muted mb-1">
           Dependências:{' '}
           {diagnostics.deps.length > 0
-            ? diagnostics.deps.map(id => labelById[id] ?? id).join(', ')
+            ? diagnostics.deps.map((id) => labelById[id] ?? id).join(', ')
             : 'nenhuma'}
         </Text>
         <Text
@@ -571,7 +564,7 @@ function FormulaConfig({
         {!diagnostics.blocked && diagnostics.deps.length > 0 ? (
           <Text className="text-[10px] font-mono text-text-muted/70 mt-1">
             {diagnostics.deps
-              .map(id => `${id} = ${previewContext[id] ?? 0}`)
+              .map((id) => `${id} = ${previewContext[id] ?? 0}`)
               .join(' · ')}
           </Text>
         ) : null}
@@ -670,7 +663,7 @@ function ChildConfig({
         options={options}
         newOption={{ label: '', value: '' }}
         setNewOption={() => undefined}
-        patch={patchProps =>
+        patch={(patchProps) =>
           patch({ ...field, ...patchProps } as FieldDefinition)
         }
       />
@@ -683,17 +676,17 @@ function ChildConfig({
         <NumberField
           label="Mínimo"
           value={field.min}
-          onChange={min => patch({ ...field, min } as FieldDefinition)}
+          onChange={(min) => patch({ ...field, min } as FieldDefinition)}
         />
         <NumberField
           label="Máximo"
           value={field.max}
-          onChange={max => patch({ ...field, max } as FieldDefinition)}
+          onChange={(max) => patch({ ...field, max } as FieldDefinition)}
         />
         <NumberField
           label="Passo"
           value={field.step}
-          onChange={step => patch({ ...field, step } as FieldDefinition)}
+          onChange={(step) => patch({ ...field, step } as FieldDefinition)}
         />
       </View>
     );
@@ -704,7 +697,7 @@ function ChildConfig({
       <NumberField
         label="Max. pontos"
         value={field.maxDots}
-        onChange={maxDots => patch({ ...field, maxDots } as FieldDefinition)}
+        onChange={(maxDots) => patch({ ...field, maxDots } as FieldDefinition)}
       />
     );
   }
@@ -714,7 +707,7 @@ function ChildConfig({
       <TextField
         label="Placeholder"
         value={field.placeholder ?? ''}
-        onChange={placeholder =>
+        onChange={(placeholder) =>
           patch({ ...field, placeholder } as FieldDefinition)
         }
       />
@@ -725,7 +718,10 @@ function ChildConfig({
     return (
       <Pressable
         onPress={() =>
-          patch({ ...field, defaultValue: !Boolean(field.defaultValue) } as FieldDefinition)
+          patch({
+            ...field,
+            defaultValue: !field.defaultValue,
+          } as FieldDefinition)
         }
         className="flex-row items-center justify-between py-2"
       >
@@ -752,7 +748,7 @@ function ChildConfig({
       <TextField
         label="Expressão"
         value={field.expression}
-        onChange={expression =>
+        onChange={(expression) =>
           patch({
             ...field,
             expression,
@@ -788,7 +784,7 @@ function SelectConfig({
           <View key={`${option.value}-${index}`} className="flex-row gap-2">
             <TextInput
               value={option.label}
-              onChangeText={label =>
+              onChangeText={(label) =>
                 patch({
                   options: options.map((opt, i) =>
                     i === index ? { label, value: opt.value } : opt,
@@ -801,7 +797,7 @@ function SelectConfig({
             />
             <TextInput
               value={option.value}
-              onChangeText={value =>
+              onChangeText={(value) =>
                 patch({
                   options: options.map((opt, i) =>
                     i === index ? { ...opt, value } : opt,
@@ -828,14 +824,14 @@ function SelectConfig({
         <View className="flex-row gap-2">
           <TextInput
             value={newOption.label}
-            onChangeText={label => setNewOption({ ...newOption, label })}
+            onChangeText={(label) => setNewOption({ ...newOption, label })}
             placeholder="Novo rótulo"
             placeholderTextColor="#888888"
             className={`${defaultInput} flex-1`}
           />
           <TextInput
             value={newOption.value}
-            onChangeText={value => setNewOption({ ...newOption, value })}
+            onChangeText={(value) => setNewOption({ ...newOption, value })}
             placeholder="Valor"
             placeholderTextColor="#888888"
             autoCapitalize="none"
@@ -867,10 +863,10 @@ function useFormulaDiagnostics(
     if (!field || field.type !== 'formula') return null;
 
     const used = extractIdentifiers(field.expression);
-    const candidateIds = new Set(candidates.map(candidate => candidate.id));
-    const unknown = used.filter(id => !candidateIds.has(id));
+    const candidateIds = new Set(candidates.map((candidate) => candidate.id));
+    const unknown = used.filter((id) => !candidateIds.has(id));
     const deps = used
-      .filter(id => candidateIds.has(id))
+      .filter((id) => candidateIds.has(id))
       .filter((id, index, all) => all.indexOf(id) === index);
 
     let previewValue: string | null = null;

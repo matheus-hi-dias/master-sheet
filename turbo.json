@@ -5,7 +5,7 @@
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
+      "outputs": ["dist/**"]
     },
     "lint": {
       "dependsOn": ["^lint"]
@@ -15,6 +15,17 @@
     },
     "check-types": {
       "dependsOn": ["^check-types"]
+    },
+    "@master-sheet/api#build": {
+      "dependsOn": ["db:generate", "^build"]
+    },
+    "@master-sheet/api#check-types": {
+      "dependsOn": ["db:generate", "^check-types"]
+    },
+    "db:generate": {
+      "cache": false,
+      "inputs": ["prisma/**"],
+      "outputs": ["src/generated/**"]
     },
     "dev": {
       "cache": false,

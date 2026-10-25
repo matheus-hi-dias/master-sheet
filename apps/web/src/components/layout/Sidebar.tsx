@@ -14,11 +14,10 @@ export function Sidebar() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const { theme, setTheme } = useThemeStore();
-  const logout = useAuthStore(s => s.logout);
+  const logout = useAuthStore((s) => s.logout);
 
   const activeMatch = NAV_LINKS.reduce<string | null>((best, link) => {
-    const matches =
-      pathname === link.id || pathname.startsWith(`${link.id}/`);
+    const matches = pathname === link.id || pathname.startsWith(`${link.id}/`);
     if (matches && link.id.length > (best?.length ?? 0)) return link.id;
     return best;
   }, null);
@@ -66,7 +65,7 @@ export function Sidebar() {
 
       {/* Links */}
       <div className="flex-1 flex flex-col gap-1 px-3 py-4">
-        {NAV_LINKS.map(l => (
+        {NAV_LINKS.map((l) => (
           <button
             key={l.id}
             onClick={() => navigate(l.id)}

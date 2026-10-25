@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  Pressable,
-  TextInput,
-} from 'react-native';
+import { View, Text, Pressable, TextInput } from 'react-native';
 import { Plus, Trash2 } from 'lucide-react-native';
 import type { FieldDefinition } from '../../types/template';
 import { evaluateFormula } from '../../lib/formula';
@@ -89,7 +84,7 @@ function ItemField({
     case 'select':
       return (
         <View className="flex-row flex-wrap" style={{ gap: 6 }}>
-          {(field.options ?? []).map(option => {
+          {(field.options ?? []).map((option) => {
             const active = toStringValue(value) === option.value;
             return (
               <Pressable
@@ -114,16 +109,16 @@ function ItemField({
     case 'checkbox':
       return (
         <Pressable
-          onPress={() => onValue(!Boolean(value))}
+          onPress={() => onValue(!value)}
           className="self-start items-center"
           hitSlop={8}
         >
           <View
             className={`w-6 h-6 rounded border items-center justify-center ${
-              Boolean(value) ? 'bg-gold border-gold' : 'bg-bg-panel border-border'
+              value ? 'bg-gold border-gold' : 'bg-bg-panel border-border'
             }`}
           >
-            {Boolean(value) ? (
+            {value ? (
               <Text className="text-[#121212] font-black text-sm">✓</Text>
             ) : null}
           </View>
@@ -159,9 +154,7 @@ export function RepeaterList({
 
   const updateItem = (index: number, key: string, value: unknown) => {
     onChange(
-      items.map((item, i) =>
-        i === index ? { ...item, [key]: value } : item,
-      ),
+      items.map((item, i) => (i === index ? { ...item, [key]: value } : item)),
     );
   };
 
@@ -190,7 +183,7 @@ export function RepeaterList({
           </View>
 
           <View style={{ gap: 10 }}>
-            {itemSchema.map(subField => (
+            {itemSchema.map((subField) => (
               <View key={subField.id}>
                 <Text className="text-[10px] text-text-muted font-bold uppercase tracking-wider mb-1">
                   {subField.label}
@@ -199,7 +192,7 @@ export function RepeaterList({
                   field={subField}
                   value={item[subField.id]}
                   item={item}
-                  onValue={value => updateItem(index, subField.id, value)}
+                  onValue={(value) => updateItem(index, subField.id, value)}
                 />
               </View>
             ))}

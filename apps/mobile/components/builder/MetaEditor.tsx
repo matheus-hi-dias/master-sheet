@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TextInput, Pressable, ScrollView } from 'react-native';
+import { View, Text, TextInput, Pressable } from 'react-native';
 import { DEFAULT_SYSTEMS, SYSTEM_LABELS } from '../../types/template';
 import type { BuilderDraft } from '../../hooks/useBuilder';
 
@@ -26,7 +26,8 @@ export function MetaEditor({
 }) {
   const totalFields = draft.structure.tabs.reduce(
     (sum, tab) =>
-      sum + tab.sections.reduce((acc, section) => acc + section.fields.length, 0),
+      sum +
+      tab.sections.reduce((acc, section) => acc + section.fields.length, 0),
     0,
   );
 
@@ -47,7 +48,7 @@ export function MetaEditor({
         <FieldLabel>Nome</FieldLabel>
         <TextInput
           value={draft.name}
-          onChangeText={value => updateMeta('name', value)}
+          onChangeText={(value) => updateMeta('name', value)}
           placeholder="Nome do modelo"
           placeholderTextColor="#888888"
           className={inputClass}
@@ -58,7 +59,7 @@ export function MetaEditor({
         <FieldLabel>Descrição</FieldLabel>
         <TextInput
           value={draft.description}
-          onChangeText={value => updateMeta('description', value)}
+          onChangeText={(value) => updateMeta('description', value)}
           placeholder="Breve descrição das regras"
           placeholderTextColor="#888888"
           multiline
@@ -71,7 +72,7 @@ export function MetaEditor({
       <View>
         <FieldLabel>Sistema</FieldLabel>
         <View className="flex-row flex-wrap" style={{ gap: 8 }}>
-          {DEFAULT_SYSTEMS.map(system => {
+          {DEFAULT_SYSTEMS.map((system) => {
             const active = draft.system === system;
             return (
               <Pressable
@@ -98,12 +99,12 @@ export function MetaEditor({
         <FieldLabel>Tags (separadas por vírgula)</FieldLabel>
         <TextInput
           value={draft.tags.join(', ')}
-          onChangeText={value =>
+          onChangeText={(value) =>
             updateMeta(
               'tags',
               value
                 .split(',')
-                .map(tag => tag.trim())
+                .map((tag) => tag.trim())
                 .filter(Boolean),
             )
           }

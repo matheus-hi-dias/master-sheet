@@ -1,8 +1,5 @@
 import { api } from './api';
-import type {
-  PaginatedResult,
-  TemplateSummary,
-} from '../types/template';
+import type { PaginatedResult, TemplateSummary } from '../types/template';
 
 export interface ListTemplatesParams {
   search?: string;
@@ -63,10 +60,7 @@ export function totalFields(template: TemplateSummary): number {
   return template.structure.tabs.reduce(
     (sum, tab) =>
       sum +
-      tab.sections.reduce(
-        (acc, section) => acc + section.fields.length,
-        0,
-      ),
+      tab.sections.reduce((acc, section) => acc + section.fields.length, 0),
     0,
   );
 }

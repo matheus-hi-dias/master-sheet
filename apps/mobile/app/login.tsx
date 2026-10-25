@@ -18,38 +18,64 @@ import { useMutation } from '@tanstack/react-query';
 import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
+interface LoginResponse {
+  access_token?: string;
+}
+
+interface ApiErrorResponse {
+  response?: {
+    data?: {
+      message?: string | string[];
+    };
+  };
+}
+
+function messageFromError(error: ApiErrorResponse, fallback: string): string {
+  const message = error.response?.data?.message;
+  if (typeof message === 'string') return message;
+  if (Array.isArray(message) && message[0]) return message[0];
+  return fallback;
+}
+
 export default function Login() {
   const [tab, setTab] = useState<'login' | 'register'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
-  const [errors, setErrors] = useState<{ email?: string; password?: string; name?: string }>({});
+  const [errors, setErrors] = useState<{
+    email?: string;
+    password?: string;
+    name?: string;
+  }>({});
   const [apiError, setApiError] = useState<string | null>(null);
 
   const { login } = useAuth();
   const passwordRef = useRef<TextInput>(null);
 
-  const loginMutation = useMutation({
+  const loginMutation = useMutation<LoginResponse, ApiErrorResponse, void>({
     mutationFn: async () => {
-      const response = await api.post('/auth/login', { email, password });
+      const response = await api.post<LoginResponse>('/auth/login', {
+        email,
+        password,
+      });
       return response.data;
     },
-    onSuccess: async (data: any) => {
-      if (data && data.access_token) {
+    onSuccess: async (data) => {
+      if (data?.access_token) {
         await login(data.access_token);
       }
     },
-    onError: (error: any) => {
-      const msg = typeof error.response?.data?.message === 'string'
-        ? error.response.data.message
-        : Array.isArray(error.response?.data?.message)
-        ? error.response.data.message[0]
-        : 'Verifique suas credenciais e tente novamente.';
-      setApiError(msg);
+    onError: (error) => {
+      setApiError(
+        messageFromError(
+          error,
+          'Verifique suas credenciais e tente novamente.',
+        ),
+      );
     },
   });
 
-  const registerMutation = useMutation({
+  const registerMutation = useMutation<unknown, ApiErrorResponse, void>({
     mutationFn: async () => {
       const response = await api.post('/auth/register', {
         name,
@@ -63,20 +89,20 @@ export default function Login() {
       setApiError(null);
       Alert.alert('Conta criada!', 'Você já pode entrar na plataforma.');
     },
-    onError: (error: any) => {
-      const msg = typeof error.response?.data?.message === 'string'
-        ? error.response.data.message
-        : Array.isArray(error.response?.data?.message)
-        ? error.response.data.message[0]
-        : 'Não foi possível criar a conta. Tente novamente.';
-      setApiError(msg);
+    onError: (error) => {
+      setApiError(
+        messageFromError(
+          error,
+          'Não foi possível criar a conta. Tente novamente.',
+        ),
+      );
     },
   });
 
   const handleSubmit = () => {
     setErrors({});
     setApiError(null);
-    let newErrors: { email?: string; password?: string; name?: string } = {};
+    const newErrors: { email?: string; password?: string; name?: string } = {};
 
     if (!email.trim()) {
       newErrors.email = 'E-mail é obrigatório';
@@ -131,7 +157,7 @@ export default function Login() {
 
             {/* Tabs Selector */}
             <View className="flex-row rounded-card overflow-hidden border border-border mb-7">
-              {['login', 'register'].map(t => (
+              {['login', 'register'].map((t) => (
                 <Pressable
                   key={t}
                   onPress={() => {
@@ -157,7 +183,10 @@ export default function Login() {
                   label="Nome"
                   placeholder="Seu nome de aventureiro"
                   value={name}
-                  onChangeText={(val) => { setName(val); setApiError(null); }}
+                  onChangeText={(val) => {
+                    setName(val);
+                    setApiError(null);
+                  }}
                   returnKeyType="next"
                   error={errors.name}
                 />
@@ -168,7 +197,10 @@ export default function Login() {
                 autoCapitalize="none"
                 placeholder="joao@email.com"
                 value={email}
-                onChangeText={(val) => { setEmail(val); setApiError(null); }}
+                onChangeText={(val) => {
+                  setEmail(val);
+                  setApiError(null);
+                }}
                 returnKeyType="next"
                 onSubmitEditing={() => passwordRef.current?.focus()}
                 error={errors.email}
@@ -179,7 +211,10 @@ export default function Login() {
                 secureTextEntry
                 placeholder="••••••••"
                 value={password}
-                onChangeText={(val) => { setPassword(val); setApiError(null); }}
+                onChangeText={(val) => {
+                  setPassword(val);
+                  setApiError(null);
+                }}
                 returnKeyType="done"
                 onSubmitEditing={handleSubmit}
                 error={errors.password}

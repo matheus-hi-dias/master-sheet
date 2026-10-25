@@ -70,7 +70,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                   type="button"
                   tabIndex={-1}
                   className="text-text-muted hover:text-text-main transition-colors cursor-pointer"
-                  onClick={() => setShowPassword(prev => !prev)}
+                  onClick={() => setShowPassword((prev) => !prev)}
                 >
                   {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>

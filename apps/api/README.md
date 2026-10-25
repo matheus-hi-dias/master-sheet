@@ -377,6 +377,10 @@ src/
 - ✅ Max 300 lines per file
 - ✅ Comprehensive test coverage
 
+### ESLint configuration
+
+Unlike `apps/web`, which consumes `@master-sheet/eslint-config/react-internal`, this app keeps an app-local `eslint.config.mjs`. NestJS requires `recommendedTypeChecked`, `projectService`, generated Prisma client ignores, and test-double relaxations that are specific to this backend and do not belong in the shared React config.
+
 ### Example: Add a New Endpoint
 
 **1. Create DTO** (`src/auth/dto/verify-two-factor.dto.ts`):

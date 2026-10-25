@@ -15,7 +15,7 @@ import EmailVerify from '../EmailVerify';
 describe('EmailVerify', () => {
   it('auto-posts token and navigates to email-verified', async () => {
     render(
-      <MemoryRouter initialEntries={["/email-verify?token=abc123"]}>
+      <MemoryRouter initialEntries={['/email-verify?token=abc123']}>
         <Routes>
           <Route path="/email-verify" element={<EmailVerify />} />
           <Route path="/email-verified" element={<div>VERIFIED-STUB</div>} />
@@ -23,13 +23,15 @@ describe('EmailVerify', () => {
       </MemoryRouter>,
     );
 
-    await waitFor(() => expect(api.auth.verifyEmail).toHaveBeenCalledWith({ token: 'abc123' }));
+    await waitFor(() =>
+      expect(api.auth.verifyEmail).toHaveBeenCalledWith({ token: 'abc123' }),
+    );
     expect(await screen.findByText('VERIFIED-STUB')).toBeInTheDocument();
   });
 
   it('allows manual token submit', async () => {
     render(
-      <MemoryRouter initialEntries={["/email-verify"]}>
+      <MemoryRouter initialEntries={['/email-verify']}>
         <Routes>
           <Route path="/email-verify" element={<EmailVerify />} />
           <Route path="/email-verified" element={<div>VERIFIED-STUB</div>} />
@@ -37,13 +39,19 @@ describe('EmailVerify', () => {
       </MemoryRouter>,
     );
 
-    const input = screen.getByPlaceholderText(/Cole aqui o token/i) as HTMLInputElement;
+    const input = screen.getByPlaceholderText(
+      /Cole aqui o token/i,
+    ) as HTMLInputElement;
     const button = screen.getByRole('button', { name: /Verificar e-mail/i });
 
     fireEvent.change(input, { target: { value: 'manual-token' } });
     fireEvent.click(button);
 
-    await waitFor(() => expect(api.auth.verifyEmail).toHaveBeenCalledWith({ token: 'manual-token' }));
+    await waitFor(() =>
+      expect(api.auth.verifyEmail).toHaveBeenCalledWith({
+        token: 'manual-token',
+      }),
+    );
     expect(await screen.findByText('VERIFIED-STUB')).toBeInTheDocument();
   });
 });

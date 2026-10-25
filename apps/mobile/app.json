@@ -38,10 +38,7 @@
               "pathPrefix": "/email-verified"
             }
           ],
-          "category": [
-            "BROWSABLE",
-            "DEFAULT"
-          ]
+          "category": ["BROWSABLE", "DEFAULT"]
         }
       ],
       "adaptiveIcon": {
@@ -57,11 +54,7 @@
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
-    "plugins": [
-      "expo-router",
-      "expo-web-browser",
-      "expo-secure-store"
-    ],
+    "plugins": ["expo-router", "expo-web-browser", "expo-secure-store"],
     "experiments": {
       "typedRoutes": true
     }

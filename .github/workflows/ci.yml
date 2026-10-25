@@ -24,6 +24,9 @@ jobs:
       - name: Setup workspace
         uses: ./.github/actions/setup
 
+      - name: Verify workspace task contract
+        run: pnpm verify:workspace
+
       - name: Run ${{ matrix.task }}
         run: pnpm turbo run ${{ matrix.task }}
         env:

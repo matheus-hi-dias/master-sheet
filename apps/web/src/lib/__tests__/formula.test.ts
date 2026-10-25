@@ -23,9 +23,7 @@ describe('evaluateFormula', () => {
   });
 
   it('supports variables from context', () => {
-    expect(
-      evaluateFormula('floor((str - 10) / 2)', { str: 15 }),
-    ).toBe(2);
+    expect(evaluateFormula('floor((str - 10) / 2)', { str: 15 })).toBe(2);
     expect(evaluateFormula('str + dex', { str: 12, dex: 14 })).toBe(26);
   });
 
@@ -40,9 +38,7 @@ describe('evaluateFormula', () => {
   });
 
   it('rejects unknown functions', () => {
-    expect(() => evaluateFormula('evil(1)')).toThrow(
-      'Unknown function "evil"',
-    );
+    expect(() => evaluateFormula('evil(1)')).toThrow('Unknown function "evil"');
   });
 
   it('rejects unknown identifiers', () => {

@@ -175,9 +175,7 @@ export function addSection(
 ): TemplateStructure {
   return updateTabs(structure, (tabs) =>
     tabs.map((tab) =>
-      tab.id === tabId
-        ? { ...tab, sections: [...tab.sections, section] }
-        : tab,
+      tab.id === tabId ? { ...tab, sections: [...tab.sections, section] } : tab,
     ),
   );
 }
@@ -194,9 +192,7 @@ export function patchSection(
         ? {
             ...tab,
             sections: tab.sections.map((section) =>
-              section.id === sectionId
-                ? { ...section, ...patch }
-                : section,
+              section.id === sectionId ? { ...section, ...patch } : section,
             ),
           }
         : tab,
@@ -214,7 +210,9 @@ export function removeSection(
       tab.id === tabId
         ? {
             ...tab,
-            sections: tab.sections.filter((section) => section.id !== sectionId),
+            sections: tab.sections.filter(
+              (section) => section.id !== sectionId,
+            ),
           }
         : tab,
     ),
@@ -230,7 +228,9 @@ export function moveSection(
   return updateTabs(structure, (tabs) =>
     tabs.map((tab) => {
       if (tab.id !== tabId) return tab;
-      const index = tab.sections.findIndex((section) => section.id === sectionId);
+      const index = tab.sections.findIndex(
+        (section) => section.id === sectionId,
+      );
       const target = index + direction;
       if (index < 0 || target < 0 || target >= tab.sections.length) return tab;
       const clone = [...tab.sections];
@@ -306,7 +306,9 @@ export function removeField(
               section.id === sectionId
                 ? {
                     ...section,
-                    fields: section.fields.filter((field) => field.id !== fieldId),
+                    fields: section.fields.filter(
+                      (field) => field.id !== fieldId,
+                    ),
                   }
                 : section,
             ),
@@ -356,9 +358,7 @@ function collectTopLevelFields(
   );
 }
 
-export function collectAllFields(
-  fields: FieldDefinition[],
-): FieldDefinition[] {
+export function collectAllFields(fields: FieldDefinition[]): FieldDefinition[] {
   return fields.flatMap((field) =>
     field.type === 'repeater'
       ? [field, ...collectAllFields(field.itemSchema ?? [])]
@@ -449,15 +449,12 @@ export function dependencyCandidates(
   return collectTopLevelFields(structure)
     .filter(
       (field) =>
-        field.id !== excludeId &&
-        NUMERIC_FIELD_TYPES.includes(field.type),
+        field.id !== excludeId && NUMERIC_FIELD_TYPES.includes(field.type),
     )
     .map((field) => ({ id: field.id, label: field.label }));
 }
 
-export function validateStructure(
-  structure: TemplateStructure,
-): string[] {
+export function validateStructure(structure: TemplateStructure): string[] {
   const errors: string[] = [];
   const seen = new Set<string>();
   const numericLike = new Set<string>();

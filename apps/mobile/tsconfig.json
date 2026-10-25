@@ -1,11 +1,12 @@
 {
-  "extends": "expo/tsconfig.base.json",
+  "extends": [
+    "@master-sheet/typescript-config/base.json",
+    "expo/tsconfig.base.json"
+  ],
   "compilerOptions": {
     "strict": true,
     "paths": {
-      "@/*": [
-        "./*"
-      ]
+      "@/*": ["./*"]
     }
   },
   "include": [

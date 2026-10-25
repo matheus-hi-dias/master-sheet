@@ -18,21 +18,21 @@ const queryClient = new QueryClient();
 
 // Protected Route Wrapper
 const ProtectedRoute = ({ children }: { children: ReactNode }) => {
-  const isAuth = useAuthStore(s => s.isAuthenticated);
+  const isAuth = useAuthStore((s) => s.isAuthenticated);
   if (!isAuth) return <Navigate to="/login" replace />;
   return children;
 };
 
 // Login Route Wrapper (Redirect to dashboard if already logged in)
 const PublicRoute = ({ children }: { children: ReactNode }) => {
-  const isAuth = useAuthStore(s => s.isAuthenticated);
+  const isAuth = useAuthStore((s) => s.isAuthenticated);
   if (isAuth) return <Navigate to="/fichas" replace />;
   return children;
 };
 
 // Hybrid Theme Engine Listener
 function ThemeProvider({ children }: { children: ReactNode }) {
-  const theme = useThemeStore(s => s.theme);
+  const theme = useThemeStore((s) => s.theme);
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -112,7 +112,10 @@ function App() {
               <Route path="/fichas" element={<FichasPage />} />
               <Route path="/templates" element={<TemplatesHub />} />
               <Route path="/templates/builder" element={<TemplateBuilder />} />
-              <Route path="/templates/builder/:id" element={<TemplateBuilder />} />
+              <Route
+                path="/templates/builder/:id"
+                element={<TemplateBuilder />}
+              />
               <Route path="/email-verified" element={<EmailVerified />} />
               <Route path="/email-verify" element={<EmailVerify />} />
               <Route path="/verify-email" element={<EmailVerify />} />

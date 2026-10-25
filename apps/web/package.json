@@ -1,11 +1,12 @@
 {
-  "name": "web",
+  "name": "@master-sheet/web",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "check-types": "tsc -p tsconfig.app.json --noEmit",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "jest"
@@ -30,6 +31,8 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@master-sheet/eslint-config": "workspace:*",
+    "@master-sheet/typescript-config": "workspace:*",
     "@testing-library/jest-dom": "^6.0.0",
     "@testing-library/react": "^14.0.0",
     "@testing-library/user-event": "^14.6.0",
