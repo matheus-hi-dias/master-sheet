@@ -21,11 +21,9 @@ export default function EmailVerifiedScreen() {
             <Text className="text-[#E0E0E0] text-center mb-6">
               Seu e-mail foi verificado com sucesso! Agora você pode acessar sua conta.
             </Text>
-            <Button 
-              title="Ir para Login" 
-              onPress={() => router.replace('/login')}
-              variant="gold"
-            />
+            <Button onPress={() => router.replace('/login')} variant="gold">
+              Ir para Login
+            </Button>
           </>
         ) : (
           <>
@@ -40,11 +38,9 @@ export default function EmailVerifiedScreen() {
             <Text className="text-[#E0E0E0] text-center mb-6">
               Não foi possível verificar seu e-mail. O link pode ter expirado ou ser inválido.
             </Text>
-            <Button 
-              title="Voltar" 
-              onPress={() => router.replace('/login')}
-              variant="outline"
-            />
+            <Button onPress={() => router.replace('/login')} variant="outline">
+              Voltar
+            </Button>
           </>
         )}
       </View>

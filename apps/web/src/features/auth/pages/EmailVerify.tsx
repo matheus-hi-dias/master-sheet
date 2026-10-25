@@ -29,10 +29,10 @@ export function EmailVerify() {
     try {
       const res = await api.auth.verifyEmail({ token: t });
       // If API returns status, map it; otherwise assume success
-      const status = (res && (res as any).status) || 'success';
+      const status = res?.status || 'success';
       navigate(`/email-verified?status=${status}`);
-    } catch (err: any) {
-      const msg = err?.message || 'invalid';
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'invalid';
       if (msg.toLowerCase().includes('expired')) {
         navigate('/email-verified?status=expired');
       } else {

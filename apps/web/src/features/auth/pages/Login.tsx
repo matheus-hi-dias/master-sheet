@@ -3,6 +3,7 @@ import { useForm, type FieldErrors } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { Swords, Scroll } from 'lucide-react';
 
 import { GemLogo } from '../../../components/ui/GemLogo';
 import { Input } from '../../../components/ui/Input';
@@ -20,6 +21,7 @@ import { PasswordStrengthMeter } from '../components/PasswordStrengthMeter';
 
 export function Login() {
   const [tab, setTab] = useState<'login' | 'register'>('login');
+  const [isLoading, setIsLoading] = useState(false);
   const loginFn = useAuthStore(s => s.login);
   const navigate = useNavigate();
 
@@ -36,12 +38,13 @@ export function Login() {
   const passwordValue = String(watch('password') ?? '');
 
   const onSubmit = async (data: LoginFormData | RegisterFormData) => {
+    setIsLoading(true);
     try {
       if (tab === 'login') {
         const d = data as LoginFormData;
         await loginFn(d.email, d.password);
         toast.success('Bem-vindo de volta, Herói!');
-        navigate('/dashboard');
+        navigate('/fichas');
       } else {
         const d = data as RegisterFormData;
         await api.auth.register({
@@ -52,10 +55,16 @@ export function Login() {
         // after register, attempt login
         await loginFn(d.email, d.password);
         toast.success('Conta criada com sucesso! Redirecionando...');
-        navigate('/dashboard');
+        navigate('/fichas');
       }
-    } catch (err: any) {
-      toast.error(err?.message || 'Erro ao processar requisição');
+    } catch (err: unknown) {
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : 'Erro ao processar requisição',
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -148,10 +157,23 @@ export function Login() {
           <Button
             variant="gold"
             size="lg"
-            className="w-full mt-2"
+            className="w-full mt-2 flex items-center justify-center gap-2"
             type="submit"
+            disabled={isLoading}
           >
-            {tab === 'login' ? '⚔️ Entrar na Plataforma' : '📜 Criar Conta'}
+            {isLoading ? (
+              'Aguarde...'
+            ) : tab === 'login' ? (
+              <>
+                <Swords size={16} />
+                Entrar na Plataforma
+              </>
+            ) : (
+              <>
+                <Scroll size={16} />
+                Criar Conta
+              </>
+            )}
           </Button>
         </form>
 

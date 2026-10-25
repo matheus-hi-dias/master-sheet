@@ -7,40 +7,27 @@ on:
     branches: [main, develop]
 
 jobs:
-  lint-test-build:
+  quality:
+    name: Quality / ${{ matrix.task }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      NODE_ENV: test
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/master_sheet?schema=public
+    strategy:
+      fail-fast: false
+      matrix:
+        task: [lint, test, build, check-types]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
+      - name: Setup workspace
+        uses: ./.github/actions/setup
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 8
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Lint all packages (turbo)
-        run: pnpm turbo run lint
-
-      - name: Run tests (turbo)
-        run: pnpm turbo run test
-
-      - name: Build all packages (turbo)
-        run: pnpm turbo run build
-
-      - name: Check types (turbo)
-        run: pnpm turbo run check-types
+      - name: Run ${{ matrix.task }}
+        run: pnpm turbo run ${{ matrix.task }}
+        env:
+          NODE_ENV: ${{ matrix.task == 'test' && 'test' || 'production' }}
 
   codeql:
     name: Analyze (CodeQL)

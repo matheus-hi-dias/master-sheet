@@ -5,6 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { MailModule } from './mail/mail.module';
 import { ConfigModule } from '@nestjs/config';
+import { TemplatesModule } from './templates/templates.module';
 import Joi from 'joi';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
@@ -14,6 +15,10 @@ import { APP_GUARD } from '@nestjs/core';
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: Joi.object({
+        NODE_ENV: Joi.string()
+          .valid('development', 'test', 'production')
+          .default('development'),
+        PORT: Joi.number().port().default(3000),
         DATABASE_URL: Joi.string().required(),
         JWT_SECRET: Joi.string().trim().min(1).required(),
         JWT_ACCESS_EXPIRES_IN: Joi.number()
@@ -64,6 +69,7 @@ import { APP_GUARD } from '@nestjs/core';
     AuthModule,
     MailModule,
     PrismaModule,
+    TemplatesModule,
   ],
   controllers: [AppController],
   providers: [

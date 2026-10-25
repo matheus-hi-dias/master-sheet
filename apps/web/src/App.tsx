@@ -6,7 +6,10 @@ import { Toaster } from 'sonner';
 import { Login } from './features/auth/pages/Login';
 import EmailVerified from './features/auth/pages/EmailVerified';
 import EmailVerify from './features/auth/pages/EmailVerify';
-import { Dashboard } from './features/dashboard/pages/Dashboard';
+import { FichasPage } from './features/dashboard/pages/Dashboard';
+import { TemplatesHub } from './features/templates/pages/TemplatesHub';
+import { TemplateBuilder } from './features/builder/pages/TemplateBuilder';
+import { DashboardLayout } from './components/layout/DashboardLayout';
 import { useAuthStore } from './store/useAuthStore';
 import { useThemeStore } from './store/useThemeStore';
 import { useEffect } from 'react';
@@ -23,7 +26,7 @@ const ProtectedRoute = ({ children }: { children: ReactNode }) => {
 // Login Route Wrapper (Redirect to dashboard if already logged in)
 const PublicRoute = ({ children }: { children: ReactNode }) => {
   const isAuth = useAuthStore(s => s.isAuthenticated);
-  if (isAuth) return <Navigate to="/dashboard" replace />;
+  if (isAuth) return <Navigate to="/fichas" replace />;
   return children;
 };
 
@@ -97,17 +100,23 @@ function App() {
                 </PublicRoute>
               }
             />
+
+            {/* Protected Layout wrapper */}
             <Route
-              path="/dashboard"
               element={
                 <ProtectedRoute>
-                  <Dashboard />
+                  <DashboardLayout />
                 </ProtectedRoute>
               }
-            />
-            <Route path="/email-verified" element={<EmailVerified />} />
-            <Route path="/email-verify" element={<EmailVerify />} />
-            <Route path="/verify-email" element={<EmailVerify />} />
+            >
+              <Route path="/fichas" element={<FichasPage />} />
+              <Route path="/templates" element={<TemplatesHub />} />
+              <Route path="/templates/builder" element={<TemplateBuilder />} />
+              <Route path="/templates/builder/:id" element={<TemplateBuilder />} />
+              <Route path="/email-verified" element={<EmailVerified />} />
+              <Route path="/email-verify" element={<EmailVerify />} />
+              <Route path="/verify-email" element={<EmailVerify />} />
+            </Route>
           </Routes>
         </BrowserRouter>
       </ThemeProvider>
