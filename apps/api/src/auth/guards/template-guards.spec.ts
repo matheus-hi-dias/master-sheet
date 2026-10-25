@@ -56,23 +56,23 @@ describe('OwnerGuard', () => {
   it('rejects a non-owner with 403', async () => {
     prisma.template.findUnique.mockResolvedValue({ authorId: 'someone-else' });
 
-    await expect(guard.canActivate(makeContext(user).context)).rejects.toBeInstanceOf(
-      ForbiddenException,
-    );
+    await expect(
+      guard.canActivate(makeContext(user).context),
+    ).rejects.toBeInstanceOf(ForbiddenException);
   });
 
   it('rejects a missing template with 404', async () => {
     prisma.template.findUnique.mockResolvedValue(null);
 
-    await expect(guard.canActivate(makeContext(user).context)).rejects.toBeInstanceOf(
-      NotFoundException,
-    );
+    await expect(
+      guard.canActivate(makeContext(user).context),
+    ).rejects.toBeInstanceOf(NotFoundException);
   });
 
   it('returns false when the request has no authenticated user', async () => {
-    await expect(guard.canActivate(makeContext(undefined).context)).resolves.toBe(
-      false,
-    );
+    await expect(
+      guard.canActivate(makeContext(undefined).context),
+    ).resolves.toBe(false);
   });
 });
 
@@ -116,16 +116,16 @@ describe('TemplateAccessGuard', () => {
   it('rejects another user private template with 403', async () => {
     prisma.template.findUnique.mockResolvedValue(template);
 
-    await expect(guard.canActivate(makeContext(user).context)).rejects.toBeInstanceOf(
-      ForbiddenException,
-    );
+    await expect(
+      guard.canActivate(makeContext(user).context),
+    ).rejects.toBeInstanceOf(ForbiddenException);
   });
 
   it('rejects a missing template with 404', async () => {
     prisma.template.findUnique.mockResolvedValue(null);
 
-    await expect(guard.canActivate(makeContext(user).context)).rejects.toBeInstanceOf(
-      NotFoundException,
-    );
+    await expect(
+      guard.canActivate(makeContext(user).context),
+    ).rejects.toBeInstanceOf(NotFoundException);
   });
 });

@@ -47,7 +47,7 @@ export class TemplatesService {
       create: { name: tag },
     }));
 
-    return this.prisma.template.create({
+    return await this.prisma.template.create({
       data: {
         ...rest,
         structure: structure as unknown as Prisma.InputJsonValue,
@@ -278,7 +278,7 @@ export class TemplatesService {
       create: { name: tag.name },
     }));
 
-    return this.prisma.template.create({
+    return await this.prisma.template.create({
       data: {
         name: `${source.name} (Copy)`,
         description: source.description,

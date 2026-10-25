@@ -8,7 +8,12 @@ import {
   TemplateStructure,
 } from '../types/template-structure.types';
 
-function makeField(field: Partial<FieldDefinition> & { id: string; type: FieldDefinition['type'] }): FieldDefinition {
+function makeField(
+  field: Partial<FieldDefinition> & {
+    id: string;
+    type: FieldDefinition['type'];
+  },
+): FieldDefinition {
   return field as FieldDefinition;
 }
 

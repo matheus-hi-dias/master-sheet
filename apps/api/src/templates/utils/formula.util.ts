@@ -1,11 +1,4 @@
-const FUNCTION_NAMES = new Set([
-  'floor',
-  'ceil',
-  'round',
-  'abs',
-  'min',
-  'max',
-]);
+const FUNCTION_NAMES = new Set(['floor', 'ceil', 'round', 'abs', 'min', 'max']);
 
 const MAX_FORMULA_LENGTH = 500;
 const MAX_NESTING_DEPTH = 50;
@@ -65,8 +58,7 @@ function tokenize(expression: string): Token[] {
 
     if (char === '(' || char === ')' || char === ',') {
       tokens.push({
-        type:
-          char === '(' ? 'lparen' : char === ')' ? 'rparen' : 'comma',
+        type: char === '(' ? 'lparen' : char === ')' ? 'rparen' : 'comma',
         value: char,
       });
       index += 1;
