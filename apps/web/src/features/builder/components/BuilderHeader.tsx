@@ -55,7 +55,7 @@ export function BuilderHeader({
             variant="gold"
             size="sm"
             onClick={onSave}
-            disabled={isSaving}
+            disabled={isSaving || errors.length > 0}
           >
             <Save size={14} />
             {isSaving ? 'Saving…' : editMode ? 'Save changes' : 'Create template'}

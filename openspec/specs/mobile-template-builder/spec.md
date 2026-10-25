@@ -1,7 +1,7 @@
 # mobile-template-builder Specification
 
 ## Purpose
-TBD - created by archiving change multi-system-rpg-template-engine. Update Purpose after archive.
+Defines the mobile template gallery scope toggle, creator-lite builder drill-down, field configuration inspector, and build-time structure validation.
 ## Requirements
 ### Requirement: Mobile Template Gallery Scope Toggle
 The mobile application SHALL allow browsing both the public gallery ("Explorar") and the logged-in user's own templates ("Meus modelos") via a segmented control above the template list, requesting `scope=mine` from the templates API when browsing personal templates.

@@ -15,6 +15,10 @@ import { APP_GUARD } from '@nestjs/core';
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: Joi.object({
+        NODE_ENV: Joi.string()
+          .valid('development', 'test', 'production')
+          .default('development'),
+        PORT: Joi.number().port().default(3000),
         DATABASE_URL: Joi.string().required(),
         JWT_SECRET: Joi.string().trim().min(1).required(),
         JWT_ACCESS_EXPIRES_IN: Joi.number()

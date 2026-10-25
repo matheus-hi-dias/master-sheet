@@ -1,5 +1,6 @@
 import { Type } from 'class-transformer';
 import {
+  ArrayMaxSize,
   IsArray,
   IsIn,
   IsInt,
@@ -206,6 +207,8 @@ export class FieldDefinitionDto {
 
   @ApiPropertyOptional({ type: [FieldDefinitionDto] })
   @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(50)
   @Type(() => FieldDefinitionDto)
   @ValidateNested({ each: true })
   itemSchema?: FieldDefinitionDto[];
@@ -229,6 +232,7 @@ export class SectionDefinitionDto {
 
   @ApiProperty({ type: [FieldDefinitionDto] })
   @IsArray()
+  @ArrayMaxSize(100)
   @Type(() => FieldDefinitionDto)
   @ValidateNested({ each: true })
   fields!: FieldDefinitionDto[];
@@ -250,6 +254,7 @@ export class TabDefinitionDto {
 
   @ApiProperty({ type: [SectionDefinitionDto] })
   @IsArray()
+  @ArrayMaxSize(40)
   @Type(() => SectionDefinitionDto)
   @ValidateNested({ each: true })
   sections!: SectionDefinitionDto[];
@@ -273,6 +278,7 @@ export class TemplateStructureDto {
 
   @ApiProperty({ type: [TabDefinitionDto] })
   @IsArray()
+  @ArrayMaxSize(20)
   @Type(() => TabDefinitionDto)
   @ValidateNested({ each: true })
   tabs!: TabDefinitionDto[];

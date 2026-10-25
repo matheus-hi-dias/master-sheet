@@ -16,6 +16,7 @@ interface TemplatePreviewBottomSheetProps {
   template: TemplateSummary | null;
   visible: boolean;
   creating: boolean;
+  sheetsEnabled: boolean;
   onClose: () => void;
   onCreate: (template: TemplateSummary) => void;
 }
@@ -24,6 +25,7 @@ export function TemplatePreviewBottomSheet({
   template,
   visible,
   creating,
+  sheetsEnabled,
   onClose,
   onCreate,
 }: TemplatePreviewBottomSheetProps) {
@@ -150,20 +152,28 @@ export function TemplatePreviewBottomSheet({
               </View>
             )}
 
-            <Pressable
-              onPress={() => onCreate(template)}
-              disabled={creating}
-              className="mt-6 bg-gold py-3.5 rounded-card items-center justify-center active:bg-gold-dim flex-row gap-2"
-            >
-              {creating ? (
-                <ActivityIndicator size="small" color="#121212" />
-              ) : (
-                <Dices size={16} color="#121212" />
-              )}
-              <Text className="text-[#121212] font-bold text-xs uppercase tracking-widest">
-                {creating ? 'Instanciando...' : '✦ Criar Ficha'}
-              </Text>
-            </Pressable>
+            {sheetsEnabled ? (
+              <Pressable
+                onPress={() => onCreate(template)}
+                disabled={creating}
+                className="mt-6 bg-gold py-3.5 rounded-card items-center justify-center active:bg-gold-dim flex-row gap-2"
+              >
+                {creating ? (
+                  <ActivityIndicator size="small" color="#121212" />
+                ) : (
+                  <Dices size={16} color="#121212" />
+                )}
+                <Text className="text-[#121212] font-bold text-xs uppercase tracking-widest">
+                  {creating ? 'Instanciando...' : '✦ Criar Ficha'}
+                </Text>
+              </Pressable>
+            ) : (
+              <View className="mt-6 border border-border rounded-card py-3.5 items-center">
+                <Text className="text-[10px] text-text-muted font-bold uppercase tracking-widest">
+                  Criação de fichas em breve
+                </Text>
+              </View>
+            )}
           </ScrollView>
         </View>
       </View>

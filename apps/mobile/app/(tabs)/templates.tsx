@@ -23,6 +23,7 @@ import {
   Plus,
 } from 'lucide-react-native';
 import { api } from '../../services/api';
+import { SHEETS_ENABLED } from '../../services/featureFlags';
 import { fetchTemplates } from '../../services/templates';
 import { DEFAULT_SYSTEMS, SYSTEM_LABELS } from '../../types/template';
 import type { TemplateSummary } from '../../types/template';
@@ -94,28 +95,16 @@ export default function TemplatesScreen() {
 
   const createSheetMutation = useMutation({
     mutationFn: async (tmpl: TemplateSummary) => {
-      try {
-        const response = await api.post('/sheets', {
-          templateId: tmpl.id,
-          name: `Ficha de ${tmpl.name}`,
-          data: {},
-        });
-        return response.data;
-      } catch (err: any) {
-        if (err.response?.status === 404) {
-          console.log(
-            'Módulo de sheets indisponível, usando simulação local fluida',
-          );
-          return {
-            id: 'mock-' + Date.now(),
-            templateId: tmpl.id,
-            name: `Ficha de ${tmpl.name}`,
-            data: {},
-            template: tmpl,
-          };
-        }
-        throw err;
+      if (!SHEETS_ENABLED) {
+        throw new Error('Sheet creation is not available yet');
       }
+
+      const response = await api.post('/sheets', {
+        templateId: tmpl.id,
+        name: `Ficha de ${tmpl.name}`,
+        data: {},
+      });
+      return response.data;
     },
     onSuccess: data => {
       setPreviewTemplate(null);
@@ -423,6 +412,7 @@ export default function TemplatesScreen() {
         template={previewTemplate}
         visible={previewTemplate !== null}
         creating={createSheetMutation.isPending}
+        sheetsEnabled={SHEETS_ENABLED}
         onClose={() => setPreviewTemplate(null)}
         onCreate={template => createSheetMutation.mutate(template)}
       />

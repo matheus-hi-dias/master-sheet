@@ -8,15 +8,16 @@ import {
   RefreshControl,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { api } from '../../services/api';
+import { SHEETS_ENABLED } from '../../services/featureFlags';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { FileText, Dices, AlertTriangle } from 'lucide-react-native';
 
 interface SheetItem {
   id: string;
   name?: string;
-  data?: any;
+  data?: Record<string, unknown>;
   template?: {
     name: string;
   };
@@ -25,7 +26,6 @@ interface SheetItem {
 
 export default function SheetsScreen() {
   const router = useRouter();
-  const queryClient = useQueryClient();
   const [refreshing, setRefreshing] = useState(false);
 
   const {
@@ -35,6 +35,7 @@ export default function SheetsScreen() {
     refetch,
   } = useQuery<SheetItem[]>({
     queryKey: ['mobile-sheets'],
+    enabled: SHEETS_ENABLED,
     queryFn: async () => {
       const response = await api.get('/sheets');
       return response.data;
@@ -48,7 +49,11 @@ export default function SheetsScreen() {
   }, [refetch]);
 
   const renderItem = ({ item }: { item: SheetItem }) => {
-    const sheetName = item.name || item.data?.name || 'Aventureiro Sem Nome';
+    const sheetName =
+      item.name ||
+      (typeof item.data?.name === 'string'
+        ? item.data.name
+        : 'Aventureiro Sem Nome');
     const systemName = item.template?.name || 'Sistema Customizado';
 
     return (

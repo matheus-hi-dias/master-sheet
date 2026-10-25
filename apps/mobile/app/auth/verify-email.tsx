@@ -51,19 +51,18 @@ export default function VerifyEmailScreen() {
               E-mail verificado com sucesso!
             </Text>
             <Button
-              title="Continuar para Login"
               onPress={() => router.replace('/login')}
               variant="gold"
-            />
+            >
+              Continuar para Login
+            </Button>
           </>
         ) : (
           <>
             <Text className="text-red-500 text-center mb-6">{error}</Text>
-            <Button
-              title="Voltar"
-              onPress={() => router.replace('/login')}
-              variant="outline"
-            />
+            <Button onPress={() => router.replace('/login')} variant="outline">
+              Voltar
+            </Button>
           </>
         )}
       </View>

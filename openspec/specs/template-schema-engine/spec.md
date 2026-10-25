@@ -1,7 +1,7 @@
 # template-schema-engine Specification
 
 ## Purpose
-TBD - created by archiving change multi-system-rpg-template-engine. Update Purpose after archive.
+Defines the standardized JSON template DSL, its server-side validation rules, and sandboxed formula evaluation shared by every client.
 ## Requirements
 ### Requirement: Standardized Template DSL Schema
 The system SHALL enforce a structured JSON DSL for all template structures, consisting of top-level system metadata, version, and an array of tabs containing sections with configurable grid columns and typed field definitions.

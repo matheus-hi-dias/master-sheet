@@ -60,6 +60,15 @@ describe('evaluateFormula', () => {
     expect(() => evaluateFormula('a + "string"')).toThrow();
   });
 
+  it('does not resolve inherited object properties', () => {
+    expect(() => evaluateFormula('constructor')).toThrow('Unknown identifier');
+    expect(() => evaluateFormula('hasOwnProperty')).toThrow(
+      'Unknown identifier',
+    );
+    expect(() => evaluateFormula('toString(1)')).toThrow('Unknown function');
+    expect(() => evaluateFormula('__proto__')).toThrow('Unknown identifier');
+  });
+
   it('rejects malformed formulas', () => {
     expect(() => evaluateFormula('')).toThrow('empty');
     expect(() => evaluateFormula('(1 + 2')).toThrow();

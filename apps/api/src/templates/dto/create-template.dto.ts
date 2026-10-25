@@ -1,4 +1,5 @@
 import {
+  ArrayMaxSize,
   IsArray,
   IsBoolean,
   IsInt,
@@ -13,12 +14,17 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { TemplateStructureDto } from './template-structure.dto';
 
 export class CreateTemplateDto {
-  @ApiProperty({ example: 'D&D 5e Character Sheet' })
+  @ApiProperty({ example: 'D&D 5e Character Sheet', maxLength: 120 })
   @IsString()
+  @MaxLength(120)
   name: string;
 
-  @ApiPropertyOptional({ example: 'Standard D&D 5e sheet layout' })
+  @ApiPropertyOptional({
+    example: 'Standard D&D 5e sheet layout',
+    maxLength: 2000,
+  })
   @IsString()
+  @MaxLength(2000)
   @IsOptional()
   description?: string;
 
@@ -52,7 +58,9 @@ export class CreateTemplateDto {
     example: ['d&d', 'fantasy'],
   })
   @IsArray()
+  @ArrayMaxSize(20)
   @IsString({ each: true })
+  @MaxLength(32, { each: true })
   @IsOptional()
   tags?: string[];
 }

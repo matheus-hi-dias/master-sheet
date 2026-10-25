@@ -79,19 +79,21 @@ async function bootstrap() {
     }),
   );
 
-  const configSwagger = new DocumentBuilder()
-    .setTitle('Master Sheet API')
-    .setDescription('API for the Master Sheet application')
-    .setVersion('1.0')
-    .addTag('templates')
-    .addTag('auth')
-    .build();
+  if (configService.get<string>('NODE_ENV') !== 'production') {
+    const configSwagger = new DocumentBuilder()
+      .setTitle('Master Sheet API')
+      .setDescription('API for the Master Sheet application')
+      .setVersion('1.0')
+      .addTag('templates')
+      .addTag('auth')
+      .build();
 
-  const documentFactory = () =>
-    SwaggerModule.createDocument(app, configSwagger);
+    const documentFactory = () =>
+      SwaggerModule.createDocument(app, configSwagger);
 
-  SwaggerModule.setup('docs', app, documentFactory);
+    SwaggerModule.setup('docs', app, documentFactory);
+  }
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(configService.get<number>('PORT') ?? 3000);
 }
 bootstrap();

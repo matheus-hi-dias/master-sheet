@@ -29,15 +29,16 @@ Everything under `/templates` applies `JwtAuthGuard` at the controller level; ow
 
 | Method   | Route               | Description                                           | DTO / Protection              |
 | :------- | :------------------ | :---------------------------------------------------- | :---------------------------- |
-| `POST`   | `/templates`        | Create a template skeleton (JSON) with tags.          | `CreateTemplateDto` / `JwtAuthGuard` |
-| `GET`    | `/templates`        | List templates (own + public); filters `tags` (comma-separated) and `isPublic`. | `JwtAuthGuard` |
-| `GET`    | `/templates/:id`    | Return full structure for dynamic rendering (public or owner). | `TemplateAccessGuard` |
-| `PATCH`  | `/templates/:id`    | Update template (owner only).                         | `UpdateTemplateDto` / `OwnerGuard` |
-| `DELETE` | `/templates/:id`    | Delete template; returns `204` (owner only).          | `OwnerGuard`                  |
+| `POST`   | `/templates`        | Create a template skeleton (JSON) with tags.          | `CreateTemplateDto` / `JwtAuthGuard` + `TemplatePayloadGuard` |
+| `GET`    | `/templates`        | List templates (own + public by default). Query: `tags` (comma-separated), `isPublic`, `search`, `system`, `scope` (`public` \| `mine`), `page`, `limit` (max 100). | `JwtAuthGuard` |
+| `GET`    | `/templates/:id`    | Return full structure for dynamic rendering (public or owner). Cached by the guard, no second query. | `TemplateAccessGuard` |
+| `POST`   | `/templates/:id/fork` | Clone a public/owned template into a private one; returns `201` and sets `forkedFromId`. | `TemplateAccessGuard` |
+| `PATCH`  | `/templates/:id`    | Update template (owner only); bumps `version` and syncs `structure.version`. | `UpdateTemplateDto` / `OwnerGuard` + `TemplatePayloadGuard` |
+| `DELETE` | `/templates/:id`    | Delete template; returns `204`, or `409` when sheets depend on it (owner only). | `OwnerGuard`                  |
 
 ### Structure Id Convention
 
-Field `id`s are the canonical reference for formula `expression` identifiers and `dependencies`, and are the keys persisted in `Sheet.data`. Builders generate human-readable, label-derived (slugified, deduplicated) ids for new fields and keep formula references in sync when a still-auto id changes; externally supplied ids are preserved. This is a client-side convention — the API validates ids only as `string` (dependencies must resolve to existing numeric fields, depth-1, acyclic).
+Field `id`s are the canonical reference for formula `expression` identifiers and `dependencies`, and are the keys persisted in `Sheet.data`. Builders generate human-readable, label-derived (slugified, deduplicated) ids for new fields and keep formula references in sync when a still-auto id changes; externally supplied ids are preserved. The API validates the DSL server-side: duplicate ids, formula grammar and whitelisted functions, identifiers used in `expression` must be declared in `dependencies`, dependencies must resolve to existing numeric fields (`number`, `dots`, `checkbox`), formula depth is limited to 1 (cycles impossible), and repeater nesting is capped at 6 levels. String and array sizes are bounded by the DTOs (name ≤ 120, description ≤ 2000, tags ≤ 20 × 32 chars, tabs ≤ 20, sections ≤ 40, fields ≤ 100, itemSchema ≤ 50).
 
 ## Sheets Module — Planned
 

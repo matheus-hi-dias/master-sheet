@@ -151,7 +151,13 @@ export function TemplateBuilder() {
         errors={errors}
         onImport={() => setJsonModal('import')}
         onExport={() => setJsonModal('export')}
-        onSave={() => saveMutation.mutate()}
+        onSave={() => {
+          if (errors.length > 0) {
+            toast.error(errors[0]);
+            return;
+          }
+          saveMutation.mutate();
+        }}
       />
 
       <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,560px)_1fr] gap-5 items-start">

@@ -13,7 +13,7 @@ import {
   Req,
 } from '@nestjs/common';
 import type { Request } from 'express';
-import { TemplatesService } from './templates.service';
+import { TemplatesService, type ForkSource } from './templates.service';
 import { CreateTemplateDto } from './dto/create-template.dto';
 import { UpdateTemplateDto } from './dto/update-template.dto';
 import {
@@ -26,6 +26,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { OwnerGuard } from '../auth/guards/owner.guard';
 import { TemplateAccessGuard } from '../auth/guards/template-access.guard';
 import { GetCurrentUser } from '../auth/decorators/get-user.decorator';
+import { TemplatePayloadGuard } from './guards/template-payload.guard';
 
 @ApiTags('templates')
 @ApiBearerAuth()
@@ -35,6 +36,7 @@ export class TemplatesController {
   constructor(private readonly templatesService: TemplatesService) {}
 
   @Post()
+  @UseGuards(TemplatePayloadGuard)
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create a new template (skeleton)' })
   create(
@@ -121,12 +123,15 @@ export class TemplatesController {
   @ApiOperation({
     summary: 'Fork a public template (or own) into a private clone',
   })
-  fork(@GetCurrentUser('userId') userId: string, @Param('id') id: string) {
-    return this.templatesService.fork(userId, id);
+  fork(
+    @GetCurrentUser('userId') userId: string,
+    @Req() request: Request & { template: ForkSource },
+  ) {
+    return this.templatesService.fork(userId, request.template);
   }
 
   @Patch(':id')
-  @UseGuards(OwnerGuard)
+  @UseGuards(OwnerGuard, TemplatePayloadGuard)
   @ApiOperation({ summary: 'Update a template (owner only)' })
   update(
     @Param('id') id: string,

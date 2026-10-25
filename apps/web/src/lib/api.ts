@@ -1,6 +1,7 @@
 import { useAuthStore } from '../store/useAuthStore';
+import { getApiBaseUrl } from '../services/api';
 
-const API_URL = 'http://localhost:3000';
+const API_URL = getApiBaseUrl();
 
 export async function fetchApi(endpoint: string, options: RequestInit = {}) {
   const { accessToken, logout } = useAuthStore.getState();
@@ -18,13 +19,18 @@ export async function fetchApi(endpoint: string, options: RequestInit = {}) {
   });
 
   if (response.status === 401) {
-    logout();
+    await logout().catch(() => undefined);
     throw new Error('Unauthorized');
   }
 
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || 'Something went wrong');
+    const errorData = (await response.json().catch(() => ({}))) as {
+      message?: string | string[];
+    };
+    const message = Array.isArray(errorData.message)
+      ? errorData.message.join(', ')
+      : errorData.message;
+    throw new Error(message || 'Something went wrong');
   }
 
   // Handle NO_CONTENT responses gracefully

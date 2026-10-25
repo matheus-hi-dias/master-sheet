@@ -1,7 +1,7 @@
 # mobile-dynamic-sheets Specification
 
 ## Purpose
-TBD - created by archiving change multi-system-rpg-template-engine. Update Purpose after archive.
+Defines the mobile dynamic sheet renderer, tab navigation, and contextual dice roller driven by a template's DSL structure.
 ## Requirements
 ### Requirement: Dynamic Mobile Sheet Form Rendering
 The mobile application SHALL render character sheets dynamically according to the template's structured tabs and field definitions, replacing static hardcoded D&D attributes.

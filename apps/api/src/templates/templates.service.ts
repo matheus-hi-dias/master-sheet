@@ -10,6 +10,10 @@ import { UpdateTemplateDto } from './dto/update-template.dto';
 import { validateFormulaDependencies } from './utils/template-structure.util';
 import type { Prisma } from '../generated/prisma/client';
 
+export type ForkSource = Prisma.TemplateGetPayload<{
+  include: { tags: true };
+}>;
+
 @Injectable()
 export class TemplatesService {
   constructor(private readonly prisma: PrismaService) {}
@@ -185,29 +189,29 @@ export class TemplatesService {
 
     const { tags, structure, system, version, ...rest } = updateTemplateDto;
 
-    const updateData: Record<string, unknown> = { ...rest };
+    const updateData: Prisma.TemplateUpdateInput = { ...rest };
 
     if (structure !== undefined) {
       validateFormulaDependencies(structure);
 
-      updateData.structure = structure;
+      const nextVersion = version ?? existing.version + 1;
+
+      updateData.structure = {
+        ...structure,
+        version: nextVersion,
+      } as unknown as Prisma.InputJsonValue;
+      updateData.version = nextVersion;
 
       if (system === undefined) {
         updateData.system =
           structure.system?.toLowerCase().trim() ?? existing.system;
       }
-
-      if (version === undefined) {
-        updateData.version = existing.version + 1;
-      }
+    } else if (version !== undefined) {
+      updateData.version = version;
     }
 
     if (system !== undefined) {
       updateData.system = system.toLowerCase().trim();
-    }
-
-    if (version !== undefined) {
-      updateData.version = version;
     }
 
     if (tags !== undefined) {
@@ -223,7 +227,7 @@ export class TemplatesService {
       };
     }
 
-    return this.prisma.template.update({
+    const updated = await this.prisma.template.update({
       where: { id },
       data: updateData,
       include: {
@@ -233,6 +237,16 @@ export class TemplatesService {
         },
       },
     });
+
+    if (tags !== undefined) {
+      // Tags detached by `set: []` are not removed by Prisma; sweep the ones
+      // that no longer belong to any template or sheet.
+      await this.prisma.tag.deleteMany({
+        where: { templates: { none: {} }, sheets: { none: {} } },
+      });
+    }
+
+    return updated;
   }
 
   async remove(id: string) {
@@ -254,16 +268,7 @@ export class TemplatesService {
     return this.prisma.template.delete({ where: { id } });
   }
 
-  async fork(userId: string, sourceId: string) {
-    const source = await this.prisma.template.findUnique({
-      where: { id: sourceId },
-      include: { tags: true },
-    });
-
-    if (!source) {
-      throw new NotFoundException('Template not found');
-    }
-
+  async fork(userId: string, source: ForkSource) {
     if (!source.isPublic && source.authorId !== userId) {
       throw new ForbiddenException('You do not have access to this template');
     }

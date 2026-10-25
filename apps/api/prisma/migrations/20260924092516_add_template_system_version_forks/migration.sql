@@ -1,16 +1,17 @@
 /*
-  Warnings:
-
-  - Added the required column `updatedAt` to the `Template` table without a default value. This is not possible if the table is not empty.
-
+  `updatedAt` is added with a temporary default so existing rows are backfilled
+  before the default is dropped (Prisma's `@updatedAt` is app-side).
 */
 -- AlterTable
 ALTER TABLE "Template" ADD COLUMN     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 ADD COLUMN     "forkedFromId" TEXT,
 ADD COLUMN     "isOfficial" BOOLEAN NOT NULL DEFAULT false,
 ADD COLUMN     "system" TEXT NOT NULL DEFAULT 'custom',
-ADD COLUMN     "updatedAt" TIMESTAMP(3) NOT NULL,
+ADD COLUMN     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 ADD COLUMN     "version" INTEGER NOT NULL DEFAULT 1;
+
+-- AlterTable
+ALTER TABLE "Template" ALTER COLUMN "updatedAt" DROP DEFAULT;
 
 -- AlterTable
 ALTER TABLE "_SheetToTag" ADD CONSTRAINT "_SheetToTag_AB_pkey" PRIMARY KEY ("A", "B");

@@ -1,13 +1,18 @@
 export type FormulaContext = Record<string, number>;
 
-const FUNCTION_WHITELIST: Record<string, (...args: number[]) => number> = {
-  floor: a => Math.floor(a),
-  ceil: a => Math.ceil(a),
-  round: a => Math.round(a),
-  abs: a => Math.abs(a),
-  min: (...args) => Math.min(...args),
-  max: (...args) => Math.max(...args),
-};
+const FUNCTION_WHITELIST: Record<string, (...args: number[]) => number> =
+  Object.assign(Object.create(null), {
+    floor: (a: number) => Math.floor(a),
+    ceil: (a: number) => Math.ceil(a),
+    round: (a: number) => Math.round(a),
+    abs: (a: number) => Math.abs(a),
+    min: (...args: number[]) => Math.min(...args),
+    max: (...args: number[]) => Math.max(...args),
+  });
+
+function hasOwn(target: object, key: string): boolean {
+  return Object.prototype.hasOwnProperty.call(target, key);
+}
 
 type TokenType =
   | 'number'
@@ -187,7 +192,7 @@ class Parser {
         return this.parseFunctionCall(token.value);
       }
 
-      if (!(token.value in this.context)) {
+      if (!hasOwn(this.context, token.value)) {
         throw new Error(`Unknown identifier "${token.value}" in formula`);
       }
 
@@ -198,10 +203,11 @@ class Parser {
   }
 
   private parseFunctionCall(name: string): number {
-    const fn = FUNCTION_WHITELIST[name];
-    if (!fn) {
+    if (!hasOwn(FUNCTION_WHITELIST, name)) {
       throw new Error(`Unknown function "${name}" in formula`);
     }
+
+    const fn = FUNCTION_WHITELIST[name];
 
     const args: number[] = [];
 
@@ -301,6 +307,6 @@ export function renderExpressionWithLabels(
   labelById: Record<string, string> = {},
 ): string {
   return expression.replace(IDENTIFIER_GLOBAL_RE, (token) =>
-    token in labelById ? `⟨${labelById[token]}⟩` : token,
+    hasOwn(labelById, token) ? `⟨${labelById[token]}⟩` : token,
   );
 }

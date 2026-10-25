@@ -1,7 +1,7 @@
 # web-template-builder Specification
 
 ## Purpose
-TBD - created by archiving change multi-system-rpg-template-engine. Update Purpose after archive.
+Defines the web Templates Hub and two-pane visual template builder: discovery and filtering, live preview, raw JSON import/export, and legible formula authoring.
 ## Requirements
 ### Requirement: Tabbed Templates Discovery Hub
 The web application SHALL provide a tabbed Templates Hub allowing users to toggle between "Community Gallery" (public & official templates) and "My Templates" (user-created private & published templates) with debounced search, system filters, and dynamic tag filtering.

@@ -1,7 +1,7 @@
 # template-management Specification
 
 ## Purpose
-TBD - created by archiving change multi-system-rpg-template-engine. Update Purpose after archive.
+Defines template lifecycle operations exposed by the API: forking, deletion protection, versioning, and server-side discovery queries.
 ## Requirements
 ### Requirement: Template Forking
 The system SHALL allow authenticated users to fork any accessible public template or owned template into their personal collection as a new private template, preserving lineage with `forkedFromId`.
