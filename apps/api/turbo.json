@@ -7,6 +7,12 @@
     },
     "check-types": {
       "dependsOn": ["db:generate", "^check-types"]
+    },
+    "lint": {
+      "dependsOn": ["db:generate", "^lint"]
+    },
+    "test": {
+      "dependsOn": ["db:generate", "^build"]
     }
   }
 }

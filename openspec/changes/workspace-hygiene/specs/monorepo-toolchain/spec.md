@@ -72,12 +72,17 @@ The workspace SHALL NOT contain directories that match workspace globs without a
 
 ### Requirement: Reproducible Generated Artifacts
 
-Generated artifacts required for compilation, including the Prisma client, SHALL be produced as part of the Turborepo task graph rather than relying solely on a package `postinstall` hook.
+Generated artifacts required for compilation, linting, type-checking, or testing, including the Prisma client, SHALL be produced as part of the Turborepo task graph rather than relying solely on a package `postinstall` hook.
 
 #### Scenario: Fresh checkout builds without manual generation
 
 - **WHEN** a clean checkout runs `pnpm build` with dependencies installed
 - **THEN** the Prisma client is generated before `api` compiles and the build succeeds without a manual `prisma generate`
+
+#### Scenario: Every API task generates the Prisma client
+
+- **WHEN** `pnpm turbo run lint check-types test build --filter @master-sheet/api` runs with `src/generated` absent
+- **THEN** `db:generate` runs before each task that imports the client and every task succeeds
 
 ### Requirement: Dependency Isolation
 
@@ -104,9 +109,23 @@ The root README SHALL describe the actual product, workspace map, task commands,
 
 ### Requirement: Single Formatting Contract
 
-The repository SHALL define Prettier configuration at the root and SHALL apply it consistently to all TypeScript, TSX, JSON, and Markdown files through the root `format` script.
+The repository SHALL define Prettier configuration at the root and SHALL apply it consistently to all TypeScript, TSX, JSON, and Markdown files through the root `format` and `format:check` scripts. CI SHALL fail when any file matched by the root Prettier glob is not formatted.
 
 #### Scenario: Formatting is consistent across apps
 
 - **WHEN** a contributor runs the root format command
 - **THEN** files in every app and package are formatted according to the same root configuration and no app-local Prettier config overrides it
+
+#### Scenario: CI blocks unformatted files
+
+- **WHEN** a pull request contains an unformatted TypeScript, TSX, JSON, or Markdown file
+- **THEN** the `Format / prettier` CI job fails
+
+### Requirement: Enforced Runtime Range
+
+The root manifest SHALL declare a Node.js engine range compatible with the frontend toolchain, and the root `.npmrc` SHALL enforce it during installation.
+
+#### Scenario: Unsupported Node version fails installation
+
+- **WHEN** `pnpm install` runs on a Node.js version outside `^20.19.0 || >=22.12.0`
+- **THEN** installation fails before dependencies are installed

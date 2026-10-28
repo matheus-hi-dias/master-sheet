@@ -78,7 +78,9 @@ Decision: don't force a single ESLint config on Nest; forcing it would require d
 
 - Remove root `node-linker=hoisted`; keep `apps/mobile/.npmrc` (Metro). This may surface phantom dependencies; the migration task is to declare them per package rather than re-enable hoisting globally.
 - Add root `.prettierrc.json`; delete `apps/api/.prettierrc` (or reduce it to overrides if Nest needs different print width). Root `format` script then covers `ts/tsx/md/json`.
-- Turbo: add `db:generate` task (`cache: false`, `inputs: ["prisma/**"]`, `outputs: ["src/generated/**"]`) and make `api#build` and `api#check-types` depend on it. Keep `postinstall` for editor/IDE convenience.
+- Turbo: add `db:generate` task (`cache: false`, `inputs: ["prisma/**"]`, `outputs: ["src/generated/**"]`) and make `api#build`, `api#check-types`, `api#lint`, and `api#test` depend on it. Keep `postinstall` for editor/IDE convenience.
+- Add root `format:check` and a `Format / prettier` CI job so unformatted files fail closed.
+- Enforce the Node range with root `engine-strict=true`, using the Vite 7-compatible range `^20.19.0 || >=22.12.0`.
 - `docker-compose.yml`: drop obsolete `version:`, add `healthcheck: pg_isready -U $POSTGRES_USER -d $POSTGRES_DB`, keep `db` only.
 - Agent config: choose `.opencode/` as the working tool source and `.github/` (Copilot) as a mirror; delete `.agent/` if no tool reads it, or document it as the canonical source that the others mirror. Decision: delete `.agent/` and note `.opencode/` as canonical in the README.
 

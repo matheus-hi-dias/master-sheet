@@ -18,7 +18,7 @@ All workspaces are private and use the `@master-sheet/*` scope.
 
 ## Prerequisites
 
-- Node.js 20 or newer (CI runs Node 20; local `.nvmrc` is not used)
+- Node.js ^20.19.0 or >=22.12.0 (Vite 7 requirement; enforced by `engine-strict=true`)
 - pnpm 9 (`corepack enable` picks up the version pinned in `package.json`)
 - Docker Desktop or another Docker runtime for the local PostgreSQL container
 
@@ -83,7 +83,7 @@ pnpm --filter @master-sheet/web dev
 pnpm --filter @master-sheet/mobile start
 ```
 
-Prisma client generation is part of the Turbo graph: `@master-sheet/api#build` and `@master-sheet/api#check-types` depend on the uncached `db:generate` task. `postinstall` also generates the client for editor/IDE convenience.
+Prisma client generation is part of the Turbo graph: `@master-sheet/api#build`, `#check-types`, `#lint`, and `#test` depend on the uncached `db:generate` task. `postinstall` also generates the client for editor/IDE convenience.
 
 ## Workspace conventions
 

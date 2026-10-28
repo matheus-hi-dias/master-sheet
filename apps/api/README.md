@@ -73,15 +73,15 @@ Master Sheet API handles authentication, user management, email verification, an
 
 ## 🛠️ Tech Stack
 
-| Layer         | Technology                              |
-| ------------- | --------------------------------------- |
-| **Runtime**   | Node.js 20+                             |
-| **Framework** | NestJS 11.x                             |
-| **Language**  | TypeScript 5.x (strict mode)            |
-| **Database**  | PostgreSQL 12+                          |
-| **ORM**       | Prisma                                  |
-| **Testing**   | Jest + Supertest                        |
-| **Security**  | bcrypt, JWT, helmet, express-rate-limit |
+| Layer         | Technology                             |
+| ------------- | -------------------------------------- |
+| **Runtime**   | Node.js 20+                            |
+| **Framework** | NestJS 11.x                            |
+| **Language**  | TypeScript 5.x (strict mode)           |
+| **Database**  | PostgreSQL 12+                         |
+| **ORM**       | Prisma                                 |
+| **Testing**   | Jest + Supertest                       |
+| **Security**  | bcrypt, JWT, helmet, @nestjs/throttler |
 
 ---
 
@@ -89,7 +89,7 @@ Master Sheet API handles authentication, user management, email verification, an
 
 ### Prerequisites
 
-- Node.js 20+ | pnpm 8+ | PostgreSQL 12+
+- Node.js 20.19+ or 22.12+ | pnpm 9+ | PostgreSQL 12+
 
 ### 1️⃣ Installation
 
@@ -372,8 +372,8 @@ src/
 ### Code Style
 
 - ✅ TypeScript strict mode (enforced)
-- ✅ ESLint config ([eslint-config](../../packages/eslint-config))
-- ✅ Prettier on commit (Husky)
+- ✅ ESLint config (`eslint.config.mjs`)
+- ✅ Prettier via the root `pnpm format` command
 - ✅ Max 300 lines per file
 - ✅ Comprehensive test coverage
 

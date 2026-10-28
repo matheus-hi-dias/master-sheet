@@ -10,7 +10,7 @@
 - [x] 2.2 Add `check-types` to `apps/web` (`tsc -p tsconfig.app.json --noEmit`) and verify it passes
 - [x] 2.3 Add `lint` to `apps/mobile` with a flat ESLint config compatible with Expo/React Native, and verify it passes
 - [x] 2.4 Add `check-types` to `apps/mobile` (`tsc --noEmit`) and fix any surfaced type errors
-- [x] 2.5 Add a real `test` runner to `apps/mobile` (jest-expo + testing-library) and make `__tests__/verify-email.test.tsx` pass, or delete the orphan test and leave `test` out of the contract for mobile
+- [x] 2.5 Add a real `test` runner to `apps/mobile` (jest-expo + testing-library) and make `__tests__/verify-email.test.tsx` cover the success and API-error paths, or delete the orphan test and leave `test` out of the contract for mobile
 - [x] 2.6 Add root `test` and `check-types` scripts that proxy the Turbo tasks
 - [x] 2.7 Run `pnpm turbo run lint check-types test build` and confirm every app executes its required tasks
 
@@ -50,9 +50,11 @@
 - [x] 7.1 Remove `node-linker=hoisted` from the root `.npmrc`; keep it in `apps/mobile/.npmrc` and document why
 - [x] 7.2 Run a clean `pnpm install` and declare any newly surfaced phantom dependencies explicitly
 - [x] 7.3 Add a root `.prettierrc.json`, remove `apps/api/.prettierrc`, and confirm `pnpm format` is consistent
-- [x] 7.4 Add a `db:generate` task to `turbo.json` and make `api#build` and `api#check-types` depend on it
+- [x] 7.4 Add a `db:generate` task to `turbo.json` and make `api#build`, `api#check-types`, `api#lint`, and `api#test` depend on it
 - [x] 7.5 Remove the obsolete `version:` key from `docker-compose.yml` and add a `pg_isready` healthcheck
 - [x] 7.6 Delete `.agent/` (or document it as canonical) so only one agent-instruction source drives `.github/` and `.opencode/`
+- [x] 7.7 Add a root `format:check` script and a `Format / prettier` CI job
+- [x] 7.8 Set the root Node engine range and enforce it with `engine-strict=true`
 
 ## 8. Documentation
 
@@ -62,7 +64,7 @@
 
 ## 9. Verification
 
-- [x] 9.1 Run `pnpm verify:workspace && pnpm lint && pnpm check-types && pnpm test && pnpm build` on a clean checkout
+- [x] 9.1 Run `pnpm verify:workspace && pnpm format:check && pnpm lint && pnpm check-types && pnpm test && pnpm build` on a clean checkout
 - [x] 9.2 Confirm CI passes and that removing a script from any app makes `verify:workspace` fail
 - [x] 9.3 Confirm `docker compose up -d db` reports healthy
 - [x] 9.4 Re-run `openspec validate workspace-hygiene --type change --strict`
