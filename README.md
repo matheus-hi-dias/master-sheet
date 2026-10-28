@@ -72,6 +72,7 @@ The API listens on `http://localhost:3000`, the web app on `http://localhost:517
 | `pnpm check-types`      | Runs `tsc --noEmit` in every workspace.                                    |
 | `pnpm test`             | Runs Jest in every workspace.                                              |
 | `pnpm format`           | Formats `ts`, `tsx`, `md`, and `json` with the root Prettier config.       |
+| `pnpm format:check`     | Fails if any file is not formatted with the root Prettier config.          |
 | `pnpm verify:workspace` | Fails if a workspace is missing a required task or a `package.json`.       |
 
 Target a single workspace with its scoped name, for example:

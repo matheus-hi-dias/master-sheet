@@ -16,12 +16,6 @@
     "check-types": {
       "dependsOn": ["^check-types"]
     },
-    "@master-sheet/api#build": {
-      "dependsOn": ["db:generate", "^build"]
-    },
-    "@master-sheet/api#check-types": {
-      "dependsOn": ["db:generate", "^check-types"]
-    },
     "db:generate": {
       "cache": false,
       "inputs": ["prisma/**"],
