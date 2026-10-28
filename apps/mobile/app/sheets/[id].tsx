@@ -24,7 +24,7 @@ import { DynamicSheetRenderer } from '@/components/sheet/DynamicSheetRenderer';
 interface SheetData {
   id: string;
   name?: string;
-  data: Record<string, any>;
+  data: Record<string, unknown>;
   template?: {
     name: string;
     structure?: TemplateStructure;
@@ -88,7 +88,7 @@ export default function SheetViewScreen() {
   const queryClient = useQueryClient();
 
   const [activeTabId, setActiveTabId] = useState<string | null>(null);
-  const [localData, setLocalData] = useState<Record<string, any>>({});
+  const [localData, setLocalData] = useState<Record<string, unknown>>({});
   const [saveStatus, setSaveStatus] = useState<'saved' | 'saving'>('saved');
   const [rollOpen, setRollOpen] = useState(false);
 
@@ -111,7 +111,9 @@ export default function SheetViewScreen() {
             const detail = await fetchTemplateDetail(String(templateId));
             tmplName = detail.name;
             structure = detail.structure;
-          } catch {}
+          } catch {
+            structure = undefined;
+          }
         }
 
         return {
@@ -147,19 +149,19 @@ export default function SheetViewScreen() {
   }, [sheet]);
 
   useEffect(() => {
-    if (tabs.length > 0 && !tabs.some(tab => tab.id === activeTabId)) {
+    if (tabs.length > 0 && !tabs.some((tab) => tab.id === activeTabId)) {
       setActiveTabId(tabs[0].id);
     }
   }, [tabs, activeTabId]);
 
   // Mutação para Auto-save com Optimistic UI
   const updateSheetMutation = useMutation({
-    mutationFn: async (newData: Record<string, any>) => {
+    mutationFn: async (newData: Record<string, unknown>) => {
       if (isMock) return newData;
       const response = await api.patch(`/sheets/${id}`, { data: newData });
       return response.data;
     },
-    onMutate: async newData => {
+    onMutate: async (newData) => {
       setSaveStatus('saving');
       await queryClient.cancelQueries({ queryKey: ['sheet', id] });
       const previousSheet = queryClient.getQueryData<SheetData>(['sheet', id]);
@@ -187,7 +189,7 @@ export default function SheetViewScreen() {
     },
   });
 
-  const handleFieldChange = (key: string, value: any) => {
+  const handleFieldChange = (key: string, value: unknown) => {
     const updated = { ...localData, [key]: value };
     setLocalData(updated);
     updateSheetMutation.mutate(updated);
@@ -210,10 +212,12 @@ export default function SheetViewScreen() {
     );
   };
 
-  const sheetName = sheet?.name || localData?.name || 'Ficha do Aventureiro';
+  const localName =
+    typeof localData.name === 'string' ? localData.name : undefined;
+  const sheetName = sheet?.name || localName || 'Ficha do Aventureiro';
   const systemName = sheet?.template?.name || 'Sistema Dinâmico';
 
-  const activeTab = tabs.find(tab => tab.id === activeTabId);
+  const activeTab = tabs.find((tab) => tab.id === activeTabId);
 
   return (
     <SafeAreaView edges={['top']} className="flex-1 bg-bg-app">
@@ -223,7 +227,10 @@ export default function SheetViewScreen() {
       >
         {/* Cabeçalho */}
         <View className="px-4 pt-3 pb-3 bg-bg-panel border-b border-border flex-row items-center justify-between">
-          <Pressable onPress={() => router.back()} className="p-2 -ml-2 active:opacity-60">
+          <Pressable
+            onPress={() => router.back()}
+            className="p-2 -ml-2 active:opacity-60"
+          >
             <Text className="text-gold font-bold text-base">◀ Voltar</Text>
           </Pressable>
 
@@ -281,7 +288,7 @@ export default function SheetViewScreen() {
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={{ paddingHorizontal: 12 }}
               >
-                {tabs.map(tab => {
+                {tabs.map((tab) => {
                   const isActive = tab.id === activeTabId;
                   return (
                     <Pressable
@@ -360,9 +367,13 @@ export default function SheetViewScreen() {
               </View>
 
               <ScrollView
-                contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 28, gap: 8 }}
+                contentContainerStyle={{
+                  paddingHorizontal: 20,
+                  paddingBottom: 28,
+                  gap: 8,
+                }}
               >
-                {diceAttributes.map(attribute => (
+                {diceAttributes.map((attribute) => (
                   <Pressable
                     key={attribute.id}
                     onPress={() => handleRoll(attribute)}

@@ -14,7 +14,13 @@ function hasOwn(target: object, key: string): boolean {
   return Object.prototype.hasOwnProperty.call(target, key);
 }
 
-type TokenType = 'number' | 'identifier' | 'operator' | 'lparen' | 'rparen' | 'comma';
+type TokenType =
+  | 'number'
+  | 'identifier'
+  | 'operator'
+  | 'lparen'
+  | 'rparen'
+  | 'comma';
 
 interface Token {
   type: TokenType;

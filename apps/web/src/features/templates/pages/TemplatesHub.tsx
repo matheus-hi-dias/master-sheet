@@ -17,10 +17,7 @@ import { PageHeader } from '../../../components/ui/PageHeader';
 import { Button } from '../../../components/ui/Button';
 import { Input } from '../../../components/ui/Input';
 import { Tag } from '../../../components/ui/Tag';
-import {
-  TemplateCard,
-  type TemplateData,
-} from '../components/TemplateCard';
+import { TemplateCard, type TemplateData } from '../components/TemplateCard';
 import { TemplateDetailDrawer } from '../components/TemplateDetailDrawer';
 import { fetchTemplates } from '../services/templatesApi';
 import { DEFAULT_SYSTEMS, SYSTEM_LABELS } from '../types/template-structure';
@@ -109,9 +106,7 @@ export function TemplatesHub() {
   const toggleTag = (name: string) => {
     setPage(1);
     setSelectedTags((prev) =>
-      prev.includes(name)
-        ? prev.filter((t) => t !== name)
-        : [...prev, name],
+      prev.includes(name) ? prev.filter((t) => t !== name) : [...prev, name],
     );
   };
 
@@ -270,8 +265,8 @@ export function TemplatesHub() {
                 <ChevronLeft size={14} /> Previous
               </Button>
               <span className="text-[12px] text-text-muted">
-                Page {meta.page} of {meta.totalPages} · {meta.total}{' '}
-                template{meta.total !== 1 ? 's' : ''}
+                Page {meta.page} of {meta.totalPages} · {meta.total} template
+                {meta.total !== 1 ? 's' : ''}
               </span>
               <Button
                 variant="outline"

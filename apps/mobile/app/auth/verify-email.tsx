@@ -24,10 +24,10 @@ export default function VerifyEmailScreen() {
     try {
       await api.post('/auth/verify-email', { token });
       setSuccess(true);
-    } catch (err: any) {
-      setError(
-        err.response?.data?.message || 'Falha na verificação do e-mail.',
-      );
+    } catch (err) {
+      const message = (err as { response?: { data?: { message?: string } } })
+        .response?.data?.message;
+      setError(message || 'Falha na verificação do e-mail.');
     } finally {
       setLoading(false);
     }
@@ -50,10 +50,7 @@ export default function VerifyEmailScreen() {
             <Text className="text-[#E0E0E0] text-center mb-6">
               E-mail verificado com sucesso!
             </Text>
-            <Button
-              onPress={() => router.replace('/login')}
-              variant="gold"
-            >
+            <Button onPress={() => router.replace('/login')} variant="gold">
               Continuar para Login
             </Button>
           </>

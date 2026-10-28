@@ -27,7 +27,7 @@ export const registerSchema = loginSchema
     confirmPassword: z.string().min(1, 'A confirmação de senha é obrigatória'),
     password: passwordRules,
   })
-  .refine(data => data.password === data.confirmPassword, {
+  .refine((data) => data.password === data.confirmPassword, {
     message: 'As senhas não coincidem',
     path: ['confirmPassword'],
   });

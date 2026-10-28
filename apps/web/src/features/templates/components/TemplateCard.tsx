@@ -102,7 +102,9 @@ export function TemplateCard({
             </span>
           )}
           {!tmpl.official && (
-            <span className="text-[11px] text-text-muted">por {tmpl.creator}</span>
+            <span className="text-[11px] text-text-muted">
+              por {tmpl.creator}
+            </span>
           )}
         </div>
 
@@ -127,7 +129,12 @@ export function TemplateCard({
         >
           Usar Modelo
         </Button>
-        <Button variant="outline" size="sm" onClick={onDetail} className="flex-1">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onDetail}
+          className="flex-1"
+        >
           Ver Detalhes
         </Button>
       </div>

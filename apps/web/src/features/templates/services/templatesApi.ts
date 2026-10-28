@@ -39,7 +39,9 @@ export async function fetchTemplates(
   return fetchApi(qs ? `/templates?${qs}` : '/templates');
 }
 
-export async function fetchTemplateDetail(id: string): Promise<TemplateSummary> {
+export async function fetchTemplateDetail(
+  id: string,
+): Promise<TemplateSummary> {
   return fetchApi(`/templates/${id}`);
 }
 

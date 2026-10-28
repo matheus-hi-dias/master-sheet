@@ -20,10 +20,10 @@ Critical: raw `process.env` is forbidden — always inject `ConfigService`.
 
 ## Commands
 
-- Run: `pnpm --filter api start:dev`
-- Migrations: `pnpm --filter api exec prisma migrate dev --name <short_name>` (schema at `apps/api/prisma/schema.prisma`)
-- Generate client: `pnpm --filter api exec prisma generate`
-- Tests: `pnpm --filter api test` (jest, `*.spec.ts`)
+- Run: `pnpm --filter @master-sheet/api start:dev`
+- Migrations: `pnpm --filter @master-sheet/api exec prisma migrate dev --name <short_name>` (schema at `apps/api/prisma/schema.prisma`)
+- Generate client: `pnpm --filter @master-sheet/api exec prisma generate`
+- Tests: `pnpm --filter @master-sheet/api test` (jest, `*.spec.ts`)
 
 ## Testing
 

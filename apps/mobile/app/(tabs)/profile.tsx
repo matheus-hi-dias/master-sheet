@@ -22,7 +22,7 @@ export default function ProfileScreen() {
       try {
         const token = await SecureStore.getItemAsync('master-sheet-jwt');
         if (token) {
-          const decoded: any = jwtDecode(token);
+          const decoded = jwtDecode<UserPayload>(token);
           setUserData(decoded);
         }
       } catch (err) {
@@ -45,7 +45,7 @@ export default function ProfileScreen() {
             await logout();
           },
         },
-      ]
+      ],
     );
   };
 
@@ -86,7 +86,9 @@ export default function ProfileScreen() {
           </Text>
           <View className="flex-row justify-between py-1.5 border-b border-border/50">
             <Text className="text-xs text-text-muted">Conexão</Text>
-            <Text className="text-xs text-success font-bold">Autenticado via JWT</Text>
+            <Text className="text-xs text-success font-bold">
+              Autenticado via JWT
+            </Text>
           </View>
           <View className="flex-row justify-between py-1.5 border-b border-border/50">
             <Text className="text-xs text-text-muted">Armazenamento</Text>

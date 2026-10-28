@@ -1,6 +1,7 @@
 ## Context
 
 Master-Sheet is a Turborepo monorepo consisting of:
+
 - `apps/api`: NestJS, Prisma ORM, PostgreSQL.
 - `apps/web`: React + Vite SPA, Tailwind CSS, React Query.
 - `apps/mobile`: React Native / Expo, NativeWind, React Query.
@@ -10,6 +11,7 @@ Currently, templates only accept arbitrary JSON without schema validation, lack 
 ## Goals / Non-Goals
 
 **Goals:**
+
 - Define a standardized, extensible JSON DSL for RPG sheet structures (`Template.structure`), including support for tabs, grid sections, diverse field types (`number`, `text`, `dots`, `select`, `checkbox`, `formula`, `repeater`).
 - Implement recursive NestJS DTO validation for template creation and updates.
 - Support template forking with author lineage and prevent deleting templates in use by active character sheets.
@@ -20,6 +22,7 @@ Currently, templates only accept arbitrary JSON without schema validation, lack 
 - Implement a creator-lite Mobile Template Builder: drill-down structure editing (tabs → sections → fields), bottom-sheet field configuration, live preview reusing the mobile sheet renderer, and a "Meus modelos" gallery scope (`scope=mine`) as its entry point.
 
 **Non-Goals:**
+
 - Real-time multiplayer synchronization or collaborative sheet editing (WebSockets/CRDTs) — to be scoped separately.
 - Automated third-party PDF to template OCR parsing.
 - Marketplace payment processing for premium templates.
@@ -29,6 +32,7 @@ Currently, templates only accept arbitrary JSON without schema validation, lack 
 ## Decisions
 
 ### 1. Standardized JSON DSL Schema for `Template.structure`
+
 - **Structure Tree:**
   - `system`: String identifier (e.g., `dnd5e`, `vampire_v5`, `tormenta20`, `coc7e`, `custom`).
   - `version`: Integer for structure versioning.
@@ -45,22 +49,27 @@ Currently, templates only accept arbitrary JSON without schema validation, lack 
 - **Rationale:** Supports any tabletop RPG ruleset without hardcoded database tables per system.
 
 ### 2. Math Formula Evaluator (Safe, Sandboxed)
+
 - **Choice:** Lightweight mathematical expression evaluator based on tokenization / AST or safe regex evaluator supporting standard math functions (`floor`, `ceil`, `round`, `abs`, `min`, `max`, basic arithmetic).
 - **Alternative considered:** `eval()` or `new Function()` — rejected due to XSS and remote code injection risks.
 
 ### 3. Template Forking & Deletion Integrity
+
 - **Forking:** `POST /templates/:id/fork` clones the template data, assigns `authorId = currentUser.userId`, sets `isPublic = false`, sets `forkedFromId = original.id`, and appends `(Cópia)` to the name.
 - **Delete Protection:** `DELETE /templates/:id` checks `_count.sheets`. If sheets > 0, returns `409 Conflict` (or soft-deletes/archives) to prevent breaking existing character sheets.
 
 ### 4. Single-Query Access Guard Optimization
+
 - In `TemplateAccessGuard`, attach the fetched template record to `request.template`. In `TemplatesController` / `TemplatesService`, use the pre-fetched record or request context when retrieving single templates.
 
 ### 5. Web Template Builder (2-Pane UI)
+
 - Left pane: Visual hierarchy tree where users add/reorder tabs, configure grid sections, and customize fields with dedicated type inspectors.
 - Right pane: Live preview rendering the Dynamic Form Mapper with reactive formula updates in real time.
 - Modal: Raw JSON Import/Export with validation.
 
 ### 6. Mobile Native Dynamic Form Mapper
+
 - Render `template.structure.tabs` using segmented/swipeable tabs.
 - Custom mobile inputs:
   - `NumberStepper`: Increment/decrement buttons + direct text input.
@@ -69,6 +78,7 @@ Currently, templates only accept arbitrary JSON without schema validation, lack 
   - `ContextualDiceRoller`: FAB opens a sheet with all numeric attributes from the character sheet to roll against.
 
 ### 7. Mobile Template Builder (Creator-Lite & At-the-Table)
+
 - **Scope:** Serves two adjacent jobs — an authoring job, condensed to phone-appropriate shape, and an at-the-table job (quick label/default/`maxDots` or field tweaks on templates the user already owns). Not a full desktop parity clone.
 - **Entry Point:** Reuse the templates tab with a segmented control "Explorar" vs "Meus modelos" (`scope=mine` via the existing `fetchTemplates` `scope` param). The builder is a stack route (not a fourth tab), reachable via "Criar modelo" and from a user's own template. Blank creation is possible but not the default posture — editing existing drafts/forks is the primary flow.
 - **Navigation Model:** Drill-down navigator — Tab list → Section list → Field list. At every level: inline rename, chevron ▼/▲ reorder (mirrors the Web builder, no drag gestures), and delete. Tapping a field opens the bottom-sheet inspector.
@@ -78,6 +88,7 @@ Currently, templates only accept arbitrary JSON without schema validation, lack 
 - **Rationale:** The Web builder is already phone-shaped (chevron reorder, chips, inspector form), the DSL types are ported to Mobile (`apps/mobile/types/template.ts`), and Mobile already ships a structure renderer — making the least-obvious win (live preview) the cheapest component of the Mobile builder.
 
 ### 8. Formula Authoring Clarity (Web & Mobile)
+
 - **Problem:** Formula expressions reference random, opaque field ids (`f_x7k9qm`), while the builder's dependency chips display labels — so the expression is unreadable, the inline preview evaluates against an empty context (always "unknown identifier"), and non-numeric fields are offered as dependencies.
 - **Decision:** Keep ids as the canonical reference (preserves `Sheet.data` keys and avoids a DSL contract change), but (a) generate human-readable slug ids from field labels for new fields, deduplicated; (b) expose the id as editable with a generate-from-label action; (c) regenerate the id from the label only while it is still auto-derived, rewriting all formula `dependencies` and expression identifiers via a token-aware `rewireFieldId`/`replaceIdentifier`; (d) show `Label · id` chips plus an id→label readout; (e) evaluate the preview against a seeded numeric context built from structure defaults and list the values used; (f) restrict dependency candidates and the validator to numeric types (`number`, `dots`, `checkbox`).
 - **Rationale:** Fixes the legibility and broken-preview problems without changing the DSL contract or breaking existing sheets/templates (existing random ids are treated as user-owned and never mutated). Mirrored on Web and Mobile to keep the authoring experience consistent.

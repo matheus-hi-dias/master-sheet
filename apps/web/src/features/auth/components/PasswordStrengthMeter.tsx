@@ -22,7 +22,7 @@ async function loadZxcvbn() {
   }
 
   if (!zxcvbnPromise) {
-    zxcvbnPromise = import('zxcvbn').then(module => {
+    zxcvbnPromise = import('zxcvbn').then((module) => {
       const fn = (module.default ?? module) as ZxcvbnFn;
       zxcvbnFn = fn;
       return fn;
@@ -64,7 +64,7 @@ export function PasswordStrengthMeter({
     }
 
     loadZxcvbn()
-      .then(scorePassword => {
+      .then((scorePassword) => {
         if (!isMounted) {
           return;
         }
