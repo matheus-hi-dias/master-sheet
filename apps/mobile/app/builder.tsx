@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   View,
   Text,
@@ -11,16 +17,8 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {
-  ChevronLeft,
-  Eye,
-  Save,
-  TriangleAlert,
-} from 'lucide-react-native';
-import {
-  useBuilder,
-  type BuilderDraft,
-} from '../hooks/useBuilder';
+import { ChevronLeft, Eye, Save, TriangleAlert } from 'lucide-react-native';
+import { useBuilder, type BuilderDraft } from '../hooks/useBuilder';
 import {
   dependencyCandidates,
   fieldLabelMap,
@@ -67,7 +65,7 @@ function draftFromTemplate(template: TemplateSummary): BuilderDraft {
     description: template.description ?? '',
     system: template.system,
     isPublic: template.isPublic,
-    tags: template.tags.map(tag => tag.name),
+    tags: template.tags.map((tag) => tag.name),
     structure: template.structure,
   };
 }
@@ -101,7 +99,7 @@ export default function BuilderScreen() {
   useEffect(() => {
     if (editingId) {
       fetchTemplateDetail(editingId)
-        .then(template => setInitial(draftFromTemplate(template)))
+        .then((template) => setInitial(draftFromTemplate(template)))
         .catch(() =>
           setToast({
             type: 'error',
@@ -125,15 +123,17 @@ export default function BuilderScreen() {
 
   const tab =
     level.kind !== 'tabs'
-      ? builder.draft.structure.tabs.find(t => t.id === level.tabId)
+      ? builder.draft.structure.tabs.find((t) => t.id === level.tabId)
       : undefined;
 
   const section =
     level.kind === 'fields' && tab
-      ? tab.sections.find(s => s.id === level.sectionId)
+      ? tab.sections.find((s) => s.id === level.sectionId)
       : undefined;
 
-  const candidates: DepCandidate[] = dependencyCandidates(builder.draft.structure);
+  const candidates: DepCandidate[] = dependencyCandidates(
+    builder.draft.structure,
+  );
 
   const labelById = useMemo(
     () => fieldLabelMap(builder.draft.structure),
@@ -151,7 +151,7 @@ export default function BuilderScreen() {
 
   const selectedField =
     inspector && tab && section
-      ? section.fields.find(f => f.id === inspector.fieldId) ?? null
+      ? (section.fields.find((f) => f.id === inspector.fieldId) ?? null)
       : null;
 
   const goBack = () => {
@@ -168,8 +168,8 @@ export default function BuilderScreen() {
     level.kind === 'tabs'
       ? 'Editor de modelo'
       : level.kind === 'sections'
-        ? tab?.label ?? 'Abas'
-        : section?.title ?? 'Seções';
+        ? (tab?.label ?? 'Abas')
+        : (section?.title ?? 'Seções');
 
   const handleSave = async () => {
     if (builder.errors.length > 0) {
@@ -209,11 +209,12 @@ export default function BuilderScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView edges={['top']} className="flex-1 bg-bg-app items-center justify-center">
+      <SafeAreaView
+        edges={['top']}
+        className="flex-1 bg-bg-app items-center justify-center"
+      >
         <ActivityIndicator size="large" color="#D4AF37" />
-        <Text className="text-xs text-text-muted mt-3">
-          Carregando modelo…
-        </Text>
+        <Text className="text-xs text-text-muted mt-3">Carregando modelo…</Text>
       </SafeAreaView>
     );
   }
@@ -268,11 +269,8 @@ export default function BuilderScreen() {
         <View className="mx-4 mt-3 bg-danger/10 border border-danger/40 rounded-card px-3 py-2.5 flex-row items-start gap-2">
           <TriangleAlert size={15} color="#e74c3c" className="mt-0.5" />
           <View className="flex-1" style={{ gap: 2 }}>
-            {builder.errors.map(error => (
-              <Text
-                key={error}
-                className="text-[11px] text-danger font-body"
-              >
+            {builder.errors.map((error) => (
+              <Text key={error} className="text-[11px] text-danger font-body">
                 {error}
               </Text>
             ))}
@@ -290,14 +288,17 @@ export default function BuilderScreen() {
           keyboardShouldPersistTaps="handled"
         >
           {level.kind === 'tabs' ? (
-            <TabsLevel builder={builder} onDrill={tabId => setLevel({ kind: 'sections', tabId })} />
+            <TabsLevel
+              builder={builder}
+              onDrill={(tabId) => setLevel({ kind: 'sections', tabId })}
+            />
           ) : null}
 
           {level.kind === 'sections' && tab ? (
             <SectionsLevel
               builder={builder}
               tab={tab}
-              onDrill={sectionId =>
+              onDrill={(sectionId) =>
                 setLevel({ kind: 'fields', tabId: tab.id, sectionId })
               }
             />
@@ -308,7 +309,7 @@ export default function BuilderScreen() {
               builder={builder}
               tabId={tab.id}
               section={section}
-              onOpenInspector={fieldId =>
+              onOpenInspector={(fieldId) =>
                 setInspector({ tabId: tab.id, sectionId: section.id, fieldId })
               }
             />
@@ -330,7 +331,7 @@ export default function BuilderScreen() {
             next,
           );
           if (nextId !== inspector.fieldId) {
-            setInspector(prev =>
+            setInspector((prev) =>
               prev ? { ...prev, fieldId: nextId } : prev,
             );
           }
@@ -381,7 +382,7 @@ function TabsLevel({
             label={
               <TextInput
                 value={tab.label}
-                onChangeText={label => builder.handleRenameTab(tab.id, label)}
+                onChangeText={(label) => builder.handleRenameTab(tab.id, label)}
                 placeholder="Nome da aba"
                 placeholderTextColor="#888888"
                 className="text-text-main font-body text-sm py-0"
@@ -407,8 +408,6 @@ function SectionsLevel({
   tab: ReturnType<typeof useBuilder>['draft']['structure']['tabs'][number];
   onDrill: (sectionId: string) => void;
 }) {
-  const { draft } = builder;
-
   return (
     <View>
       <Text className="text-[10px] font-bold uppercase tracking-[0.14em] text-text-muted mb-2">
@@ -430,7 +429,7 @@ function SectionsLevel({
             label={
               <TextInput
                 value={section.title}
-                onChangeText={title =>
+                onChangeText={(title) =>
                   builder.handlePatchSection(tab.id, section.id, { title })
                 }
                 placeholder="Título da seção"
@@ -443,7 +442,10 @@ function SectionsLevel({
       </View>
 
       <View className="mt-3">
-        <AddRow label="Adicionar seção" onPress={() => builder.handleAddSection(tab.id)} />
+        <AddRow
+          label="Adicionar seção"
+          onPress={() => builder.handleAddSection(tab.id)}
+        />
       </View>
     </View>
   );
@@ -457,7 +459,9 @@ function FieldsLevel({
 }: {
   builder: ReturnType<typeof useBuilder>;
   tabId: string;
-  section: ReturnType<typeof useBuilder>['draft']['structure']['tabs'][number]['sections'][number];
+  section: ReturnType<
+    typeof useBuilder
+  >['draft']['structure']['tabs'][number]['sections'][number];
   onOpenInspector: (fieldId: string) => void;
 }) {
   const columns = Math.min(Math.max(section.columns ?? 1, 1), 4);
@@ -473,13 +477,15 @@ function FieldsLevel({
           Colunas da grade
         </Text>
         <View className="flex-row" style={{ gap: 8 }}>
-          {[1, 2, 3, 4].map(count => {
+          {[1, 2, 3, 4].map((count) => {
             const active = count === columns;
             return (
               <Pressable
                 key={count}
                 onPress={() =>
-                  builder.handlePatchSection(tabId, section.id, { columns: count })
+                  builder.handlePatchSection(tabId, section.id, {
+                    columns: count,
+                  })
                 }
                 className={`px-3 py-1.5 rounded-full border ${
                   active ? 'bg-gold border-gold' : 'bg-bg-card border-border'
@@ -504,13 +510,22 @@ function FieldsLevel({
             key={field.id}
             onPress={() => onOpenInspector(field.id)}
             subtitle={field.type}
-            onUp={() => builder.handleMoveField(tabId, section.id, field.id, -1)}
-            onDown={() => builder.handleMoveField(tabId, section.id, field.id, 1)}
-            onDelete={() => builder.handleRemoveField(tabId, section.id, field.id)}
+            onUp={() =>
+              builder.handleMoveField(tabId, section.id, field.id, -1)
+            }
+            onDown={() =>
+              builder.handleMoveField(tabId, section.id, field.id, 1)
+            }
+            onDelete={() =>
+              builder.handleRemoveField(tabId, section.id, field.id)
+            }
             isFirst={index === 0}
             isLast={index === section.fields.length - 1}
             label={
-              <Text className="text-text-main font-body text-sm" numberOfLines={1}>
+              <Text
+                className="text-text-main font-body text-sm"
+                numberOfLines={1}
+              >
                 {field.label || field.type}
               </Text>
             }
@@ -522,7 +537,7 @@ function FieldsLevel({
         Adicionar campo
       </Text>
       <View className="flex-row flex-wrap" style={{ gap: 8 }}>
-        {(Object.keys(TYPE_ACTION_LABELS) as FieldType[]).map(type => (
+        {(Object.keys(TYPE_ACTION_LABELS) as FieldType[]).map((type) => (
           <Pressable
             key={type}
             onPress={() => {

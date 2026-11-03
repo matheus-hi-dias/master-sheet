@@ -17,7 +17,7 @@ export class CreateTemplateDto {
   @ApiProperty({ example: 'D&D 5e Character Sheet', maxLength: 120 })
   @IsString()
   @MaxLength(120)
-  name: string;
+  name!: string;
 
   @ApiPropertyOptional({
     example: 'Standard D&D 5e sheet layout',
@@ -34,7 +34,7 @@ export class CreateTemplateDto {
   })
   @ValidateNested()
   @Type(() => TemplateStructureDto)
-  structure: TemplateStructureDto;
+  structure!: TemplateStructureDto;
 
   @ApiPropertyOptional({ example: 'dnd5e', maxLength: 64 })
   @IsString()

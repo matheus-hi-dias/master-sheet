@@ -1,7 +1,4 @@
-import type {
-  FieldDefinition,
-  TemplateStructure,
-} from '../types/template';
+import type { FieldDefinition, TemplateStructure } from '../types/template';
 
 export function defaultFieldValue(field: FieldDefinition): unknown {
   switch (field.type) {
@@ -50,8 +47,8 @@ export function structureDefaultValues(
   structure: TemplateStructure,
   seed?: Record<string, unknown>,
 ): Record<string, unknown> {
-  const fields = structure.tabs.flatMap(tab =>
-    tab.sections.flatMap(section => section.fields),
+  const fields = structure.tabs.flatMap((tab) =>
+    tab.sections.flatMap((section) => section.fields),
   );
 
   return buildDefaultValues(fields, seed);

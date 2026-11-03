@@ -66,7 +66,7 @@ export function EmailVerified() {
               type="email"
               placeholder="Seu e-mail"
               value={email}
-              onChange={event => setEmail(event.target.value)}
+              onChange={(event) => setEmail(event.target.value)}
             />
             <div className="flex justify-center gap-2">
               <Button variant="gold" size="md" onClick={handleResend}>

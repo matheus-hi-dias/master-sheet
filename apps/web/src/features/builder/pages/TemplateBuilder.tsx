@@ -16,7 +16,11 @@ import { BuilderPreview } from '../components/BuilderPreview';
 import { JsonModal } from '../components/JsonModal';
 import { StructureCanvas } from '../components/StructureCanvas';
 import { useBuilder } from '../hooks/useBuilder';
-import { fieldLabelMap, dependencyCandidates, validateStructure } from '../lib/structureOps';
+import {
+  fieldLabelMap,
+  dependencyCandidates,
+  validateStructure,
+} from '../lib/structureOps';
 import { structureDefaultValues } from '../../sheets/lib/defaults';
 
 export function TemplateBuilder() {
@@ -50,7 +54,10 @@ export function TemplateBuilder() {
 
   const candidates = useMemo(
     () =>
-      dependencyCandidates(builder.draft.structure, builder.selection.fieldId ?? undefined),
+      dependencyCandidates(
+        builder.draft.structure,
+        builder.selection.fieldId ?? undefined,
+      ),
     [builder.draft.structure, builder.selection.fieldId],
   );
 
@@ -135,7 +142,11 @@ export function TemplateBuilder() {
         <p className="text-sm text-text-muted mb-6">
           It may have been deleted or you may not own it.
         </p>
-        <Button variant="outline" size="md" onClick={() => navigate('/templates')}>
+        <Button
+          variant="outline"
+          size="md"
+          onClick={() => navigate('/templates')}
+        >
           Back to templates
         </Button>
       </div>
@@ -168,7 +179,10 @@ export function TemplateBuilder() {
           labelById={labelById}
           previewContext={previewContext}
         />
-        <BuilderPreview structure={builder.draft.structure} shapeKey={shapeKey} />
+        <BuilderPreview
+          structure={builder.draft.structure}
+          shapeKey={shapeKey}
+        />
       </div>
 
       {jsonModal && (

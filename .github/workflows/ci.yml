@@ -24,10 +24,27 @@ jobs:
       - name: Setup workspace
         uses: ./.github/actions/setup
 
+      - name: Verify workspace task contract
+        run: pnpm verify:workspace
+
       - name: Run ${{ matrix.task }}
         run: pnpm turbo run ${{ matrix.task }}
         env:
           NODE_ENV: ${{ matrix.task == 'test' && 'test' || 'production' }}
+
+  format:
+    name: Format / prettier
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup workspace
+        uses: ./.github/actions/setup
+
+      - name: Check formatting
+        run: pnpm format:check
 
   codeql:
     name: Analyze (CodeQL)

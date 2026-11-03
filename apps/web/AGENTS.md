@@ -17,5 +17,5 @@ React 19 + Vite 7 SPA, Tailwind CSS 4, React Query, React Hook Form + Zod, Zusta
 
 ## Commands
 
-- Dev: `pnpm --filter web dev` · Build: `pnpm --filter web build` · Lint: `pnpm --filter web lint` · Test: `pnpm --filter web test` (jest)
-- Type check: `pnpm --filter web exec tsc --noEmit`
+- Dev: `pnpm --filter @master-sheet/web dev` · Build: `pnpm --filter @master-sheet/web build` · Lint: `pnpm --filter @master-sheet/web lint` · Test: `pnpm --filter @master-sheet/web test` (jest)
+- Type check: `pnpm --filter @master-sheet/web exec tsc --noEmit`

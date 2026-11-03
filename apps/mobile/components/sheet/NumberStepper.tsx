@@ -28,7 +28,9 @@ export function NumberStepper({
     return Math.round(next / factor) * factor;
   };
 
-  const current = clamped(Math.round((value || 0) / (Math.abs(step) || 1)) * (Math.abs(step) || 1));
+  const current = clamped(
+    Math.round((value || 0) / (Math.abs(step) || 1)) * (Math.abs(step) || 1),
+  );
 
   const handleDelta = (delta: number) => {
     onChange(clamped(roundToStep((value || 0) + delta)));

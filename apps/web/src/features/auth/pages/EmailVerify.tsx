@@ -58,7 +58,7 @@ export function EmailVerify() {
           type="text"
           placeholder="Cole aqui o token"
           value={localToken}
-          onChange={e => setLocalToken(e.target.value)}
+          onChange={(e) => setLocalToken(e.target.value)}
         />
         <div className="flex justify-center gap-2">
           <button

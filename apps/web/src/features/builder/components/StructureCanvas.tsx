@@ -68,9 +68,12 @@ export function StructureCanvas({
   previewContext,
 }: StructureCanvasProps) {
   const { structure } = data;
-  const activeTab = structure.tabs.find((t) => t.id === builder.selection.tabId);
+  const activeTab = structure.tabs.find(
+    (t) => t.id === builder.selection.tabId,
+  );
   const activeSection =
-    activeTab?.sections.find((s) => s.id === builder.selection.sectionId) ?? null;
+    activeTab?.sections.find((s) => s.id === builder.selection.sectionId) ??
+    null;
   const selectedField = builder.selectedField;
 
   const onChangeType = (field: FieldDefinition, type: FieldType) => {
@@ -190,7 +193,9 @@ export function StructureCanvas({
                   aria-label="Section columns"
                   value={section.columns ?? 1}
                   onChange={(e) =>
-                    builder.handlePatchSection({ columns: Number(e.target.value) })
+                    builder.handlePatchSection({
+                      columns: Number(e.target.value),
+                    })
                   }
                   className="bg-bg-panel border border-border rounded px-1.5 py-0.5 text-[11px] text-text-muted outline-none cursor-pointer shrink-0"
                 >
@@ -272,7 +277,9 @@ export function StructureCanvas({
                   <div className="flex gap-2 pt-1">
                     <select
                       value="text"
-                      onChange={(e) => builder.handleAddField(e.target.value as FieldType)}
+                      onChange={(e) =>
+                        builder.handleAddField(e.target.value as FieldType)
+                      }
                       className="flex-1 bg-bg-panel border border-border rounded-lg px-3 py-2 text-[12px] text-text-main outline-none focus:border-gold cursor-pointer"
                     >
                       <option value="text" disabled>
@@ -308,7 +315,9 @@ export function StructureCanvas({
             <select
               aria-label="Change field type"
               value={selectedField.type}
-              onChange={(e) => onChangeType(selectedField, e.target.value as FieldType)}
+              onChange={(e) =>
+                onChangeType(selectedField, e.target.value as FieldType)
+              }
               className="ml-auto bg-bg-panel border border-border rounded px-2 py-1 text-[11px] text-gold outline-none cursor-pointer"
             >
               {FIELD_TYPES.map((type) => (
@@ -361,7 +370,10 @@ export function StructureCanvas({
   );
 }
 
-function createFieldFor(source: FieldDefinition, type: FieldType): FieldDefinition {
+function createFieldFor(
+  source: FieldDefinition,
+  type: FieldType,
+): FieldDefinition {
   switch (type) {
     case 'number':
       return { type, id: source.id, label: source.label, defaultValue: 0 };
@@ -369,7 +381,13 @@ function createFieldFor(source: FieldDefinition, type: FieldType): FieldDefiniti
     case 'textarea':
       return { type, id: source.id, label: source.label };
     case 'dots':
-      return { type, id: source.id, label: source.label, maxDots: 5, defaultValue: 0 };
+      return {
+        type,
+        id: source.id,
+        label: source.label,
+        maxDots: 5,
+        defaultValue: 0,
+      };
     case 'select':
       return {
         type,
@@ -383,7 +401,13 @@ function createFieldFor(source: FieldDefinition, type: FieldType): FieldDefiniti
     case 'checkbox':
       return { type, id: source.id, label: source.label, defaultValue: false };
     case 'formula':
-      return { type, id: source.id, label: source.label, expression: '0', dependencies: [] };
+      return {
+        type,
+        id: source.id,
+        label: source.label,
+        expression: '0',
+        dependencies: [],
+      };
     case 'repeater':
       return { type, id: source.id, label: source.label, itemSchema: [] };
   }

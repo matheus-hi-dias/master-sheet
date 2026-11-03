@@ -1,30 +1,100 @@
-# Turborepo starter
+# Master-Sheet
 
-This Turborepo starter is maintained by the Turborepo core team.
+Master-Sheet is a multi-system RPG character sheet ecosystem for D&D, Vampire, Tormenta, and custom homebrews. A NestJS API owns authentication and the dynamic template/sheet data model; a React web app and an Expo mobile app render the same JSON-defined sheets on their respective platforms.
 
-## Using this example
+The repository follows Spec-Driven Development. Current contracts live in `openspec/specs/`, product and UX decisions live in `docs/`, and in-progress work is tracked under `openspec/changes/`.
 
-Run the following command:
+## Workspace map
 
-```sh
-npx create-turbo@latest
+| Workspace                    | Package                           | Stack                                                                         |
+| ---------------------------- | --------------------------------- | ----------------------------------------------------------------------------- |
+| `apps/api`                   | `@master-sheet/api`               | NestJS 11, Prisma 7, PostgreSQL, Passport-JWT, Jest 30                        |
+| `apps/web`                   | `@master-sheet/web`               | React 19, Vite 7, Tailwind CSS 4, React Query, React Hook Form + Zod, Jest 29 |
+| `apps/mobile`                | `@master-sheet/mobile`            | Expo 55, React Native 0.83, NativeWind, Expo Router, jest-expo / Jest 29      |
+| `packages/eslint-config`     | `@master-sheet/eslint-config`     | Shared ESLint flat configs (`base`, `react-internal`)                         |
+| `packages/typescript-config` | `@master-sheet/typescript-config` | Shared TypeScript bases (`base`, `react-app`, `react-library`)                |
+
+All workspaces are private and use the `@master-sheet/*` scope.
+
+## Prerequisites
+
+- Node.js ^20.19.0 or >=22.12.0 (Vite 7 requirement; enforced by `engine-strict=true`)
+- pnpm 9 (`corepack enable` picks up the version pinned in `package.json`)
+- Docker Desktop or another Docker runtime for the local PostgreSQL container
+
+## Setup
+
+```bash
+corepack enable
+pnpm install
 ```
 
-## What's inside?
+Create the environment files from their examples:
 
-This Turborepo includes the following packages/apps:
+```bash
+cp .env.example .env
+cp apps/api/.env.example apps/api/.env
+cp apps/mobile/.env.example apps/mobile/.env
+```
 
-### Apps and Packages
+Fill `apps/api/.env` with a `DATABASE_URL`, a strong `JWT_SECRET`, and the SMTP/URL values you need. The root `.env` only feeds the PostgreSQL container.
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+Start the database and apply migrations:
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+```bash
+docker compose up -d db
+pnpm --filter @master-sheet/api exec prisma migrate dev
+```
 
-## Auth Contract
+Run the apps:
+
+```bash
+pnpm dev
+```
+
+The API listens on `http://localhost:3000`, the web app on `http://localhost:5173`, and Expo prints its own dev-server URL.
+
+## Environment files
+
+| File               | Purpose                                                                                                                                                 |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `.env`             | Docker Compose PostgreSQL credentials (`POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`, `POSTGRES_PORT`).                                           |
+| `apps/api/.env`    | API runtime: `DATABASE_URL`, `JWT_SECRET`, token TTLs, `APP_URL`, `FRONTEND_URL`, email verification redirects, SMTP, CORS origins, `PORT`, `NODE_ENV`. |
+| `apps/mobile/.env` | `EXPO_PUBLIC_API_URL` for the mobile client (use `http://10.0.2.2:3000` from the Android emulator).                                                     |
+
+## Root tasks
+
+| Command                 | What it does                                                               |
+| ----------------------- | -------------------------------------------------------------------------- |
+| `pnpm dev`              | Runs the persistent dev tasks for every app through Turbo.                 |
+| `pnpm build`            | Builds `@master-sheet/api` and `@master-sheet/web`; mobile builds via EAS. |
+| `pnpm lint`             | Runs ESLint in every workspace.                                            |
+| `pnpm check-types`      | Runs `tsc --noEmit` in every workspace.                                    |
+| `pnpm test`             | Runs Jest in every workspace.                                              |
+| `pnpm format`           | Formats `ts`, `tsx`, `md`, and `json` with the root Prettier config.       |
+| `pnpm format:check`     | Fails if any file is not formatted with the root Prettier config.          |
+| `pnpm verify:workspace` | Fails if a workspace is missing a required task or a `package.json`.       |
+
+Target a single workspace with its scoped name, for example:
+
+```bash
+pnpm --filter @master-sheet/api test
+pnpm --filter @master-sheet/web dev
+pnpm --filter @master-sheet/mobile start
+```
+
+Prisma client generation is part of the Turbo graph: `@master-sheet/api#build`, `#check-types`, `#lint`, and `#test` depend on the uncached `db:generate` task. `postinstall` also generates the client for editor/IDE convenience.
+
+## Workspace conventions
+
+- **Scope:** every manifest uses `@master-sheet/*`; all packages are private.
+- **Task contract:** every app implements `lint`, `check-types`, and `test`. `build` is required for `api` and `web`; `mobile` is exempt because native binaries are produced by EAS/Expo (`eas build`, `expo run:*`). `scripts/verify-workspace.mjs` enforces this contract and also fails on a workspace directory without a `package.json`.
+- **TypeScript:** `packages/typescript-config/base.json` holds the strict shared settings. `react-app.json` adds browser/bundler options for Vite, `react-library.json` adds library emit, the API keeps NestJS overrides (`nodenext`, decorators, `emitDecoratorMetadata`, `outDir`), and mobile extends the shared base first and `expo/tsconfig.base.json` second so Expo wins for Metro-specific resolution.
+- **ESLint:** `@master-sheet/eslint-config/base` and `react-internal` are shared. The web app consumes `react-internal`; the API keeps an app-local config because NestJS needs `recommendedTypeChecked`, `projectService`, generated Prisma ignores, and test-double relaxations. The exception is documented in `apps/api/README.md`.
+- **Install layout:** the root `pnpm` install is isolated, so each workspace resolves its own tool versions. `apps/mobile/.npmrc` retains `node-linker=hoisted` for Metro-sensitive installs; do not re-enable hoisting at the root, because it allowed the API's Jest 30 to shadow the mobile app's Jest 29.
+- **Agent instructions:** `.opencode/` is the canonical source for agent workflows; `.github/` mirrors the same skills/prompts for Copilot users.
+
+## Auth contract
 
 The auth flow is shared across the API, web app, and mobile app with the following rules:
 
@@ -35,135 +105,38 @@ The auth flow is shared across the API, web app, and mobile app with the followi
 - Email verification and password reset links are issued by the API; in development, the mail layer falls back to logging when SMTP is not configured.
 - The API rejects expired, revoked, or replayed tokens and applies temporary lockout after repeated failed logins.
 
-### One-click Email Verification
+### One-click email verification
 
 The system supports a one-click verification flow where the user clicks a link in their email and is automatically verified and redirected to the appropriate landing page.
 
 #### Configuration
 
-- `EMAIL_VERIFY_URL`: The full URL template used in verification emails.
-  - **One-click (Default)**: `${API_URL}/auth/verify-email?token={{token}}`
-  - **Frontend-mediated**: `${FRONTEND_URL}/email-verify?token={{token}}`
-- `EMAIL_VERIFY_REDIRECT_BASE`: The base URL where the API redirects the user after verification. Defaults to `FRONTEND_URL` or `APP_URL`.
-- `APP_URL`: The base URL of the API.
-- `FRONTEND_URL`: The base URL of the web application.
+- `EMAIL_VERIFY_URL`: the full URL template used in verification emails.
+  - **One-click (default):** `${API_URL}/auth/verify-email?token={{token}}`
+  - **Frontend-mediated:** `${FRONTEND_URL}/email-verify?token={{token}}`
+- `EMAIL_VERIFY_REDIRECT_BASE`: the base URL where the API redirects after verification. Defaults to `FRONTEND_URL` or `APP_URL`.
+- `APP_URL`: the base URL of the API.
+- `FRONTEND_URL`: the base URL of the web application.
 
-#### Redirect Behavior
+#### Redirect behavior
 
 When a user hits `GET /auth/verify-email?token=...`, the API processes the token and redirects to:
+
 `${EMAIL_VERIFY_REDIRECT_BASE}/email-verified?status=<status>&message=<optional-message>`
 
-**Status values:**
-- `success`: Email verified successfully.
-- `expired`: Token has expired (24h TTL).
-- `invalid`: Token is invalid, already used, or not found.
+Status values:
 
-### Utilities
+- `success`: email verified successfully.
+- `expired`: token has expired (24h TTL).
+- `invalid`: token is invalid, already used, or not found.
 
-This Turborepo has some additional tools already setup for you:
+## Documentation
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+- API endpoint tables: [`docs/api/contracts.md`](docs/api/contracts.md)
+- Design system and screens: [`docs/design-system.md`](docs/design-system.md), [`docs/screens/`](docs/screens/)
+- Capability specs: [`openspec/specs/`](openspec/specs/)
+- Active changes: [`openspec/changes/`](openspec/changes/)
 
-### Build
+## Contributing
 
-To build all apps and packages, run the following command:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
-```
-
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
-
-```
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
-
-### Develop
-
-To develop all apps and packages, run the following command:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
-
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
-
-```
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+Use Conventional Commits (`feat(api): ...`, `fix(web): ...`, `chore(workspace): ...`). Run `pnpm verify:workspace && pnpm lint && pnpm check-types && pnpm test && pnpm build` before opening a pull request.

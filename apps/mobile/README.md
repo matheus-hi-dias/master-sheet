@@ -1,4 +1,22 @@
-# Mobile Auth
+# Mobile
+
+## Workspace task contract
+
+This workspace intentionally does **not** define a `build` script. Native binaries are produced by EAS/Expo (`eas build`, `expo run:*`) rather than by the monorepo task graph, so `pnpm turbo run build` skips this app by design. `lint`, `check-types`, and `test` are required and run from the repository root.
+
+## TypeScript configuration
+
+This app extends both `@master-sheet/typescript-config/base.json` and `expo/tsconfig.base.json`, in that order. The Expo config must win for `module`, `moduleResolution`, `target`, `lib`, and `jsx`, because Metro expects Expo's React Native resolution. The shared base only contributes strictness (`strict`, `forceConsistentCasingInFileNames`, `isolatedModules`, `noFallthroughCasesInSwitch`); replacing Expo's module resolution with the Node-oriented base would break the mobile build.
+
+## ESLint configuration
+
+This app keeps an app-local `eslint.config.mjs` instead of consuming `@master-sheet/eslint-config`. Expo and React Native need their own globals, JSX settings, and platform-specific ignores; the shared base targets web/server TypeScript and would require the same overrides here. The local config still layers `@eslint/js`, `typescript-eslint`, `eslint-config-prettier`, and the React Hooks ruleset.
+
+## pnpm linker
+
+Metro is the most symlink-sensitive consumer in this monorepo, so `apps/mobile/.npmrc` retains `node-linker=hoisted` as the documented Metro exception. The root install is intentionally isolated: hoisting the entire workspace let the API's Jest 30 shadow the mobile app's Jest 29 and broke the Expo test preset. If you change native dependencies, verify the resulting `node_modules` layout and bundling before shipping.
+
+## Mobile Auth
 
 The mobile client uses the API's token-rotation flow.
 

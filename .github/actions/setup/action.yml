@@ -25,4 +25,4 @@ runs:
 
     - name: Generate Prisma client
       shell: bash
-      run: pnpm --filter api db:generate
+      run: pnpm --filter @master-sheet/api db:generate

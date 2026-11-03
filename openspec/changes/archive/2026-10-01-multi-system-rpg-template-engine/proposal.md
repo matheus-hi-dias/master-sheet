@@ -25,6 +25,7 @@ Master-Sheet is conceived as a multi-system RPG character sheet ecosystem, but c
 ## Capabilities
 
 ### New Capabilities
+
 - `template-schema-engine`: Standardized JSON DSL specification for RPG templates, type definitions, and mathematical formula evaluation.
 - `template-management`: Full template lifecycle, forking lineage, dependency-aware deletion protection, server-side pagination, search, and filtering.
 - `web-template-builder`: Visual drag/configure template builder with live preview and dynamic form mapping on Web.
@@ -32,6 +33,7 @@ Master-Sheet is conceived as a multi-system RPG character sheet ecosystem, but c
 - `mobile-template-builder`: Creator-lite mobile template builder with drill-down structure editing, bottom-sheet field configuration, and dynamic preview.
 
 ### Modified Capabilities
+
 <!-- None -->
 
 ## Impact

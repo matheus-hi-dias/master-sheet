@@ -69,7 +69,9 @@ function reconcileSelection(
   selection: Selection,
   structure: TemplateStructure,
 ): Selection {
-  const tab = structure.tabs.find((candidate) => candidate.id === selection.tabId);
+  const tab = structure.tabs.find(
+    (candidate) => candidate.id === selection.tabId,
+  );
   if (!tab) return resolveSelection(structure);
 
   const section = tab.sections.find(
@@ -100,20 +102,14 @@ export function useBuilder(initial?: BuilderDraft | null) {
     resolveSelection(initial?.structure ?? blankDraft().structure),
   );
 
-  const mutateStructure = useCallback(
-    (next: TemplateStructure) => {
-      setDraft((prev) => ({ ...prev, structure: next }));
-      setSelection((prev) => reconcileSelection(prev, next));
-    },
-    [],
-  );
+  const mutateStructure = useCallback((next: TemplateStructure) => {
+    setDraft((prev) => ({ ...prev, structure: next }));
+    setSelection((prev) => reconcileSelection(prev, next));
+  }, []);
 
-  const updateStructure = useCallback(
-    (next: TemplateStructure) => {
-      setDraft((prev) => ({ ...prev, structure: next }));
-    },
-    [],
-  );
+  const updateStructure = useCallback((next: TemplateStructure) => {
+    setDraft((prev) => ({ ...prev, structure: next }));
+  }, []);
 
   const load = useCallback((next: BuilderDraft) => {
     setDraft(next);
@@ -133,7 +129,9 @@ export function useBuilder(initial?: BuilderDraft | null) {
   const selectTab = useCallback(
     (tabId: string) => {
       setSelection((prev) => {
-        const tab = draft.structure.tabs.find((candidate) => candidate.id === tabId);
+        const tab = draft.structure.tabs.find(
+          (candidate) => candidate.id === tabId,
+        );
         if (!tab) return prev;
         return {
           tabId,
@@ -149,12 +147,9 @@ export function useBuilder(initial?: BuilderDraft | null) {
     setSelection((prev) => ({ ...prev, sectionId, fieldId: null }));
   }, []);
 
-  const selectField = useCallback(
-    (fieldId: string | null) => {
-      setSelection((prev) => ({ ...prev, fieldId }));
-    },
-    [],
-  );
+  const selectField = useCallback((fieldId: string | null) => {
+    setSelection((prev) => ({ ...prev, fieldId }));
+  }, []);
 
   const handleAddTab = useCallback(() => {
     const tab = createTab(collectAllIds(draft.structure));
@@ -255,7 +250,10 @@ export function useBuilder(initial?: BuilderDraft | null) {
       if (field.id !== oldId) {
         const base = field.id.trim() ? field.id : oldId;
         nextId = uniqueId(slugify(base), taken);
-      } else if (field.label !== current.label && isAutoId(oldId, current.label)) {
+      } else if (
+        field.label !== current.label &&
+        isAutoId(oldId, current.label)
+      ) {
         nextId = uniqueId(slugify(field.label), taken);
       }
 
@@ -297,7 +295,13 @@ export function useBuilder(initial?: BuilderDraft | null) {
         selection.fieldId,
       ),
     );
-  }, [draft.structure, selection.tabId, selection.sectionId, selection.fieldId, mutateStructure]);
+  }, [
+    draft.structure,
+    selection.tabId,
+    selection.sectionId,
+    selection.fieldId,
+    mutateStructure,
+  ]);
 
   const handleMoveField = useCallback(
     (direction: -1 | 1) => {
@@ -312,14 +316,20 @@ export function useBuilder(initial?: BuilderDraft | null) {
         ),
       );
     },
-    [draft.structure, selection.tabId, selection.sectionId, selection.fieldId, mutateStructure],
+    [
+      draft.structure,
+      selection.tabId,
+      selection.sectionId,
+      selection.fieldId,
+      mutateStructure,
+    ],
   );
 
   const selectedField = selection.fieldId
-    ? draft.structure.tabs
+    ? (draft.structure.tabs
         .find((tab) => tab.id === selection.tabId)
         ?.sections.find((section) => section.id === selection.sectionId)
-        ?.fields.find((field) => field.id === selection.fieldId) ?? null
+        ?.fields.find((field) => field.id === selection.fieldId) ?? null)
     : null;
 
   return {

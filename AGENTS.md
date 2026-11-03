@@ -14,6 +14,7 @@ Load these on a need-to-know basis for the task at hand (do not preload all of t
 - **Active / archived changes:** `openspec/changes/` — proposals, designs, and task breakdowns for work in progress.
 - **Design system & screens:** `docs/design-system.md`, `docs/screens/*.md` — visual tokens, components, and per-screen UX for Web and Mobile.
 - **API contracts:** `docs/api/contracts.md` — reconciled REST endpoint tables (routes, DTOs, guards, throttles).
+- **Workspace conventions:** [`README.md` § Workspace conventions](README.md#workspace-conventions) — scopes, task contract, config inheritance, and install layout.
 
 ## Environment State & Migrations
 
@@ -27,8 +28,7 @@ Load these on a need-to-know basis for the task at hand (do not preload all of t
   - `apps/api`: NestJS 11 core API backend, Prisma 7 ORM and PostgreSQL Schemas (schema at `apps/api/prisma/schema.prisma`).
   - `apps/web`: React 19 + Vite 7 SPA (Dashboard, Template Creator, Sheet Editor).
   - `apps/mobile`: Expo / React Native Mobile app (Fast inspection, swipeable tabs, quick dice overlay).
-  - `apps/docs`: leftover Turborepo starter app (not in active use).
-  - `packages/ui`, `packages/eslint-config`, `packages/typescript-config`: shared frontend/build configuration.
+  - `packages/eslint-config`, `packages/typescript-config`: shared frontend/build configuration.
 - **Data Identification:** All primary keys MUST use **UUID v4** (`@default(uuid())`).
 - **Dependencies:** Always use `pnpm` for installing, running, and managing monorepo scripts (`pnpm add`, `pnpm dev`, `pnpm --filter`). Never suggest `npm` or `yarn` commands.
 
@@ -79,7 +79,7 @@ When creating or modifying a feature:
 
 1. Check `apps/api/prisma/schema.prisma` before proposing schema changes.
 2. Consult the relevant capability spec in `openspec/specs/`; if a contract changes, update the spec.
-3. If modifying database models, generate and execute the migration command (`pnpm --filter api exec prisma migrate dev`).
+3. If modifying database models, generate and execute the migration command (`pnpm --filter @master-sheet/api exec prisma migrate dev`).
 4. Keep controllers thin; place complex business rules (e.g., RPG attribute modifiers or formula parsing) in pure NestJS Services.
 5. When introducing a backend feature, ensure the corresponding DTOs and type contracts match frontend consumption requirements.
 6. Keep documentation in sync: update `docs/api/contracts.md`, the app README, or the relevant capability spec when API contracts, environment variables, or run commands change.

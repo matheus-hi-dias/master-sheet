@@ -23,7 +23,7 @@ export function DynamicSheetRenderer({
 }: DynamicSheetRendererProps) {
   return (
     <View style={{ gap: 16 }}>
-      {tab.sections.map(section => {
+      {tab.sections.map((section) => {
         const columns = Math.max(
           1,
           Math.min(section.columns ?? 1, section.fields.length),
@@ -42,7 +42,7 @@ export function DynamicSheetRenderer({
               className="flex-row flex-wrap"
               style={{ gap: 8, justifyContent: 'flex-start' }}
             >
-              {section.fields.map(field => (
+              {section.fields.map((field) => (
                 <View
                   key={field.id}
                   style={{ width: COLUMN_WIDTHS[columns] ?? '100%' }}
@@ -54,7 +54,7 @@ export function DynamicSheetRenderer({
                     field={field}
                     value={values[field.id]}
                     context={values}
-                    onChange={value => onChange(field.id, value)}
+                    onChange={(value) => onChange(field.id, value)}
                   />
                 </View>
               ))}

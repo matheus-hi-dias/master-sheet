@@ -2,7 +2,21 @@ import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { TemplateStructureDto } from './template-structure.dto';
 
-const validStructure = {
+type MutableField = Record<string, unknown>;
+interface MutableSection {
+  [key: string]: unknown;
+  fields: MutableField[];
+}
+interface MutableTab {
+  [key: string]: unknown;
+  sections: MutableSection[];
+}
+interface MutableStructure {
+  [key: string]: unknown;
+  tabs: MutableTab[];
+}
+
+const validStructure: MutableStructure = {
   system: 'dnd5e',
   version: 1,
   tabs: [

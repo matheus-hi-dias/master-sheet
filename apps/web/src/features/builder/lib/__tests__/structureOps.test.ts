@@ -27,8 +27,18 @@ function baseStructure(): TemplateStructure {
             title: 'Attributes',
             columns: 2,
             fields: [
-              { type: 'number', id: 'str', label: 'Strength', defaultValue: 10 },
-              { type: 'number', id: 'dex', label: 'Dexterity', defaultValue: 10 },
+              {
+                type: 'number',
+                id: 'str',
+                label: 'Strength',
+                defaultValue: 10,
+              },
+              {
+                type: 'number',
+                id: 'dex',
+                label: 'Dexterity',
+                defaultValue: 10,
+              },
               {
                 type: 'formula',
                 id: 'initiative',
@@ -165,9 +175,9 @@ describe('rewireFieldId', () => {
     const fields = rewired.tabs[0].sections[0].fields;
     const formula = fields.find((field) => field.type === 'formula');
     expect(fields[0].id).toBe('strength');
-    expect(formula && formula.type === 'formula' ? formula.expression : '').toBe(
-      '(strength + dex) / 2',
-    );
+    expect(
+      formula && formula.type === 'formula' ? formula.expression : '',
+    ).toBe('(strength + dex) / 2');
     expect(
       formula && formula.type === 'formula' ? formula.dependencies : [],
     ).toEqual(['strength', 'dex']);
@@ -246,10 +256,15 @@ describe('parseTemplateStructure', () => {
     const result = parseTemplateStructure(JSON.stringify(structure));
     expect(result.ok).toBe(true);
     if (result.ok) {
-      const repeater = result.value.tabs[0].sections[0]
-        .fields[3] as Extract<typeof structure['tabs'][number]['sections'][number]['fields'][number], { type: 'repeater' }>;
+      const repeater = result.value.tabs[0].sections[0].fields[3] as Extract<
+        (typeof structure)['tabs'][number]['sections'][number]['fields'][number],
+        { type: 'repeater' }
+      >;
       expect(repeater.itemSchema).toHaveLength(2);
-      expect(repeater.itemSchema[1]).toMatchObject({ type: 'number', id: 'level' });
+      expect(repeater.itemSchema[1]).toMatchObject({
+        type: 'number',
+        id: 'level',
+      });
     }
   });
 });

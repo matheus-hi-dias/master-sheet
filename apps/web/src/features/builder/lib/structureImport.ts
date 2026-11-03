@@ -28,9 +28,7 @@ export function parseTemplateStructure(raw: string) {
 function validateNode(
   node: unknown,
   depth: number,
-):
-  | { ok: true; value: TemplateStructure }
-  | { ok: false; error: string } {
+): { ok: true; value: TemplateStructure } | { ok: false; error: string } {
   if (depth > 6) {
     return { ok: false, error: 'Template DSL is nested too deeply' };
   }
@@ -57,7 +55,8 @@ function validateNode(
       const sections = Array.isArray(tab.sections) ? tab.sections : [];
       return {
         id: typeof tab.id === 'string' ? tab.id : `t_${tabIndex}`,
-        label: typeof tab.label === 'string' ? tab.label : `Tab ${tabIndex + 1}`,
+        label:
+          typeof tab.label === 'string' ? tab.label : `Tab ${tabIndex + 1}`,
         sections,
       };
     },
@@ -74,8 +73,9 @@ function validateNode(
           typeof section.title === 'string'
             ? section.title
             : `Section ${sectionIndex + 1}`,
-        columns:
-          Number.isInteger(columns) ? Math.max(1, Math.min(4, columns)) : 1,
+        columns: Number.isInteger(columns)
+          ? Math.max(1, Math.min(4, columns))
+          : 1,
         fields: parseFields(fields, depth + 1),
       };
     });
@@ -121,8 +121,11 @@ function parseFields(fields: unknown[], depth: number): FieldDefinition[] {
           id,
           label,
           placeholder:
-            typeof field.placeholder === 'string' ? field.placeholder : undefined,
-          maxLength: typeof field.maxLength === 'number' ? field.maxLength : undefined,
+            typeof field.placeholder === 'string'
+              ? field.placeholder
+              : undefined,
+          maxLength:
+            typeof field.maxLength === 'number' ? field.maxLength : undefined,
         };
       case 'dots':
         return {
@@ -142,8 +145,14 @@ function parseFields(fields: unknown[], depth: number): FieldDefinition[] {
             ? field.options.map((option) => {
                 const o = option as Record<string, unknown>;
                 return {
-                  label: typeof o.label === 'string' ? o.label : String(o.value ?? ''),
-                  value: typeof o.value === 'string' ? o.value : String(o.value ?? ''),
+                  label:
+                    typeof o.label === 'string'
+                      ? o.label
+                      : String(o.value ?? ''),
+                  value:
+                    typeof o.value === 'string'
+                      ? o.value
+                      : String(o.value ?? ''),
                 };
               })
             : [],
@@ -160,7 +169,8 @@ function parseFields(fields: unknown[], depth: number): FieldDefinition[] {
           type,
           id,
           label,
-          expression: typeof field.expression === 'string' ? field.expression : '0',
+          expression:
+            typeof field.expression === 'string' ? field.expression : '0',
           dependencies: Array.isArray(field.dependencies)
             ? field.dependencies.filter(
                 (dep): dep is string => typeof dep === 'string',
