@@ -27,6 +27,7 @@ import { OwnerGuard } from '../auth/guards/owner.guard';
 import { TemplateAccessGuard } from '../auth/guards/template-access.guard';
 import { GetCurrentUser } from '../auth/decorators/get-user.decorator';
 import { TemplatePayloadGuard } from './guards/template-payload.guard';
+import { TemplateStructureValidationPipe } from './pipes/template-structure-validation.pipe';
 
 @ApiTags('templates')
 @ApiBearerAuth()
@@ -41,7 +42,8 @@ export class TemplatesController {
   @ApiOperation({ summary: 'Create a new template (skeleton)' })
   create(
     @GetCurrentUser('userId') userId: string,
-    @Body() createTemplateDto: CreateTemplateDto,
+    @Body(new TemplateStructureValidationPipe())
+    createTemplateDto: CreateTemplateDto,
   ) {
     return this.templatesService.create(userId, createTemplateDto);
   }
@@ -135,7 +137,8 @@ export class TemplatesController {
   @ApiOperation({ summary: 'Update a template (owner only)' })
   update(
     @Param('id') id: string,
-    @Body() updateTemplateDto: UpdateTemplateDto,
+    @Body(new TemplateStructureValidationPipe())
+    updateTemplateDto: UpdateTemplateDto,
   ) {
     return this.templatesService.update(id, updateTemplateDto);
   }
