@@ -1,0 +1,542 @@
+{
+  "description": "Template structures used for structural validation and formula ordering characterization.",
+  "evaluateStructure": [
+    {
+      "name": "base formula",
+      "structure": {
+        "system": "dnd5e",
+        "version": 1,
+        "tabs": [
+          {
+            "id": "main",
+            "label": "Main",
+            "sections": [
+              {
+                "id": "core",
+                "title": "Core",
+                "fields": [
+                  { "id": "str", "label": "Strength", "type": "number" },
+                  { "id": "dex", "label": "Dexterity", "type": "number" },
+                  {
+                    "id": "initiative",
+                    "label": "Initiative",
+                    "type": "formula",
+                    "expression": "(str + dex) / 2",
+                    "dependencies": ["str", "dex"]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "data": { "str": 12, "dex": 14 },
+      "expected": { "str": 12, "dex": 14, "initiative": 13 }
+    },
+    {
+      "name": "formula chain evaluated in topological order",
+      "structure": {
+        "system": "custom",
+        "version": 1,
+        "tabs": [
+          {
+            "id": "main",
+            "label": "Main",
+            "sections": [
+              {
+                "id": "core",
+                "title": "Core",
+                "fields": [
+                  { "id": "base", "label": "Base", "type": "number" },
+                  {
+                    "id": "a",
+                    "label": "A",
+                    "type": "formula",
+                    "expression": "base + 1",
+                    "dependencies": ["base"]
+                  },
+                  {
+                    "id": "b",
+                    "label": "B",
+                    "type": "formula",
+                    "expression": "a * 2",
+                    "dependencies": ["a"]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "data": { "base": 2 },
+      "expected": { "base": 2, "a": 3, "b": 6 }
+    },
+    {
+      "name": "missing dependency yields null",
+      "structure": {
+        "system": "custom",
+        "version": 1,
+        "tabs": [
+          {
+            "id": "main",
+            "label": "Main",
+            "sections": [
+              {
+                "id": "core",
+                "title": "Core",
+                "fields": [
+                  {
+                    "id": "broken",
+                    "label": "Broken",
+                    "type": "formula",
+                    "expression": "missing + 1",
+                    "dependencies": ["missing"]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "data": {},
+      "expected": { "broken": null }
+    }
+  ],
+  "cycles": [
+    {
+      "name": "two-node cycle",
+      "structure": {
+        "system": "custom",
+        "version": 1,
+        "tabs": [
+          {
+            "id": "main",
+            "label": "Main",
+            "sections": [
+              {
+                "id": "core",
+                "title": "Core",
+                "fields": [
+                  {
+                    "id": "a",
+                    "label": "A",
+                    "type": "formula",
+                    "expression": "b + 1",
+                    "dependencies": ["b"]
+                  },
+                  {
+                    "id": "b",
+                    "label": "B",
+                    "type": "formula",
+                    "expression": "a + 1",
+                    "dependencies": ["a"]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "expectedCycle": ["a", "b"]
+    }
+  ],
+  "valid": [
+    {
+      "name": "every field type",
+      "structure": {
+        "system": "dnd5e",
+        "version": 1,
+        "tabs": [
+          {
+            "id": "main",
+            "label": "Main",
+            "icon": "swords",
+            "sections": [
+              {
+                "id": "abilities",
+                "title": "Abilities",
+                "columns": 2,
+                "fields": [
+                  {
+                    "id": "str",
+                    "label": "Strength",
+                    "type": "number",
+                    "min": 0,
+                    "max": 30,
+                    "step": 1,
+                    "defaultValue": 10
+                  },
+                  {
+                    "id": "notes",
+                    "label": "Notes",
+                    "type": "textarea",
+                    "placeholder": "Enter notes",
+                    "maxLength": 500
+                  },
+                  {
+                    "id": "hp_dots",
+                    "label": "Hit Dice",
+                    "type": "dots",
+                    "maxDots": 10,
+                    "defaultValue": 3
+                  },
+                  {
+                    "id": "align",
+                    "label": "Alignment",
+                    "type": "select",
+                    "options": [{ "label": "Lawful", "value": "lawful" }]
+                  },
+                  {
+                    "id": "hero",
+                    "label": "Hero",
+                    "type": "checkbox",
+                    "defaultValue": true
+                  },
+                  {
+                    "id": "mod_str",
+                    "label": "Modifier",
+                    "type": "formula",
+                    "expression": "floor((str - 10) / 2)",
+                    "dependencies": ["str"]
+                  },
+                  {
+                    "id": "spells",
+                    "label": "Spells",
+                    "type": "repeater",
+                    "itemSchema": [
+                      { "id": "name", "label": "Spell name", "type": "text" }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "repeater formula resolves siblings",
+      "structure": {
+        "system": "custom",
+        "version": 1,
+        "tabs": [
+          {
+            "id": "main",
+            "label": "Main",
+            "sections": [
+              {
+                "id": "inventory",
+                "title": "Inventory",
+                "fields": [
+                  {
+                    "id": "items",
+                    "label": "Items",
+                    "type": "repeater",
+                    "itemSchema": [
+                      { "id": "count", "label": "Count", "type": "number" },
+                      {
+                        "id": "total_weight",
+                        "label": "Total weight",
+                        "type": "formula",
+                        "expression": "count * 2",
+                        "dependencies": ["count"]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "invalid": [
+    {
+      "name": "non-object root",
+      "input": "not a structure",
+      "codes": ["INVALID_TYPE"]
+    },
+    {
+      "name": "unknown field type",
+      "input": {
+        "system": "custom",
+        "version": 1,
+        "tabs": [
+          {
+            "id": "main",
+            "label": "Main",
+            "sections": [
+              {
+                "id": "s",
+                "title": "S",
+                "fields": [{ "id": "x", "label": "X", "type": "mystery" }]
+              }
+            ]
+          }
+        ]
+      },
+      "codes": ["INVALID_VALUE"]
+    },
+    {
+      "name": "unknown property on a field",
+      "input": {
+        "system": "custom",
+        "version": 1,
+        "tabs": [
+          {
+            "id": "main",
+            "label": "Main",
+            "sections": [
+              {
+                "id": "s",
+                "title": "S",
+                "fields": [
+                  { "id": "x", "label": "X", "type": "number", "bogus": true }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "codes": ["UNKNOWN_PROPERTY"]
+    },
+    {
+      "name": "dots without maxDots",
+      "input": {
+        "system": "custom",
+        "version": 1,
+        "tabs": [
+          {
+            "id": "main",
+            "label": "Main",
+            "sections": [
+              {
+                "id": "s",
+                "title": "S",
+                "fields": [{ "id": "x", "label": "X", "type": "dots" }]
+              }
+            ]
+          }
+        ]
+      },
+      "codes": ["INVALID_TYPE"]
+    },
+    {
+      "name": "duplicate field ids",
+      "input": {
+        "system": "custom",
+        "version": 1,
+        "tabs": [
+          {
+            "id": "main",
+            "label": "Main",
+            "sections": [
+              {
+                "id": "s",
+                "title": "S",
+                "fields": [
+                  { "id": "x", "label": "X", "type": "number" },
+                  { "id": "x", "label": "X2", "type": "text" }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "codes": ["DUPLICATE_FIELD_ID"]
+    },
+    {
+      "name": "formula undeclared identifier",
+      "input": {
+        "system": "custom",
+        "version": 1,
+        "tabs": [
+          {
+            "id": "main",
+            "label": "Main",
+            "sections": [
+              {
+                "id": "s",
+                "title": "S",
+                "fields": [
+                  { "id": "str", "label": "Str", "type": "number" },
+                  {
+                    "id": "f",
+                    "label": "F",
+                    "type": "formula",
+                    "expression": "str + dex",
+                    "dependencies": ["str"]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "codes": ["FORMULA_UNDECLARED_DEPENDENCY"]
+    },
+    {
+      "name": "formula missing dependency target",
+      "input": {
+        "system": "custom",
+        "version": 1,
+        "tabs": [
+          {
+            "id": "main",
+            "label": "Main",
+            "sections": [
+              {
+                "id": "s",
+                "title": "S",
+                "fields": [
+                  {
+                    "id": "f",
+                    "label": "F",
+                    "type": "formula",
+                    "expression": "dex + 1",
+                    "dependencies": ["dex"]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "codes": ["FORMULA_MISSING_DEPENDENCY"]
+    },
+    {
+      "name": "formula non-numeric dependency",
+      "input": {
+        "system": "custom",
+        "version": 1,
+        "tabs": [
+          {
+            "id": "main",
+            "label": "Main",
+            "sections": [
+              {
+                "id": "s",
+                "title": "S",
+                "fields": [
+                  { "id": "name", "label": "Name", "type": "text" },
+                  {
+                    "id": "f",
+                    "label": "F",
+                    "type": "formula",
+                    "expression": "name + 1",
+                    "dependencies": ["name"]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "codes": ["FORMULA_NON_NUMERIC_DEPENDENCY"]
+    },
+    {
+      "name": "formula depends on formula",
+      "input": {
+        "system": "custom",
+        "version": 1,
+        "tabs": [
+          {
+            "id": "main",
+            "label": "Main",
+            "sections": [
+              {
+                "id": "s",
+                "title": "S",
+                "fields": [
+                  { "id": "str", "label": "Str", "type": "number" },
+                  {
+                    "id": "a",
+                    "label": "A",
+                    "type": "formula",
+                    "expression": "str + 1",
+                    "dependencies": ["str"]
+                  },
+                  {
+                    "id": "b",
+                    "label": "B",
+                    "type": "formula",
+                    "expression": "a + 1",
+                    "dependencies": ["a"]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "codes": ["FORMULA_DEPENDENCY_ON_FORMULA"]
+    },
+    {
+      "name": "circular formula dependency",
+      "input": {
+        "system": "custom",
+        "version": 1,
+        "tabs": [
+          {
+            "id": "main",
+            "label": "Main",
+            "sections": [
+              {
+                "id": "s",
+                "title": "S",
+                "fields": [
+                  {
+                    "id": "a",
+                    "label": "A",
+                    "type": "formula",
+                    "expression": "b + 1",
+                    "dependencies": ["b"]
+                  },
+                  {
+                    "id": "b",
+                    "label": "B",
+                    "type": "formula",
+                    "expression": "a + 1",
+                    "dependencies": ["a"]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "codes": ["FORMULA_CYCLE", "FORMULA_DEPENDENCY_ON_FORMULA"]
+    },
+    {
+      "name": "malformed formula expression",
+      "input": {
+        "system": "custom",
+        "version": 1,
+        "tabs": [
+          {
+            "id": "main",
+            "label": "Main",
+            "sections": [
+              {
+                "id": "s",
+                "title": "S",
+                "fields": [
+                  { "id": "str", "label": "Str", "type": "number" },
+                  {
+                    "id": "f",
+                    "label": "F",
+                    "type": "formula",
+                    "expression": "floor((str - 10",
+                    "dependencies": ["str"]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "codes": ["FORMULA_SYNTAX"]
+    }
+  ]
+}
