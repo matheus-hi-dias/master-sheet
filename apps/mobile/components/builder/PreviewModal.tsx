@@ -2,7 +2,10 @@ import React, { useState } from 'react';
 import { Modal, View, Text, Pressable, ScrollView } from 'react-native';
 import { X, Eye } from 'lucide-react-native';
 import { DynamicSheetRenderer } from '../sheet/DynamicSheetRenderer';
-import { buildItemDefaults, structureDefaultValues } from '../../lib/defaults';
+import {
+  buildItemDefaults,
+  structureDefaultValues,
+} from '@master-sheet/contracts';
 import type { TemplateStructure } from '../../types/template';
 
 interface PreviewModalProps {

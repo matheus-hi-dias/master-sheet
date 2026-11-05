@@ -24,7 +24,7 @@ import {
   fieldLabelMap,
   type DepCandidate,
 } from '../lib/builder/structureOps';
-import { structureDefaultValues, toNumber } from '../lib/defaults';
+import { structureDefaultValues, toNumber } from '@master-sheet/contracts';
 import {
   createTemplate,
   fetchTemplateDetail,

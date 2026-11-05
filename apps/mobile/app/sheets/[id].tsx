@@ -17,8 +17,9 @@ import { api } from '@/services/api';
 import { fetchTemplateDetail } from '@/services/templates';
 import { Dices, AlertTriangle, X } from 'lucide-react-native';
 import type { TemplateStructure } from '@/types/template';
-import { structureDefaultValues, toNumber } from '@/lib/defaults';
-import { evaluateFormula } from '@/lib/formula';
+import { structureDefaultValues, toNumber } from '@master-sheet/contracts';
+import { evaluateFormula } from '@master-sheet/sheet-engine/formula';
+import { validateSheetData } from '@master-sheet/sheet-engine/validation';
 import { DynamicSheetRenderer } from '@/components/sheet/DynamicSheetRenderer';
 
 interface SheetData {
@@ -57,11 +58,15 @@ function collectDiceAttributes(
             for (const dep of field.dependencies) {
               context[dep] = toNumber(values[dep]);
             }
-            attributes.push({
-              id: field.id,
-              label: field.label,
-              value: evaluateFormula(field.expression, context),
-            });
+            const result = evaluateFormula(field.expression, context);
+
+            if (result !== null) {
+              attributes.push({
+                id: field.id,
+                label: field.label,
+                value: result,
+              });
+            }
           } catch {
             // Formulas with unresolved dependencies are skipped.
           }
@@ -157,6 +162,16 @@ export default function SheetViewScreen() {
   // Mutação para Auto-save com Optimistic UI
   const updateSheetMutation = useMutation({
     mutationFn: async (newData: Record<string, unknown>) => {
+      if (structure) {
+        const validation = validateSheetData(structure, newData);
+
+        if (!validation.ok) {
+          throw new Error(
+            validation.issues.map((item) => item.message).join('\n'),
+          );
+        }
+      }
+
       if (isMock) return newData;
       const response = await api.patch(`/sheets/${id}`, { data: newData });
       return response.data;
@@ -184,7 +199,9 @@ export default function SheetViewScreen() {
       }
       Alert.alert(
         'Erro na sincronização',
-        'Não foi possível salvar as últimas alterações.',
+        err instanceof Error
+          ? err.message
+          : 'Não foi possível salvar as últimas alterações.',
       );
     },
   });

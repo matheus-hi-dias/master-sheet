@@ -1,9 +1,13 @@
 import React from 'react';
 import { View, Text, Pressable, TextInput } from 'react-native';
 import { Plus, Trash2 } from 'lucide-react-native';
-import type { FieldDefinition } from '../../types/template';
-import { evaluateFormula } from '../../lib/formula';
-import { buildItemDefaults, toNumber, toStringValue } from '../../lib/defaults';
+import { evaluateFormula } from '@master-sheet/sheet-engine/formula';
+import {
+  buildItemDefaults,
+  toNumber,
+  toStringValue,
+  type FieldDefinition,
+} from '@master-sheet/contracts';
 import { NumberStepper } from './NumberStepper';
 import { DotTracker } from './DotTracker';
 

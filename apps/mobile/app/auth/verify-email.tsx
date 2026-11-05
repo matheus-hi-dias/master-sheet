@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, ActivityIndicator } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Button } from '@/components/Button';
-import { api } from '@/services/api';
+import { api, getApiErrorMessage } from '@/services/api';
 
 export default function VerifyEmailScreen() {
   const { token } = useLocalSearchParams<{ token: string }>();
@@ -25,9 +25,7 @@ export default function VerifyEmailScreen() {
       await api.post('/auth/verify-email', { token });
       setSuccess(true);
     } catch (err) {
-      const message = (err as { response?: { data?: { message?: string } } })
-        .response?.data?.message;
-      setError(message || 'Falha na verificação do e-mail.');
+      setError(getApiErrorMessage(err, 'Falha na verificação do e-mail.'));
     } finally {
       setLoading(false);
     }

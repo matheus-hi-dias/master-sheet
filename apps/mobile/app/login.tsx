@@ -15,27 +15,9 @@ import { Button } from '../components/Button';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Swords, Scroll } from 'lucide-react-native';
 import { useMutation } from '@tanstack/react-query';
-import { api } from '../services/api';
+import type { AuthSessionResponse } from '@master-sheet/contracts';
+import { api, getApiErrorMessage } from '../services/api';
 import { useAuth } from '../context/AuthContext';
-
-interface LoginResponse {
-  access_token?: string;
-}
-
-interface ApiErrorResponse {
-  response?: {
-    data?: {
-      message?: string | string[];
-    };
-  };
-}
-
-function messageFromError(error: ApiErrorResponse, fallback: string): string {
-  const message = error.response?.data?.message;
-  if (typeof message === 'string') return message;
-  if (Array.isArray(message) && message[0]) return message[0];
-  return fallback;
-}
 
 export default function Login() {
   const [tab, setTab] = useState<'login' | 'register'>('login');
@@ -52,9 +34,9 @@ export default function Login() {
   const { login } = useAuth();
   const passwordRef = useRef<TextInput>(null);
 
-  const loginMutation = useMutation<LoginResponse, ApiErrorResponse, void>({
+  const loginMutation = useMutation<AuthSessionResponse, Error, void>({
     mutationFn: async () => {
-      const response = await api.post<LoginResponse>('/auth/login', {
+      const response = await api.post<AuthSessionResponse>('/auth/login', {
         email,
         password,
       });
@@ -67,7 +49,7 @@ export default function Login() {
     },
     onError: (error) => {
       setApiError(
-        messageFromError(
+        getApiErrorMessage(
           error,
           'Verifique suas credenciais e tente novamente.',
         ),
@@ -75,7 +57,7 @@ export default function Login() {
     },
   });
 
-  const registerMutation = useMutation<unknown, ApiErrorResponse, void>({
+  const registerMutation = useMutation<unknown, Error, void>({
     mutationFn: async () => {
       const response = await api.post('/auth/register', {
         name,
@@ -91,7 +73,7 @@ export default function Login() {
     },
     onError: (error) => {
       setApiError(
-        messageFromError(
+        getApiErrorMessage(
           error,
           'Não foi possível criar a conta. Tente novamente.',
         ),
