@@ -3,7 +3,7 @@ import { Check, Copy, Download, TriangleAlert, X } from 'lucide-react';
 import { Button } from '../../../components/ui/Button';
 import { cn } from '../../../lib/utils';
 import { parseTemplateStructure } from '../lib/structureImport';
-import type { TemplateStructure } from '../../templates/types/template-structure';
+import type { TemplateStructure } from '@master-sheet/contracts';
 
 type ModalMode = 'import' | 'export';
 

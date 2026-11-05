@@ -10,7 +10,7 @@ import {
   fetchTemplateDetail,
   updateTemplate,
 } from '../../templates/services/templatesApi';
-import type { TemplateStructure } from '../../templates/types/template-structure';
+import type { TemplateStructure } from '@master-sheet/contracts';
 import { BuilderHeader } from '../components/BuilderHeader';
 import { BuilderPreview } from '../components/BuilderPreview';
 import { JsonModal } from '../components/JsonModal';
@@ -21,7 +21,7 @@ import {
   dependencyCandidates,
   validateStructure,
 } from '../lib/structureOps';
-import { structureDefaultValues } from '../../sheets/lib/defaults';
+import { structureDefaultValues } from '@master-sheet/contracts';
 
 export function TemplateBuilder() {
   const navigate = useNavigate();

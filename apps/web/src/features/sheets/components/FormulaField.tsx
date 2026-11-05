@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useWatch, type Control, type UseFormSetValue } from 'react-hook-form';
-import { evaluateFormula, type FormulaContext } from '../../../lib/formula';
-import type { FormulaFieldDefinition } from '../../templates/types/template-structure';
+import {
+  evaluateFormula,
+  type FormulaContext,
+} from '@master-sheet/sheet-engine/formula';
+import type { FormulaFieldDefinition } from '@master-sheet/contracts';
 import type { SheetFormValues } from '../types/sheet.types';
 
 interface FormulaFieldProps {

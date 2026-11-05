@@ -2,10 +2,7 @@ import { ArrowLeft, Download, Save, Upload, TriangleAlert } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../../components/ui/Button';
 import { cn } from '../../../lib/utils';
-import {
-  DEFAULT_SYSTEMS,
-  SYSTEM_LABELS,
-} from '../../templates/types/template-structure';
+import { DEFAULT_SYSTEMS, SYSTEM_LABELS } from '@master-sheet/contracts';
 import type { Builder } from '../hooks/useBuilder';
 
 interface BuilderHeaderProps {

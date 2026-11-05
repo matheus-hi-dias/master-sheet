@@ -6,11 +6,8 @@ import {
   extractIdentifiers,
   renderExpressionWithLabels,
   type FormulaContext,
-} from '../../../lib/formula';
-import type {
-  FieldDefinition,
-  FieldType,
-} from '../../templates/types/template-structure';
+} from '@master-sheet/sheet-engine/formula';
+import type { FieldDefinition, FieldType } from '@master-sheet/contracts';
 import { createField, slugify, type DepCandidate } from '../lib/structureOps';
 
 interface FieldConfigFormProps {
@@ -87,7 +84,8 @@ export function FieldConfigForm({
 
     let previewValue: string | null = null;
     try {
-      previewValue = String(evaluateFormula(field.expression, previewContext));
+      const evaluated = evaluateFormula(field.expression, previewContext);
+      previewValue = evaluated === null ? '—' : String(evaluated);
     } catch (error) {
       previewValue = error instanceof Error ? error.message : 'Invalid formula';
     }

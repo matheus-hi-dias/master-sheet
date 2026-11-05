@@ -5,7 +5,7 @@ import type {
   SectionDefinition,
   TabDefinition,
   TemplateStructure,
-} from '../../templates/types/template-structure';
+} from '@master-sheet/contracts';
 import {
   addField,
   addSection,

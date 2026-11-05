@@ -20,7 +20,7 @@ import { Tag } from '../../../components/ui/Tag';
 import { TemplateCard, type TemplateData } from '../components/TemplateCard';
 import { TemplateDetailDrawer } from '../components/TemplateDetailDrawer';
 import { fetchTemplates } from '../services/templatesApi';
-import { DEFAULT_SYSTEMS, SYSTEM_LABELS } from '../types/template-structure';
+import { DEFAULT_SYSTEMS, SYSTEM_LABELS } from '@master-sheet/contracts';
 import type { TemplateSummary } from '../types/templates';
 import { useDebounce } from '../hooks/useDebounce';
 import { useForkTemplate } from '../hooks/useForkTemplate';
