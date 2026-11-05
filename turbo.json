@@ -11,10 +11,17 @@
       "dependsOn": ["^lint"]
     },
     "test": {
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "test/fixtures/**",
+        "**/*.spec.ts",
+        "**/*.test.ts",
+        "**/*.test.tsx"
+      ]
     },
     "check-types": {
-      "dependsOn": ["^check-types"]
+      "dependsOn": ["^build"]
     },
     "db:generate": {
       "cache": false,
@@ -22,6 +29,7 @@
       "outputs": ["src/generated/**"]
     },
     "dev": {
+      "dependsOn": ["^build"],
       "cache": false,
       "persistent": true
     }
