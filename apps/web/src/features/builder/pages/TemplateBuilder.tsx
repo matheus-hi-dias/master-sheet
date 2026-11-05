@@ -120,7 +120,7 @@ export function TemplateBuilder() {
     },
     onSuccess: () => {
       toast.success(editMode ? 'Template updated' : 'Template created');
-      navigate('/templates');
+      navigate('/templates?tab=mine');
     },
     onError: () => {
       toast.error('Could not save the template');
