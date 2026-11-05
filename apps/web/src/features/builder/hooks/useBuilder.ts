@@ -34,7 +34,7 @@ export interface BuilderDraft {
   description: string;
   system: string;
   isPublic: boolean;
-  tags: string[];
+  tags: string;
   structure: TemplateStructure;
 }
 
@@ -50,7 +50,7 @@ function blankDraft(): BuilderDraft {
     description: '',
     system: 'dnd5e',
     isPublic: false,
-    tags: [],
+    tags: '',
     structure: { system: 'dnd5e', version: 1, tabs: [createTab()] },
   };
 }

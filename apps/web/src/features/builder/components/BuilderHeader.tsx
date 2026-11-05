@@ -120,16 +120,8 @@ export function BuilderHeader({
             Tags (comma separated)
           </span>
           <input
-            value={builder.draft.tags.join(', ')}
-            onChange={(e) =>
-              builder.updateMeta(
-                'tags',
-                e.target.value
-                  .split(',')
-                  .map((t) => t.trim())
-                  .filter(Boolean),
-              )
-            }
+            value={builder.draft.tags}
+            onChange={(e) => builder.updateMeta('tags', e.target.value)}
             className={inputClass}
             placeholder="fantasy, dark, 5e"
           />
