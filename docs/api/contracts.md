@@ -8,6 +8,8 @@ Reconciled REST endpoint reference, cross-checked against `apps/api` source. DTO
 - **Refresh cookie (web):** `master-sheet-refresh-token`, set as HttpOnly, Secure, SameSite.
 - **Named throttles** (see `openspec/specs/api-rate-limiting/spec.md`): `strictAuth`, `tokenRefresh`, `passwordReset`, plus the general endpoint limit (120/min).
 - **Errors:** standard NestJS HTTP exceptions; throttled requests return `429` with `{ statusCode: 429, message: "Throttled" }`.
+- **Shared wire contracts:** request/response shapes live in `@master-sheet/contracts` (`packages/contracts/src/envelopes.ts`), with template/sheet schemas in `template.ts`/`sheet.ts`. The API validates `Template.structure` through `validateTemplateStructure` from `@master-sheet/sheet-engine`; web and mobile consume the same schemas, issue codes, and envelope types instead of redeclaring them.
+- **Validation errors:** structured template/sheet failures return HTTP `400` with `message` plus an `issues` array of `{ code, path, message }`, using the stable codes from `@master-sheet/contracts`.
 
 ## Auth Module
 
@@ -42,7 +44,7 @@ Field `id`s are the canonical reference for formula `expression` identifiers and
 
 ## Sheets Module — Planned
 
-The `Sheet` model exists in `apps/api/prisma/schema.prisma`, but no controller/service is implemented yet. Planned surface (per `openspec/changes/multi-system-rpg-template-engine/` and screen docs):
+The `Sheet` model exists in `apps/api/prisma/schema.prisma`, but no controller/service is implemented yet. Shared `validateSheetData` is ready in `@master-sheet/sheet-engine/validation` for the planned module and is already used by the web/mobile editors. Planned surface (per `openspec/changes/multi-system-rpg-template-engine/` and screen docs):
 
 | Method  | Route         | Description                                   | Protection     |
 | :------ | :------------ | :-------------------------------------------- | :------------- |

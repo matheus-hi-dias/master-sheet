@@ -2,14 +2,14 @@
 
 The domain is already specified as shared, but implemented three times:
 
-| Concern | API | Web | Mobile |
-|---|---|---|---|
-| Formula evaluation | `apps/api/src/templates/utils/formula.util.ts` | `apps/web/src/lib/formula.ts` (311 lines) | `apps/mobile/lib/formula.ts` (312 lines) |
-| Template DSL types | DTOs in `apps/api/src/templates` | `features/templates/types/template-structure.ts` | `types/template.ts` |
-| Sheet data shape | DTOs in `apps/api/src/sheets` | `features/sheets/types/sheet.types.ts` | inferred locally |
-| HTTP client | — | `lib/api.ts` + `services/api.ts` | `services/api.ts` |
+| Concern            | API                                            | Web                                              | Mobile                                   |
+| ------------------ | ---------------------------------------------- | ------------------------------------------------ | ---------------------------------------- |
+| Formula evaluation | `apps/api/src/templates/utils/formula.util.ts` | `apps/web/src/lib/formula.ts` (311 lines)        | `apps/mobile/lib/formula.ts` (312 lines) |
+| Template DSL types | DTOs in `apps/api/src/templates`               | `features/templates/types/template-structure.ts` | `types/template.ts`                      |
+| Sheet data shape   | DTOs in `apps/api/src/sheets`                  | `features/sheets/types/sheet.types.ts`           | inferred locally                         |
+| HTTP client        | —                                              | `lib/api.ts` + `services/api.ts`                 | `services/api.ts`                        |
 
-`openspec/specs/template-schema-engine/spec.md` already states: *"sandboxed formula evaluation shared by every client"*, and `openspec/specs/sheet-engine/spec.md` requires *"structural validation parity"*. Neither is enforceable today. The web copy and mobile copy differ (different hashes), so drift has already started.
+`openspec/specs/template-schema-engine/spec.md` already states: _"sandboxed formula evaluation shared by every client"_, and `openspec/specs/sheet-engine/spec.md` requires _"structural validation parity"_. Neither is enforceable today. The web copy and mobile copy differ (different hashes), so drift has already started.
 
 Hard constraints:
 
@@ -81,8 +81,9 @@ Rules:
 Both packages emit CJS via `tsc` with `main`, `types`, and `exports`, and are consumed through workspace dependencies.
 
 - Nest (CJS) consumes directly.
-- Vite consumes CJS fine; tree-shaking of named exports still works.
-- Metro consumes CJS reliably.
+- Vite production builds consume CJS through Rollup's commonjs transform; because pnpm links workspace packages outside `node_modules`, `apps/web/vite.config.ts` includes `packages/contracts` and `packages/sheet-engine` in `build.commonjsOptions.include`.
+- Vite dev consumes CJS through its dependency pre-bundler; `optimizeDeps.include` lists the package roots and every used subpath (`/defaults`, `/schemas`, `/formula`, `/graph`, `/validation`) so dev never serves raw CJS files from `dist` (which breaks named imports in the browser).
+- Metro consumes CJS reliably; the Android export resolves both packages and their subpath exports.
 - Rejected alternative: publish TS source and rely on consumers to transpile (`transpilePackages` in Expo, Vite alias, Nest tsconfig paths). It works but creates three different resolution stories and breaks `tsc -b`/CI typechecking consistency.
 
 Subpath exports (e.g. `@master-sheet/sheet-engine/formula`, `/validation`) keep mobile bundles lean.
@@ -103,7 +104,7 @@ Allowed: `apps/* → sheet-engine → contracts`, `apps/* → contracts`. Forbid
 
 - **[Formula behavior drifts during extraction]** → Characterization corpus (D6) is a gate; no app file is removed until it passes on Node and in a jsdom-free test run.
 - **[A package accidentally imports Node/DOM/RN]** → CI boundary script bans `node:*`, `fs`, `path`, `window`, `document`, `react-native`, and `@nestjs/*` from `contracts`/`sheet-engine`; add an engine smoke test under the mobile Jest preset once available.
-- **[CJS/ESM interop surprises]** → Single CJS output verified against Nest build, Vite build, and Metro bundle before deleting duplicates.
+- **[CJS/ESM interop surprises]** → Single CJS output verified against Nest build, Vite build (with linked-workspace commonjs inclusion), and Metro bundle before deleting duplicates.
 - **[Duplicate Zod instances cause `instanceof`/schema mismatch]** → Pin one Zod version in the workspace; do not add a second version in any app. Prefer `zod` v3-compatible API already used by web.
 - **[Validation messages change and break UI or tests]** → Normalize `Issue` codes and keep user-facing copy in the apps; API keeps 400 semantics.
 - **[Mobile bundle grows]** → Subpath exports + no Node polyfills; measure bundle before/after.
