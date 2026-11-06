@@ -1,6 +1,6 @@
 import { fetchApi } from '../../../lib/api';
 import type { PaginatedResult, TemplateSummary } from '../types/templates';
-import type { TemplateStructure } from '@master-sheet/contracts';
+import type { UpsertTemplatePayload } from '@master-sheet/contracts';
 
 export interface ListTemplatesParams {
   tags?: string[];
@@ -51,15 +51,6 @@ export function forkTemplate(id: string): Promise<TemplateSummary> {
 
 export function deleteTemplate(id: string): Promise<void> {
   return fetchApi<void>(`/templates/${id}`, { method: 'DELETE' });
-}
-
-export interface UpsertTemplatePayload {
-  name: string;
-  description?: string;
-  structure: TemplateStructure;
-  system?: string;
-  isPublic?: boolean;
-  tags?: string[];
 }
 
 export function createTemplate(
