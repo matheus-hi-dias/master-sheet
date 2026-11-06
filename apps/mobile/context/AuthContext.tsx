@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import * as SecureStore from 'expo-secure-store';
-import { useRouter, useSegments } from 'expo-router';
-function jwtDecode<T = any>(token: string): T {
+import { useRouter } from 'expo-router';
+function jwtDecode<T = Record<string, unknown>>(token: string): T {
   try {
     const base64Url = token.split('.')[1];
     if (!base64Url) return {} as T;
@@ -9,8 +9,8 @@ function jwtDecode<T = any>(token: string): T {
     const jsonPayload = decodeURIComponent(
       atob(base64)
         .split('')
-        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-        .join('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join(''),
     );
     return JSON.parse(jsonPayload);
   } catch {
@@ -31,7 +31,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
-  const segments = useSegments();
 
   useEffect(() => {
     loadToken();
@@ -41,9 +40,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const token = await SecureStore.getItemAsync('master-sheet-jwt');
       if (token) {
-        const decoded: any = jwtDecode(token);
+        const decoded = jwtDecode<{ exp?: number }>(token);
         const currentTime = Date.now() / 1000;
-        
+
         if (decoded.exp && decoded.exp > currentTime) {
           setIsAuthenticated(true);
         } else {
@@ -60,7 +59,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   // We should enforce navigation manually when auth state changes significantly
-  // But Expo Router handles basic transitions well if we use router.replace 
+  // But Expo Router handles basic transitions well if we use router.replace
   // explicitly during login/logout interactions.
   const login = async (token: string) => {
     await SecureStore.setItemAsync('master-sheet-jwt', token);

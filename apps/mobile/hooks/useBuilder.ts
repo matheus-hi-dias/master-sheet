@@ -51,7 +51,9 @@ export function blankDraft(): BuilderDraft {
 }
 
 export function useBuilder(initial?: BuilderDraft | null) {
-  const [draft, setDraft] = useState<BuilderDraft>(() => initial ?? blankDraft());
+  const [draft, setDraft] = useState<BuilderDraft>(
+    () => initial ?? blankDraft(),
+  );
 
   useEffect(() => {
     if (initial) load(initial);
@@ -59,7 +61,7 @@ export function useBuilder(initial?: BuilderDraft | null) {
   }, [initial]);
 
   const setStructure = useCallback((next: TemplateStructure) => {
-    setDraft(prev => ({ ...prev, structure: next }));
+    setDraft((prev) => ({ ...prev, structure: next }));
   }, []);
 
   const updateMeta = useCallback(
@@ -67,7 +69,7 @@ export function useBuilder(initial?: BuilderDraft | null) {
       key: K,
       value: BuilderDraft[K],
     ) => {
-      setDraft(prev => {
+      setDraft((prev) => {
         if (key === 'system') {
           return {
             ...prev,
@@ -124,16 +126,14 @@ export function useBuilder(initial?: BuilderDraft | null) {
 
   const handlePatchSection = useCallback(
     (tabId: string, sectionId: string, patch: Partial<SectionDefinition>) => {
-      setStructure(
-        patchSection(draft.structure, tabId, sectionId, patch),
-      );
+      setStructure(patchSection(draft.structure, tabId, sectionId, patch));
     },
     [draft.structure, setStructure],
   );
 
   const handleRemoveSection = useCallback(
     (tabId: string, sectionId: string) => {
-      const tab = draft.structure.tabs.find(t => t.id === tabId);
+      const tab = draft.structure.tabs.find((t) => t.id === tabId);
       if (!tab || tab.sections.length <= 1) return;
       setStructure(removeSection(draft.structure, tabId, sectionId));
     },
@@ -164,19 +164,24 @@ export function useBuilder(initial?: BuilderDraft | null) {
       field: FieldDefinition,
     ) => {
       const current = draft.structure.tabs
-        .find(candidateTab => candidateTab.id === tabId)
-        ?.sections.find(candidateSection => candidateSection.id === sectionId)
-        ?.fields.find(candidateField => candidateField.id === fieldId);
+        .find((candidateTab) => candidateTab.id === tabId)
+        ?.sections.find((candidateSection) => candidateSection.id === sectionId)
+        ?.fields.find((candidateField) => candidateField.id === fieldId);
 
       if (!current) return fieldId;
 
-      const taken = collectAllIds(draft.structure).filter(id => id !== fieldId);
+      const taken = collectAllIds(draft.structure).filter(
+        (id) => id !== fieldId,
+      );
 
       let nextId = fieldId;
       if (field.id !== fieldId) {
         const base = field.id.trim() ? field.id : fieldId;
         nextId = uniqueId(slugify(base), taken);
-      } else if (field.label !== current.label && isAutoId(fieldId, current.label)) {
+      } else if (
+        field.label !== current.label &&
+        isAutoId(fieldId, current.label)
+      ) {
         nextId = uniqueId(slugify(field.label), taken);
       }
 
@@ -185,9 +190,21 @@ export function useBuilder(initial?: BuilderDraft | null) {
 
       if (nextId !== fieldId) {
         structure = rewireFieldId(structure, fieldId, nextId);
-        structure = replaceField(structure, tabId, sectionId, nextId, nextField);
+        structure = replaceField(
+          structure,
+          tabId,
+          sectionId,
+          nextId,
+          nextField,
+        );
       } else {
-        structure = replaceField(structure, tabId, sectionId, fieldId, nextField);
+        structure = replaceField(
+          structure,
+          tabId,
+          sectionId,
+          fieldId,
+          nextField,
+        );
       }
 
       setStructure(structure);

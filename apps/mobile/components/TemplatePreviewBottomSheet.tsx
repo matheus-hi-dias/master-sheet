@@ -82,8 +82,8 @@ export function TemplatePreviewBottomSheet({
               <View className="bg-bg-card border border-border px-2.5 py-1 rounded-full flex-row items-center gap-1">
                 <Layers size={11} color="#888888" />
                 <Text className="text-[10px] text-text-muted font-bold uppercase tracking-widest">
-                  {template.structure.tabs.length} abas · {totalFields(template)}{' '}
-                  campos
+                  {template.structure.tabs.length} abas ·{' '}
+                  {totalFields(template)} campos
                 </Text>
               </View>
             </View>
@@ -96,7 +96,7 @@ export function TemplatePreviewBottomSheet({
 
             {template.tags.length > 0 && (
               <View className="flex-row flex-wrap gap-1.5 mt-3">
-                {template.tags.map(tag => (
+                {template.tags.map((tag) => (
                   <View
                     key={tag.id}
                     className="bg-bg-card px-2 py-0.5 rounded border border-border"
@@ -116,7 +116,7 @@ export function TemplatePreviewBottomSheet({
                   Estrutura do modelo
                 </Text>
               </View>
-              {template.structure.tabs.map(tab => (
+              {template.structure.tabs.map((tab) => (
                 <View
                   key={tab.id}
                   className="px-3 py-2.5 border-b border-border/60 flex-row items-center"
@@ -138,7 +138,7 @@ export function TemplatePreviewBottomSheet({
             {keyFields.length > 0 && (
               <View className="mt-4">
                 <View className="flex-row flex-wrap justify-start gap-2">
-                  {keyFields.map(label => (
+                  {keyFields.map((label) => (
                     <View
                       key={label}
                       className="bg-bg-card border border-border px-2.5 py-1 rounded-full"

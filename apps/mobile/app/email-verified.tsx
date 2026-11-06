@@ -1,10 +1,13 @@
-import React, { useMemo } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React from 'react';
+import { View, Text } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Button } from '../components/Button';
 
 export default function EmailVerifiedScreen() {
-  const { status, message } = useLocalSearchParams<{ status: string; message: string }>();
+  const { status, message } = useLocalSearchParams<{
+    status: string;
+    message: string;
+  }>();
   const router = useRouter();
 
   const isSuccess = status === 'success';
@@ -15,11 +18,12 @@ export default function EmailVerifiedScreen() {
         <Text className="text-2xl font-bold text-[#E0E0E0] mb-4">
           Verificação de E-mail
         </Text>
-        
+
         {isSuccess ? (
           <>
             <Text className="text-[#E0E0E0] text-center mb-6">
-              Seu e-mail foi verificado com sucesso! Agora você pode acessar sua conta.
+              Seu e-mail foi verificado com sucesso! Agora você pode acessar sua
+              conta.
             </Text>
             <Button onPress={() => router.replace('/login')} variant="gold">
               Ir para Login
@@ -36,7 +40,8 @@ export default function EmailVerifiedScreen() {
               </Text>
             ) : null}
             <Text className="text-[#E0E0E0] text-center mb-6">
-              Não foi possível verificar seu e-mail. O link pode ter expirado ou ser inválido.
+              Não foi possível verificar seu e-mail. O link pode ter expirado ou
+              ser inválido.
             </Text>
             <Button onPress={() => router.replace('/login')} variant="outline">
               Voltar

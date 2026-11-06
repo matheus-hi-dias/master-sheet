@@ -1,8 +1,7 @@
-import js from "@eslint/js";
-import eslintConfigPrettier from "eslint-config-prettier";
-import turboPlugin from "eslint-plugin-turbo";
-import tseslint from "typescript-eslint";
-import onlyWarn from "eslint-plugin-only-warn";
+import js from '@eslint/js';
+import eslintConfigPrettier from 'eslint-config-prettier';
+import turboPlugin from 'eslint-plugin-turbo';
+import tseslint from 'typescript-eslint';
 
 /**
  * A shared ESLint configuration for the repository.
@@ -18,15 +17,29 @@ export const config = [
       turbo: turboPlugin,
     },
     rules: {
-      "turbo/no-undeclared-env-vars": "warn",
+      'turbo/no-undeclared-env-vars': 'warn',
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: [
+                '@master-sheet/api',
+                '@master-sheet/web',
+                '@master-sheet/mobile',
+              ],
+              message: 'Applications must not import from other applications.',
+            },
+            {
+              group: ['../../apps/*', '../../../apps/*', '../../../../apps/*'],
+              message: 'Applications must not import from other applications.',
+            },
+          ],
+        },
+      ],
     },
   },
   {
-    plugins: {
-      onlyWarn,
-    },
-  },
-  {
-    ignores: ["dist/**"],
+    ignores: ['dist/**'],
   },
 ];

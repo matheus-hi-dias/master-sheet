@@ -18,7 +18,7 @@ export function DotTracker({ value, maxDots, onChange }: DotTrackerProps) {
 
   return (
     <View className="flex-row flex-wrap items-center" style={{ gap: 8 }}>
-      {dots.map(index => {
+      {dots.map((index) => {
         const filled = index < current;
         return (
           <Pressable
@@ -26,9 +26,7 @@ export function DotTracker({ value, maxDots, onChange }: DotTrackerProps) {
             onPress={() => setDot(index)}
             hitSlop={6}
             className={`w-8 h-8 rounded-full border items-center justify-center ${
-              filled
-                ? 'bg-gold border-gold'
-                : 'bg-bg-panel border-border'
+              filled ? 'bg-gold border-gold' : 'bg-bg-panel border-border'
             }`}
           >
             {filled ? (

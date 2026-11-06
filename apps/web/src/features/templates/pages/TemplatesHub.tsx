@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import {
   Search,
@@ -17,13 +17,10 @@ import { PageHeader } from '../../../components/ui/PageHeader';
 import { Button } from '../../../components/ui/Button';
 import { Input } from '../../../components/ui/Input';
 import { Tag } from '../../../components/ui/Tag';
-import {
-  TemplateCard,
-  type TemplateData,
-} from '../components/TemplateCard';
+import { TemplateCard, type TemplateData } from '../components/TemplateCard';
 import { TemplateDetailDrawer } from '../components/TemplateDetailDrawer';
 import { fetchTemplates } from '../services/templatesApi';
-import { DEFAULT_SYSTEMS, SYSTEM_LABELS } from '../types/template-structure';
+import { DEFAULT_SYSTEMS, SYSTEM_LABELS } from '@master-sheet/contracts';
 import type { TemplateSummary } from '../types/templates';
 import { useDebounce } from '../hooks/useDebounce';
 import { useForkTemplate } from '../hooks/useForkTemplate';
@@ -53,7 +50,10 @@ function toTemplateData(t: TemplateSummary): TemplateData {
 
 export function TemplatesHub() {
   const navigate = useNavigate();
-  const [tab, setTab] = useState<HubTab>('gallery');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [tab, setTab] = useState<HubTab>(() =>
+    searchParams.get('tab') === 'mine' ? 'mine' : 'gallery',
+  );
   const [search, setSearch] = useState('');
   const [system, setSystem] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -104,14 +104,15 @@ export function TemplatesHub() {
     setPage(1);
     setSelectedTags([]);
     setDrawerTemplate(null);
+    setSearchParams(next === 'mine' ? { tab: 'mine' } : {}, {
+      replace: true,
+    });
   };
 
   const toggleTag = (name: string) => {
     setPage(1);
     setSelectedTags((prev) =>
-      prev.includes(name)
-        ? prev.filter((t) => t !== name)
-        : [...prev, name],
+      prev.includes(name) ? prev.filter((t) => t !== name) : [...prev, name],
     );
   };
 
@@ -270,8 +271,8 @@ export function TemplatesHub() {
                 <ChevronLeft size={14} /> Previous
               </Button>
               <span className="text-[12px] text-text-muted">
-                Page {meta.page} of {meta.totalPages} · {meta.total}{' '}
-                template{meta.total !== 1 ? 's' : ''}
+                Page {meta.page} of {meta.totalPages} · {meta.total} template
+                {meta.total !== 1 ? 's' : ''}
               </span>
               <Button
                 variant="outline"

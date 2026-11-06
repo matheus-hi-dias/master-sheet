@@ -1,6 +1,17 @@
 import React from 'react';
-import { View, Text, Pressable, type StyleProp, type ViewStyle } from 'react-native';
-import { ChevronUp, ChevronDown, Trash2, ChevronRight } from 'lucide-react-native';
+import {
+  View,
+  Text,
+  Pressable,
+  type StyleProp,
+  type ViewStyle,
+} from 'react-native';
+import {
+  ChevronUp,
+  ChevronDown,
+  Trash2,
+  ChevronRight,
+} from 'lucide-react-native';
 
 interface BuilderRowProps {
   label: React.ReactNode;
@@ -46,9 +57,7 @@ export function BuilderRow({
       </Pressable>
 
       <View className="flex-row items-center px-1.5">
-        {onPress ? (
-          <ChevronRight size={16} color="#888888" />
-        ) : null}
+        {onPress ? <ChevronRight size={16} color="#888888" /> : null}
         {onUp ? (
           <Pressable
             onPress={onUp}

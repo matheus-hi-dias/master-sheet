@@ -3,7 +3,7 @@ import { Check, Copy, Download, TriangleAlert, X } from 'lucide-react';
 import { Button } from '../../../components/ui/Button';
 import { cn } from '../../../lib/utils';
 import { parseTemplateStructure } from '../lib/structureImport';
-import type { TemplateStructure } from '../../templates/types/template-structure';
+import type { TemplateStructure } from '@master-sheet/contracts';
 
 type ModalMode = 'import' | 'export';
 
@@ -66,7 +66,9 @@ export function JsonModal({
       >
         <div className="flex items-center gap-2 px-4 py-3 border-b border-border">
           <h2 className="text-[13px] font-display font-bold uppercase tracking-[0.14em] text-text-main">
-            {mode === 'import' ? 'Import template JSON' : 'Export template JSON'}
+            {mode === 'import'
+              ? 'Import template JSON'
+              : 'Export template JSON'}
           </h2>
           <button
             type="button"
@@ -81,8 +83,8 @@ export function JsonModal({
         <div className="p-4">
           {mode === 'import' ? (
             <p className="text-[12px] text-text-muted mb-3">
-              Paste a template DSL export. The structure will replace the current
-              tabs, sections and fields.
+              Paste a template DSL export. The structure will replace the
+              current tabs, sections and fields.
             </p>
           ) : (
             <p className="text-[12px] text-text-muted mb-3">
@@ -101,8 +103,7 @@ export function JsonModal({
             spellCheck={false}
             className={cn(
               'w-full font-mono text-[12px] leading-relaxed bg-bg-card border border-border rounded-card p-3 text-text-main outline-none resize-y focus:border-gold',
-              mode === 'export' &&
-                'opacity-90 cursor-text select-text',
+              mode === 'export' && 'opacity-90 cursor-text select-text',
             )}
           />
 

@@ -2,7 +2,10 @@ import React, { useState } from 'react';
 import { Modal, View, Text, Pressable, ScrollView } from 'react-native';
 import { X, Eye } from 'lucide-react-native';
 import { DynamicSheetRenderer } from '../sheet/DynamicSheetRenderer';
-import { buildItemDefaults, structureDefaultValues } from '../../lib/defaults';
+import {
+  buildItemDefaults,
+  structureDefaultValues,
+} from '@master-sheet/contracts';
 import type { TemplateStructure } from '../../types/template';
 
 interface PreviewModalProps {
@@ -11,7 +14,9 @@ interface PreviewModalProps {
   onClose: () => void;
 }
 
-function seedPreviewValues(structure: TemplateStructure): Record<string, unknown> {
+function seedPreviewValues(
+  structure: TemplateStructure,
+): Record<string, unknown> {
   const values = structureDefaultValues(structure);
 
   for (const tab of structure.tabs) {
@@ -30,7 +35,11 @@ function seedPreviewValues(structure: TemplateStructure): Record<string, unknown
   return values;
 }
 
-export function PreviewModal({ visible, structure, onClose }: PreviewModalProps) {
+export function PreviewModal({
+  visible,
+  structure,
+  onClose,
+}: PreviewModalProps) {
   const [activeTab, setActiveTab] = useState(0);
 
   const versionKey = JSON.stringify(structure);
@@ -81,7 +90,9 @@ export function PreviewModal({ visible, structure, onClose }: PreviewModalProps)
                       key={candidate.id}
                       onPress={() => setActiveTab(index)}
                       className={`px-3 py-1.5 rounded-full border ${
-                        active ? 'bg-gold border-gold' : 'bg-bg-card border-border'
+                        active
+                          ? 'bg-gold border-gold'
+                          : 'bg-bg-card border-border'
                       }`}
                     >
                       <Text
@@ -103,7 +114,11 @@ export function PreviewModal({ visible, structure, onClose }: PreviewModalProps)
             contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 32 }}
           >
             {tab ? (
-              <PreviewTab key={versionKey} structure={structure} tabIndex={activeTab} />
+              <PreviewTab
+                key={versionKey}
+                structure={structure}
+                tabIndex={activeTab}
+              />
             ) : (
               <Text className="text-xs text-text-muted text-center py-8">
                 Nenhuma aba definida ainda.
@@ -134,7 +149,9 @@ function PreviewTab({
       key={tab.id}
       tab={tab}
       values={values}
-      onChange={(key, value) => setValues(prev => ({ ...prev, [key]: value }))}
+      onChange={(key, value) =>
+        setValues((prev) => ({ ...prev, [key]: value }))
+      }
     />
   );
 }

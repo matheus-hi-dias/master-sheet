@@ -1,4 +1,5 @@
-import { replaceIdentifier } from '../formula';
+import { replaceIdentifier } from '@master-sheet/sheet-engine/formula';
+import { validateTemplateStructure } from '@master-sheet/sheet-engine/validation';
 import type {
   FieldDefinition,
   FieldType,
@@ -122,7 +123,10 @@ export function createTab(taken: Iterable<string> = []): TabDefinition {
 export function buildFieldIndex(
   structure: TemplateStructure,
 ): Map<string, { tab: TabDefinition; section: SectionDefinition }> {
-  const index = new Map<string, { tab: TabDefinition; section: SectionDefinition }>();
+  const index = new Map<
+    string,
+    { tab: TabDefinition; section: SectionDefinition }
+  >();
   for (const tab of structure.tabs) {
     for (const section of tab.sections) {
       for (const field of section.fields) {
@@ -147,7 +151,7 @@ export function renameTab(
 ): TemplateStructure {
   return {
     ...structure,
-    tabs: structure.tabs.map(tab =>
+    tabs: structure.tabs.map((tab) =>
       tab.id === tabId ? { ...tab, label } : tab,
     ),
   };
@@ -159,7 +163,7 @@ export function removeTab(
 ): TemplateStructure {
   return {
     ...structure,
-    tabs: structure.tabs.filter(tab => tab.id !== tabId),
+    tabs: structure.tabs.filter((tab) => tab.id !== tabId),
   };
 }
 
@@ -168,7 +172,7 @@ export function moveTab(
   tabId: string,
   direction: -1 | 1,
 ): TemplateStructure {
-  const index = structure.tabs.findIndex(tab => tab.id === tabId);
+  const index = structure.tabs.findIndex((tab) => tab.id === tabId);
   const target = index + direction;
   if (index < 0 || target < 0 || target >= structure.tabs.length) {
     return structure;
@@ -186,10 +190,8 @@ export function addSection(
 ): TemplateStructure {
   return {
     ...structure,
-    tabs: structure.tabs.map(tab =>
-      tab.id === tabId
-        ? { ...tab, sections: [...tab.sections, section] }
-        : tab,
+    tabs: structure.tabs.map((tab) =>
+      tab.id === tabId ? { ...tab, sections: [...tab.sections, section] } : tab,
     ),
   };
 }
@@ -202,11 +204,11 @@ export function patchSection(
 ): TemplateStructure {
   return {
     ...structure,
-    tabs: structure.tabs.map(tab =>
+    tabs: structure.tabs.map((tab) =>
       tab.id === tabId
         ? {
             ...tab,
-            sections: tab.sections.map(section =>
+            sections: tab.sections.map((section) =>
               section.id === sectionId ? { ...section, ...patch } : section,
             ),
           }
@@ -222,12 +224,12 @@ export function removeSection(
 ): TemplateStructure {
   return {
     ...structure,
-    tabs: structure.tabs.map(tab =>
+    tabs: structure.tabs.map((tab) =>
       tab.id === tabId
         ? {
             ...tab,
             sections: tab.sections.filter(
-              section => section.id !== sectionId,
+              (section) => section.id !== sectionId,
             ),
           }
         : tab,
@@ -243,9 +245,11 @@ export function moveSection(
 ): TemplateStructure {
   return {
     ...structure,
-    tabs: structure.tabs.map(tab => {
+    tabs: structure.tabs.map((tab) => {
       if (tab.id !== tabId) return tab;
-      const index = tab.sections.findIndex(section => section.id === sectionId);
+      const index = tab.sections.findIndex(
+        (section) => section.id === sectionId,
+      );
       const target = index + direction;
       if (index < 0 || target < 0 || target >= tab.sections.length) return tab;
       const clone = [...tab.sections];
@@ -264,11 +268,11 @@ export function addField(
 ): TemplateStructure {
   return {
     ...structure,
-    tabs: structure.tabs.map(tab =>
+    tabs: structure.tabs.map((tab) =>
       tab.id === tabId
         ? {
             ...tab,
-            sections: tab.sections.map(section =>
+            sections: tab.sections.map((section) =>
               section.id === sectionId
                 ? { ...section, fields: [...section.fields, field] }
                 : section,
@@ -288,15 +292,15 @@ export function replaceField(
 ): TemplateStructure {
   return {
     ...structure,
-    tabs: structure.tabs.map(tab =>
+    tabs: structure.tabs.map((tab) =>
       tab.id === tabId
         ? {
             ...tab,
-            sections: tab.sections.map(section =>
+            sections: tab.sections.map((section) =>
               section.id === sectionId
                 ? {
                     ...section,
-                    fields: section.fields.map(candidate =>
+                    fields: section.fields.map((candidate) =>
                       candidate.id === fieldId ? field : candidate,
                     ),
                   }
@@ -316,15 +320,17 @@ export function removeField(
 ): TemplateStructure {
   return {
     ...structure,
-    tabs: structure.tabs.map(tab =>
+    tabs: structure.tabs.map((tab) =>
       tab.id === tabId
         ? {
             ...tab,
-            sections: tab.sections.map(section =>
+            sections: tab.sections.map((section) =>
               section.id === sectionId
                 ? {
                     ...section,
-                    fields: section.fields.filter(field => field.id !== fieldId),
+                    fields: section.fields.filter(
+                      (field) => field.id !== fieldId,
+                    ),
                   }
                 : section,
             ),
@@ -343,13 +349,15 @@ export function moveField(
 ): TemplateStructure {
   return {
     ...structure,
-    tabs: structure.tabs.map(tab =>
+    tabs: structure.tabs.map((tab) =>
       tab.id === tabId
         ? {
             ...tab,
-            sections: tab.sections.map(section => {
+            sections: tab.sections.map((section) => {
               if (section.id !== sectionId) return section;
-              const index = section.fields.findIndex(field => field.id === fieldId);
+              const index = section.fields.findIndex(
+                (field) => field.id === fieldId,
+              );
               const target = index + direction;
               if (index < 0 || target < 0 || target >= section.fields.length) {
                 return section;
@@ -365,16 +373,16 @@ export function moveField(
   };
 }
 
-function collectTopLevelFields(structure: TemplateStructure): FieldDefinition[] {
-  return structure.tabs.flatMap(tab =>
-    tab.sections.flatMap(section => section.fields),
+function collectTopLevelFields(
+  structure: TemplateStructure,
+): FieldDefinition[] {
+  return structure.tabs.flatMap((tab) =>
+    tab.sections.flatMap((section) => section.fields),
   );
 }
 
-export function collectAllFields(
-  fields: FieldDefinition[],
-): FieldDefinition[] {
-  return fields.flatMap(field =>
+export function collectAllFields(fields: FieldDefinition[]): FieldDefinition[] {
+  return fields.flatMap((field) =>
     field.type === 'repeater'
       ? [field, ...collectAllFields(field.itemSchema ?? [])]
       : [field],
@@ -416,7 +424,7 @@ function rewireField(
 
   if (field.type === 'formula') {
     const dependencies = Array.from(
-      new Set(field.dependencies.map(dep => (dep === oldId ? newId : dep))),
+      new Set(field.dependencies.map((dep) => (dep === oldId ? newId : dep))),
     );
     return {
       ...field,
@@ -430,7 +438,7 @@ function rewireField(
     return {
       ...field,
       id,
-      itemSchema: (field.itemSchema ?? []).map(child =>
+      itemSchema: (field.itemSchema ?? []).map((child) =>
         rewireField(child, oldId, newId),
       ),
     };
@@ -448,11 +456,11 @@ export function rewireFieldId(
 
   return {
     ...structure,
-    tabs: structure.tabs.map(tab => ({
+    tabs: structure.tabs.map((tab) => ({
       ...tab,
-      sections: tab.sections.map(section => ({
+      sections: tab.sections.map((section) => ({
         ...section,
-        fields: section.fields.map(field => rewireField(field, oldId, newId)),
+        fields: section.fields.map((field) => rewireField(field, oldId, newId)),
       })),
     })),
   };
@@ -464,43 +472,39 @@ export function dependencyCandidates(
 ): DepCandidate[] {
   return collectTopLevelFields(structure)
     .filter(
-      field =>
+      (field) =>
         field.id !== excludeId && NUMERIC_FIELD_TYPES.includes(field.type),
     )
-    .map(field => ({ id: field.id, label: field.label }));
+    .map((field) => ({ id: field.id, label: field.label }));
 }
 
 export function validateStructure(structure: TemplateStructure): string[] {
-  const errors: string[] = [];
-  const seen = new Set<string>();
-  const numericLike = new Set<string>();
+  const result = validateTemplateStructure(structure);
 
-  for (const field of collectTopLevelFields(structure)) {
-    if (NUMERIC_FIELD_TYPES.includes(field.type)) {
-      numericLike.add(field.id);
-    }
+  if (
+    result.ok &&
+    structure.tabs.every((tab) =>
+      tab.sections.every((section) =>
+        section.fields.every(
+          (field) => field.type !== 'repeater' || field.itemSchema.length > 0,
+        ),
+      ),
+    )
+  ) {
+    return [];
   }
 
-  for (const field of collectTopLevelFields(structure)) {
-    if (seen.has(field.id)) {
-      errors.push(`ID de campo duplicado "${field.id}"`);
-    }
-    seen.add(field.id);
+  const errors = result.ok ? [] : result.issues.map((item) => item.message);
 
-    if (field.type === 'formula') {
-      for (const dep of field.dependencies) {
-        if (!numericLike.has(dep)) {
+  for (const tab of structure.tabs) {
+    for (const section of tab.sections) {
+      for (const field of section.fields) {
+        if (field.type === 'repeater' && field.itemSchema.length === 0) {
           errors.push(
-            `A fórmula "${field.label}" referencia "${dep}", que não é um campo numérico`,
+            `O repetidor "${field.label}" precisa de ao menos um campo interno`,
           );
         }
       }
-    }
-
-    if (field.type === 'repeater' && field.itemSchema.length === 0) {
-      errors.push(
-        `O repetidor "${field.label}" precisa de ao menos um campo interno`,
-      );
     }
   }
 

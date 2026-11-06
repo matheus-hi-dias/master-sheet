@@ -2,7 +2,7 @@ import React from 'react';
 import { Tag } from '../../../components/ui/Tag';
 import { Button } from '../../../components/ui/Button';
 import { FileText, Copy, Pencil, Trash2 } from 'lucide-react';
-import { SYSTEM_LABELS } from '../types/template-structure';
+import { SYSTEM_LABELS } from '@master-sheet/contracts';
 
 export interface TemplateData {
   id: string;
@@ -102,7 +102,9 @@ export function TemplateCard({
             </span>
           )}
           {!tmpl.official && (
-            <span className="text-[11px] text-text-muted">por {tmpl.creator}</span>
+            <span className="text-[11px] text-text-muted">
+              por {tmpl.creator}
+            </span>
           )}
         </div>
 
@@ -127,7 +129,12 @@ export function TemplateCard({
         >
           Usar Modelo
         </Button>
-        <Button variant="outline" size="sm" onClick={onDetail} className="flex-1">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onDetail}
+          className="flex-1"
+        >
           Ver Detalhes
         </Button>
       </div>

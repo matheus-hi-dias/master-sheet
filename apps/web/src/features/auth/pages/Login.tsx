@@ -22,7 +22,7 @@ import { PasswordStrengthMeter } from '../components/PasswordStrengthMeter';
 export function Login() {
   const [tab, setTab] = useState<'login' | 'register'>('login');
   const [isLoading, setIsLoading] = useState(false);
-  const loginFn = useAuthStore(s => s.login);
+  const loginFn = useAuthStore((s) => s.login);
   const navigate = useNavigate();
 
   const {
@@ -59,9 +59,7 @@ export function Login() {
       }
     } catch (err: unknown) {
       toast.error(
-        err instanceof Error
-          ? err.message
-          : 'Erro ao processar requisição',
+        err instanceof Error ? err.message : 'Erro ao processar requisição',
       );
     } finally {
       setIsLoading(false);
@@ -92,7 +90,7 @@ export function Login() {
         </div>
 
         <div className="flex rounded-card overflow-hidden border border-border border-t-[3px] border-t-gold mb-7">
-          {(['login', 'register'] as const).map(t => (
+          {(['login', 'register'] as const).map((t) => (
             <button
               key={t}
               onClick={() => handleTabChange(t)}

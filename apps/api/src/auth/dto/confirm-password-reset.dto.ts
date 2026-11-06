@@ -5,7 +5,7 @@ export class ConfirmPasswordResetDto {
   @ApiProperty({ description: 'Token único de reset de senha.' })
   @IsString()
   @MinLength(16)
-  token: string;
+  token!: string;
 
   @ApiProperty({
     description: 'Nova senha da conta.',
@@ -13,5 +13,5 @@ export class ConfirmPasswordResetDto {
   })
   @IsString()
   @MinLength(8)
-  password: string;
+  password!: string;
 }

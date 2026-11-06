@@ -1,9 +1,13 @@
+import type { ApiErrorEnvelope } from '@master-sheet/contracts';
 import { useAuthStore } from '../store/useAuthStore';
 import { getApiBaseUrl } from '../services/api';
 
 const API_URL = getApiBaseUrl();
 
-export async function fetchApi(endpoint: string, options: RequestInit = {}) {
+export async function fetchApi<T>(
+  endpoint: string,
+  options: RequestInit = {},
+): Promise<T> {
   const { accessToken, logout } = useAuthStore.getState();
 
   const headers = new Headers(options.headers || {});
@@ -24,19 +28,18 @@ export async function fetchApi(endpoint: string, options: RequestInit = {}) {
   }
 
   if (!response.ok) {
-    const errorData = (await response.json().catch(() => ({}))) as {
-      message?: string | string[];
-    };
+    const errorData = (await response
+      .json()
+      .catch(() => ({}))) as ApiErrorEnvelope;
     const message = Array.isArray(errorData.message)
       ? errorData.message.join(', ')
       : errorData.message;
     throw new Error(message || 'Something went wrong');
   }
 
-  // Handle NO_CONTENT responses gracefully
   if (response.status === 204) {
-    return null;
+    return null as T;
   }
 
-  return response.json();
+  return (await response.json()) as T;
 }

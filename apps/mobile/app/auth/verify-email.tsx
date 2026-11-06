@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, ActivityIndicator } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Button } from '@/components/Button';
-import { api } from '@/services/api';
+import { api, getApiErrorMessage } from '@/services/api';
 
 export default function VerifyEmailScreen() {
   const { token } = useLocalSearchParams<{ token: string }>();
@@ -24,10 +24,8 @@ export default function VerifyEmailScreen() {
     try {
       await api.post('/auth/verify-email', { token });
       setSuccess(true);
-    } catch (err: any) {
-      setError(
-        err.response?.data?.message || 'Falha na verificação do e-mail.',
-      );
+    } catch (err) {
+      setError(getApiErrorMessage(err, 'Falha na verificação do e-mail.'));
     } finally {
       setLoading(false);
     }
@@ -50,10 +48,7 @@ export default function VerifyEmailScreen() {
             <Text className="text-[#E0E0E0] text-center mb-6">
               E-mail verificado com sucesso!
             </Text>
-            <Button
-              onPress={() => router.replace('/login')}
-              variant="gold"
-            >
+            <Button onPress={() => router.replace('/login')} variant="gold">
               Continuar para Login
             </Button>
           </>

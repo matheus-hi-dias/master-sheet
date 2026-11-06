@@ -17,14 +17,15 @@ import { api } from '@/services/api';
 import { fetchTemplateDetail } from '@/services/templates';
 import { Dices, AlertTriangle, X } from 'lucide-react-native';
 import type { TemplateStructure } from '@/types/template';
-import { structureDefaultValues, toNumber } from '@/lib/defaults';
-import { evaluateFormula } from '@/lib/formula';
+import { structureDefaultValues, toNumber } from '@master-sheet/contracts';
+import { evaluateFormula } from '@master-sheet/sheet-engine/formula';
+import { validateSheetData } from '@master-sheet/sheet-engine/validation';
 import { DynamicSheetRenderer } from '@/components/sheet/DynamicSheetRenderer';
 
 interface SheetData {
   id: string;
   name?: string;
-  data: Record<string, any>;
+  data: Record<string, unknown>;
   template?: {
     name: string;
     structure?: TemplateStructure;
@@ -57,11 +58,15 @@ function collectDiceAttributes(
             for (const dep of field.dependencies) {
               context[dep] = toNumber(values[dep]);
             }
-            attributes.push({
-              id: field.id,
-              label: field.label,
-              value: evaluateFormula(field.expression, context),
-            });
+            const result = evaluateFormula(field.expression, context);
+
+            if (result !== null) {
+              attributes.push({
+                id: field.id,
+                label: field.label,
+                value: result,
+              });
+            }
           } catch {
             // Formulas with unresolved dependencies are skipped.
           }
@@ -88,8 +93,11 @@ export default function SheetViewScreen() {
   const queryClient = useQueryClient();
 
   const [activeTabId, setActiveTabId] = useState<string | null>(null);
-  const [localData, setLocalData] = useState<Record<string, any>>({});
-  const [saveStatus, setSaveStatus] = useState<'saved' | 'saving'>('saved');
+  const [localData, setLocalData] = useState<Record<string, unknown>>({});
+  const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'error'>(
+    'saved',
+  );
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [rollOpen, setRollOpen] = useState(false);
 
   const isMock = typeof id === 'string' && id.startsWith('mock-');
@@ -111,7 +119,9 @@ export default function SheetViewScreen() {
             const detail = await fetchTemplateDetail(String(templateId));
             tmplName = detail.name;
             structure = detail.structure;
-          } catch {}
+          } catch {
+            structure = undefined;
+          }
         }
 
         return {
@@ -147,20 +157,21 @@ export default function SheetViewScreen() {
   }, [sheet]);
 
   useEffect(() => {
-    if (tabs.length > 0 && !tabs.some(tab => tab.id === activeTabId)) {
+    if (tabs.length > 0 && !tabs.some((tab) => tab.id === activeTabId)) {
       setActiveTabId(tabs[0].id);
     }
   }, [tabs, activeTabId]);
 
   // Mutação para Auto-save com Optimistic UI
   const updateSheetMutation = useMutation({
-    mutationFn: async (newData: Record<string, any>) => {
+    mutationFn: async (newData: Record<string, unknown>) => {
       if (isMock) return newData;
       const response = await api.patch(`/sheets/${id}`, { data: newData });
       return response.data;
     },
-    onMutate: async newData => {
+    onMutate: async (newData) => {
       setSaveStatus('saving');
+      setSaveError(null);
       await queryClient.cancelQueries({ queryKey: ['sheet', id] });
       const previousSheet = queryClient.getQueryData<SheetData>(['sheet', id]);
 
@@ -174,22 +185,36 @@ export default function SheetViewScreen() {
     },
     onSuccess: () => {
       setSaveStatus('saved');
+      setSaveError(null);
     },
-    onError: (err, newData, context) => {
-      setSaveStatus('saved');
+    onError: (err, _newData, context) => {
+      setSaveStatus('error');
+      setSaveError(
+        err instanceof Error
+          ? err.message
+          : 'Não foi possível salvar as últimas alterações.',
+      );
       if (context?.previousSheet) {
         queryClient.setQueryData(['sheet', id], context.previousSheet);
       }
-      Alert.alert(
-        'Erro na sincronização',
-        'Não foi possível salvar as últimas alterações.',
-      );
     },
   });
 
-  const handleFieldChange = (key: string, value: any) => {
+  const handleFieldChange = (key: string, value: unknown) => {
     const updated = { ...localData, [key]: value };
     setLocalData(updated);
+
+    if (structure) {
+      const validation = validateSheetData(structure, updated);
+
+      if (!validation.ok) {
+        setSaveStatus('error');
+        setSaveError(validation.issues.map((item) => item.message).join('\n'));
+        return;
+      }
+    }
+
+    setSaveError(null);
     updateSheetMutation.mutate(updated);
   };
 
@@ -210,10 +235,12 @@ export default function SheetViewScreen() {
     );
   };
 
-  const sheetName = sheet?.name || localData?.name || 'Ficha do Aventureiro';
+  const localName =
+    typeof localData.name === 'string' ? localData.name : undefined;
+  const sheetName = sheet?.name || localName || 'Ficha do Aventureiro';
   const systemName = sheet?.template?.name || 'Sistema Dinâmico';
 
-  const activeTab = tabs.find(tab => tab.id === activeTabId);
+  const activeTab = tabs.find((tab) => tab.id === activeTabId);
 
   return (
     <SafeAreaView edges={['top']} className="flex-1 bg-bg-app">
@@ -223,7 +250,10 @@ export default function SheetViewScreen() {
       >
         {/* Cabeçalho */}
         <View className="px-4 pt-3 pb-3 bg-bg-panel border-b border-border flex-row items-center justify-between">
-          <Pressable onPress={() => router.back()} className="p-2 -ml-2 active:opacity-60">
+          <Pressable
+            onPress={() => router.back()}
+            className="p-2 -ml-2 active:opacity-60"
+          >
             <Text className="text-gold font-bold text-base">◀ Voltar</Text>
           </Pressable>
 
@@ -238,10 +268,22 @@ export default function SheetViewScreen() {
 
           <View className="w-12 items-end">
             <View
-              className={`w-2 h-2 rounded-full ${saveStatus === 'saving' ? 'bg-warning animate-pulse' : 'bg-success'}`}
+              className={`w-2 h-2 rounded-full ${
+                saveStatus === 'saving'
+                  ? 'bg-warning animate-pulse'
+                  : saveStatus === 'error'
+                    ? 'bg-danger'
+                    : 'bg-success'
+              }`}
             />
           </View>
         </View>
+
+        {saveError ? (
+          <View className="mx-4 mt-3 px-3 py-2 rounded-card border border-danger/50 bg-danger/5">
+            <Text className="text-[11px] text-danger">{saveError}</Text>
+          </View>
+        ) : null}
 
         {isLoading ? (
           <View className="flex-1 items-center justify-center">
@@ -281,7 +323,7 @@ export default function SheetViewScreen() {
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={{ paddingHorizontal: 12 }}
               >
-                {tabs.map(tab => {
+                {tabs.map((tab) => {
                   const isActive = tab.id === activeTabId;
                   return (
                     <Pressable
@@ -360,9 +402,13 @@ export default function SheetViewScreen() {
               </View>
 
               <ScrollView
-                contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 28, gap: 8 }}
+                contentContainerStyle={{
+                  paddingHorizontal: 20,
+                  paddingBottom: 28,
+                  gap: 8,
+                }}
               >
-                {diceAttributes.map(attribute => (
+                {diceAttributes.map((attribute) => (
                   <Pressable
                     key={attribute.id}
                     onPress={() => handleRoll(attribute)}

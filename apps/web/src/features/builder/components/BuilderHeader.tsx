@@ -2,7 +2,7 @@ import { ArrowLeft, Download, Save, Upload, TriangleAlert } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../../components/ui/Button';
 import { cn } from '../../../lib/utils';
-import { DEFAULT_SYSTEMS, SYSTEM_LABELS } from '../../templates/types/template-structure';
+import { DEFAULT_SYSTEMS, SYSTEM_LABELS } from '@master-sheet/contracts';
 import type { Builder } from '../hooks/useBuilder';
 
 interface BuilderHeaderProps {
@@ -58,7 +58,11 @@ export function BuilderHeader({
             disabled={isSaving || errors.length > 0}
           >
             <Save size={14} />
-            {isSaving ? 'Saving…' : editMode ? 'Save changes' : 'Create template'}
+            {isSaving
+              ? 'Saving…'
+              : editMode
+                ? 'Save changes'
+                : 'Create template'}
           </Button>
         </div>
       </div>
@@ -116,13 +120,8 @@ export function BuilderHeader({
             Tags (comma separated)
           </span>
           <input
-            value={builder.draft.tags.join(', ')}
-            onChange={(e) =>
-              builder.updateMeta(
-                'tags',
-                e.target.value.split(',').map((t) => t.trim()).filter(Boolean),
-              )
-            }
+            value={builder.draft.tags}
+            onChange={(e) => builder.updateMeta('tags', e.target.value)}
             className={inputClass}
             placeholder="fantasy, dark, 5e"
           />
@@ -131,7 +130,9 @@ export function BuilderHeader({
         <div className="flex items-end pb-1">
           <button
             type="button"
-            onClick={() => builder.updateMeta('isPublic', !builder.draft.isPublic)}
+            onClick={() =>
+              builder.updateMeta('isPublic', !builder.draft.isPublic)
+            }
             className="flex items-center gap-2 cursor-pointer group"
           >
             <span

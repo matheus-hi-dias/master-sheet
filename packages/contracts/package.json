@@ -1,0 +1,47 @@
+{
+  "name": "@master-sheet/contracts",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Single source of truth for Master-Sheet domain types and runtime schemas.",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./schemas": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./defaults": {
+      "types": "./dist/defaults.d.ts",
+      "import": "./dist/defaults.js",
+      "require": "./dist/defaults.js",
+      "default": "./dist/defaults.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "check-types": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint \"{src,test}/**/*.ts\"",
+    "test": "tsc -p tsconfig.test.json && node ../../scripts/run-node-tests.mjs dist-test/test"
+  },
+  "dependencies": {
+    "zod": "4.3.6"
+  },
+  "devDependencies": {
+    "@master-sheet/eslint-config": "workspace:*",
+    "@master-sheet/typescript-config": "workspace:*",
+    "@types/node": "^24.10.1",
+    "eslint": "^9.39.1",
+    "typescript": "5.9.2"
+  }
+}

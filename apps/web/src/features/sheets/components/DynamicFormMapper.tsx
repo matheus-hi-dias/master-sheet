@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { cn } from '../../../lib/utils';
-import type { TemplateStructure } from '../../templates/types/template-structure';
-import { structureDefaultValues } from '../lib/defaults';
+import type { TemplateStructure } from '@master-sheet/contracts';
+import { structureDefaultValues } from '@master-sheet/contracts';
 import type { SheetForm, SheetFormValues } from '../types/sheet.types';
+import { createSheetResolver } from '../lib/sheetValidation';
 import { FieldInput } from './FieldInput';
 
 interface DynamicFormMapperProps {
@@ -24,7 +25,9 @@ export function DynamicFormMapper({
     [structure],
   );
 
-  const form = useForm<SheetFormValues>({ defaultValues });
+  const resolver = useMemo(() => createSheetResolver(structure), [structure]);
+
+  const form = useForm<SheetFormValues>({ defaultValues, resolver });
   const formRef = useRef<SheetForm>(form);
   formRef.current = form;
 
@@ -39,8 +42,8 @@ export function DynamicFormMapper({
 
   const [activeTabId, setActiveTabId] = useState(structure.tabs[0]?.id);
 
-  const activeTab = structure.tabs.find((tab) => tab.id === activeTabId) ??
-    structure.tabs[0];
+  const activeTab =
+    structure.tabs.find((tab) => tab.id === activeTabId) ?? structure.tabs[0];
 
   return (
     <div className="flex flex-col gap-4 w-full">
@@ -86,7 +89,11 @@ export function DynamicFormMapper({
               }}
             >
               {section.fields.map((field) => (
-                <FieldInput key={field.id} field={field} form={formRef.current} />
+                <FieldInput
+                  key={field.id}
+                  field={field}
+                  form={formRef.current}
+                />
               ))}
             </div>
           </section>

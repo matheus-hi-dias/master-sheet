@@ -6,11 +6,8 @@ import {
   extractIdentifiers,
   renderExpressionWithLabels,
   type FormulaContext,
-} from '../../../lib/formula';
-import type {
-  FieldDefinition,
-  FieldType,
-} from '../../templates/types/template-structure';
+} from '@master-sheet/sheet-engine/formula';
+import type { FieldDefinition, FieldType } from '@master-sheet/contracts';
 import { createField, slugify, type DepCandidate } from '../lib/structureOps';
 
 interface FieldConfigFormProps {
@@ -87,7 +84,8 @@ export function FieldConfigForm({
 
     let previewValue: string | null = null;
     try {
-      previewValue = String(evaluateFormula(field.expression, previewContext));
+      const evaluated = evaluateFormula(field.expression, previewContext);
+      previewValue = evaluated === null ? '—' : String(evaluated);
     } catch (error) {
       previewValue = error instanceof Error ? error.message : 'Invalid formula';
     }
@@ -132,7 +130,9 @@ export function FieldConfigForm({
               const deps = used.filter((id) => candidateIds.has(id));
               patch({
                 expression: e.target.value,
-                dependencies: deps.filter((id, index, all) => all.indexOf(id) === index),
+                dependencies: deps.filter(
+                  (id, index, all) => all.indexOf(id) === index,
+                ),
               });
             }}
             className={cn(inputClass, 'font-mono text-[12px] resize-y')}
@@ -185,16 +185,16 @@ export function FieldConfigForm({
               <p className="flex items-center gap-1.5 text-danger">
                 <TriangleAlert size={12} /> Unknown:{' '}
                 {diagnostics.unknown
-                  .map((id) => (labelById[id] ? `${id} (${labelById[id]})` : id))
+                  .map((id) =>
+                    labelById[id] ? `${id} (${labelById[id]})` : id,
+                  )
                   .join(', ')}
               </p>
             )}
             <p className="text-text-muted">
               Dependencies:{' '}
               {diagnostics.deps.length > 0
-                ? diagnostics.deps
-                    .map((id) => labelById[id] ?? id)
-                    .join(', ')
+                ? diagnostics.deps.map((id) => labelById[id] ?? id).join(', ')
                 : 'none'}
             </p>
             <p
@@ -232,7 +232,9 @@ export function FieldConfigForm({
                 index={index}
                 onChange={(next) => {
                   patch({
-                    itemSchema: children.map((c, i) => (i === index ? next : c)),
+                    itemSchema: children.map((c, i) =>
+                      i === index ? next : c,
+                    ),
                   });
                 }}
                 onRemove={() => {
@@ -270,7 +272,8 @@ export function FieldConfigForm({
           </button>
         </div>
         <p className="text-[11px] text-text-muted">
-          Repeater items share a common sub-schema. Nested repeaters are not supported.
+          Repeater items share a common sub-schema. Nested repeaters are not
+          supported.
         </p>
       </div>
     );
@@ -289,7 +292,9 @@ export function FieldConfigForm({
                     value={option.label}
                     onChange={(e) => {
                       const next = options.map((o, i) =>
-                        i === index ? { label: e.target.value, value: o.value } : o,
+                        i === index
+                          ? { label: e.target.value, value: o.value }
+                          : o,
                       );
                       patch({ options: next });
                     }}

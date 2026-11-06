@@ -14,7 +14,7 @@ export function Tag({ children, active, className, ...props }: TagProps) {
         active
           ? 'bg-gold text-[#121212] border-gold shadow-[0_0_12px_rgba(212,175,55,0.3)]'
           : 'bg-transparent text-text-muted border-border hover:border-gold hover:text-gold hover:bg-[rgba(212,175,55,0.05)]',
-        className
+        className,
       )}
       {...props}
     >

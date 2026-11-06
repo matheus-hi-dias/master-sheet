@@ -1,0 +1,53 @@
+{
+  "name": "@master-sheet/sheet-engine",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Shared formula engine and structural validation for Master-Sheet.",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./formula": {
+      "types": "./dist/formula.d.ts",
+      "import": "./dist/formula.js",
+      "require": "./dist/formula.js",
+      "default": "./dist/formula.js"
+    },
+    "./validation": {
+      "types": "./dist/validation.d.ts",
+      "import": "./dist/validation.js",
+      "require": "./dist/validation.js",
+      "default": "./dist/validation.js"
+    },
+    "./graph": {
+      "types": "./dist/graph.d.ts",
+      "import": "./dist/graph.js",
+      "require": "./dist/graph.js",
+      "default": "./dist/graph.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "check-types": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint \"{src,test}/**/*.ts\"",
+    "test": "tsc -p tsconfig.test.json && node ../../scripts/run-node-tests.mjs dist-test/test"
+  },
+  "dependencies": {
+    "@master-sheet/contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "@master-sheet/eslint-config": "workspace:*",
+    "@master-sheet/typescript-config": "workspace:*",
+    "@types/node": "^24.10.1",
+    "eslint": "^9.39.1",
+    "typescript": "5.9.2"
+  }
+}

@@ -1,6 +1,6 @@
 import { fetchApi } from '../../../lib/api';
 import type { PaginatedResult, TemplateSummary } from '../types/templates';
-import type { TemplateStructure } from '../types/template-structure';
+import type { UpsertTemplatePayload } from '@master-sheet/contracts';
 
 export interface ListTemplatesParams {
   tags?: string[];
@@ -12,7 +12,7 @@ export interface ListTemplatesParams {
   limit?: number;
 }
 
-export async function fetchTemplates(
+export function fetchTemplates(
   params: ListTemplatesParams = {},
 ): Promise<PaginatedResult<TemplateSummary>> {
   const query = new URLSearchParams();
@@ -36,44 +36,37 @@ export async function fetchTemplates(
   query.append('limit', String(params.limit ?? 12));
 
   const qs = query.toString();
-  return fetchApi(qs ? `/templates?${qs}` : '/templates');
+  return fetchApi<PaginatedResult<TemplateSummary>>(
+    qs ? `/templates?${qs}` : '/templates',
+  );
 }
 
-export async function fetchTemplateDetail(id: string): Promise<TemplateSummary> {
-  return fetchApi(`/templates/${id}`);
+export function fetchTemplateDetail(id: string): Promise<TemplateSummary> {
+  return fetchApi<TemplateSummary>(`/templates/${id}`);
 }
 
-export async function forkTemplate(id: string): Promise<TemplateSummary> {
-  return fetchApi(`/templates/${id}/fork`, { method: 'POST' });
+export function forkTemplate(id: string): Promise<TemplateSummary> {
+  return fetchApi<TemplateSummary>(`/templates/${id}/fork`, { method: 'POST' });
 }
 
-export async function deleteTemplate(id: string): Promise<void> {
-  return fetchApi(`/templates/${id}`, { method: 'DELETE' });
+export function deleteTemplate(id: string): Promise<void> {
+  return fetchApi<void>(`/templates/${id}`, { method: 'DELETE' });
 }
 
-export interface UpsertTemplatePayload {
-  name: string;
-  description?: string;
-  structure: TemplateStructure;
-  system?: string;
-  isPublic?: boolean;
-  tags?: string[];
-}
-
-export async function createTemplate(
+export function createTemplate(
   payload: UpsertTemplatePayload,
 ): Promise<TemplateSummary> {
-  return fetchApi('/templates', {
+  return fetchApi<TemplateSummary>('/templates', {
     method: 'POST',
     body: JSON.stringify(payload),
   });
 }
 
-export async function updateTemplate(
+export function updateTemplate(
   id: string,
   payload: Partial<UpsertTemplatePayload>,
 ): Promise<TemplateSummary> {
-  return fetchApi(`/templates/${id}`, {
+  return fetchApi<TemplateSummary>(`/templates/${id}`, {
     method: 'PATCH',
     body: JSON.stringify(payload),
   });

@@ -7,7 +7,7 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateTemplateDto } from './dto/create-template.dto';
 import { UpdateTemplateDto } from './dto/update-template.dto';
-import { validateFormulaDependencies } from './utils/template-structure.util';
+import { assertTemplateStructure } from './validation/template-validation';
 import type { Prisma } from '../generated/prisma/client';
 
 export type ForkSource = Prisma.TemplateGetPayload<{
@@ -37,9 +37,14 @@ export class TemplatesService {
   }
 
   async create(authorId: string, createTemplateDto: CreateTemplateDto) {
-    const { tags, structure, system, version, ...rest } = createTemplateDto;
-
-    validateFormulaDependencies(structure);
+    const {
+      tags,
+      system,
+      version,
+      structure: rawStructure,
+      ...rest
+    } = createTemplateDto;
+    const structure = assertTemplateStructure(rawStructure);
 
     const normalizedTags = this.normalizeTags(tags);
     const tagConnections = normalizedTags.map((tag) => ({
@@ -187,12 +192,18 @@ export class TemplatesService {
       throw new NotFoundException('Template not found');
     }
 
-    const { tags, structure, system, version, ...rest } = updateTemplateDto;
+    const {
+      tags,
+      system,
+      version,
+      structure: rawStructure,
+      ...rest
+    } = updateTemplateDto;
 
     const updateData: Prisma.TemplateUpdateInput = { ...rest };
 
-    if (structure !== undefined) {
-      validateFormulaDependencies(structure);
+    if (rawStructure !== undefined) {
+      const structure = assertTemplateStructure(rawStructure);
 
       const nextVersion = version ?? existing.version + 1;
 

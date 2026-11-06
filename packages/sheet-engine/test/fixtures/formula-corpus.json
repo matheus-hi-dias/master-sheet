@@ -1,0 +1,231 @@
+{
+  "description": "Behavioral corpus captured from apps/web/src/lib/formula.ts, apps/mobile/lib/formula.ts and apps/api/src/templates/utils/formula.util.ts. Evaluation expectations follow the canonical API/design rules (design D3): missing or non-numeric dependencies and non-finite results evaluate to null; parse errors are structured.",
+  "evaluation": [
+    {
+      "name": "arithmetic precedence",
+      "expression": "1 + 2 * 3",
+      "values": {},
+      "expected": 7
+    },
+    {
+      "name": "parentheses",
+      "expression": "(1 + 2) * 3",
+      "values": {},
+      "expected": 9
+    },
+    {
+      "name": "subtraction and division",
+      "expression": "10 - 4 / 2",
+      "values": {},
+      "expected": 8
+    },
+    { "name": "modulo", "expression": "10 % 4", "values": {}, "expected": 2 },
+    {
+      "name": "unary minus",
+      "expression": "-2 + 5",
+      "values": {},
+      "expected": 3
+    },
+    {
+      "name": "unary after parentheses",
+      "expression": "-(3 * 2)",
+      "values": {},
+      "expected": -6
+    },
+    {
+      "name": "exponentiation",
+      "expression": "2 ^ 10",
+      "values": {},
+      "expected": 1024
+    },
+    {
+      "name": "right-associative exponentiation",
+      "expression": "2 ^ 3 ^ 2",
+      "values": {},
+      "expected": 512
+    },
+    {
+      "name": "floor with dependency",
+      "expression": "floor((str - 10) / 2)",
+      "values": { "str": 15 },
+      "expected": 2
+    },
+    {
+      "name": "multiple dependencies",
+      "expression": "str + dex",
+      "values": { "str": 12, "dex": 14 },
+      "expected": 26
+    },
+    {
+      "name": "ceil function",
+      "expression": "ceil(a)",
+      "values": { "a": 3.7 },
+      "expected": 4
+    },
+    {
+      "name": "nested min/max/floor",
+      "expression": "floor(min(a * 2, b + 3))",
+      "values": { "a": 3.7, "b": 2.2 },
+      "expected": 5
+    },
+    {
+      "name": "min function",
+      "expression": "min(a, b)",
+      "values": { "a": 3.7, "b": 2.2 },
+      "expected": 2.2
+    },
+    {
+      "name": "max function",
+      "expression": "max(a, b)",
+      "values": { "a": 3.7, "b": 2.2 },
+      "expected": 3.7
+    },
+    {
+      "name": "min with literal",
+      "expression": "min(a, b, 1)",
+      "values": { "a": 3.7, "b": 2.2 },
+      "expected": 1
+    },
+    {
+      "name": "round function",
+      "expression": "round(2.5)",
+      "values": {},
+      "expected": 3
+    },
+    {
+      "name": "abs function",
+      "expression": "abs(-4)",
+      "values": {},
+      "expected": 4
+    },
+    {
+      "name": "missing dependency is null",
+      "expression": "a + 1",
+      "values": {},
+      "expected": null
+    },
+    {
+      "name": "unknown identifier is null",
+      "expression": "globalThis",
+      "values": {},
+      "expected": null
+    },
+    {
+      "name": "inherited property is not resolved",
+      "expression": "constructor",
+      "values": {},
+      "expected": null
+    },
+    {
+      "name": "non-numeric string dependency is null",
+      "expression": "a + b",
+      "values": { "a": 1, "b": "x" },
+      "expected": null
+    },
+    {
+      "name": "numeric string dependency is null",
+      "expression": "a + 1",
+      "values": { "a": "2" },
+      "expected": null
+    },
+    {
+      "name": "null dependency is null",
+      "expression": "a + b",
+      "values": { "a": 1, "b": null },
+      "expected": null
+    },
+    {
+      "name": "boolean dependency is null",
+      "expression": "a + 1",
+      "values": { "a": true },
+      "expected": null
+    },
+    {
+      "name": "division by zero is null",
+      "expression": "1 / 0",
+      "values": {},
+      "expected": null
+    },
+    {
+      "name": "dependency division by zero is null",
+      "expression": "a / 0",
+      "values": { "a": 5 },
+      "expected": null
+    },
+    {
+      "name": "modulo by zero is null",
+      "expression": "1 % 0",
+      "values": {},
+      "expected": null
+    },
+    {
+      "name": "non-finite exponentiation is null",
+      "expression": "10 ^ 400",
+      "values": {},
+      "expected": null
+    }
+  ],
+  "parseErrors": [
+    {
+      "name": "unknown function",
+      "expression": "evil(1)",
+      "code": "FORMULA_UNKNOWN_FUNCTION"
+    },
+    {
+      "name": "unknown function nested",
+      "expression": "1 + alert(1)",
+      "code": "FORMULA_UNKNOWN_FUNCTION"
+    },
+    {
+      "name": "invalid character",
+      "expression": "1 + @",
+      "code": "FORMULA_SYNTAX"
+    },
+    {
+      "name": "string literal rejected",
+      "expression": "a + \"string\"",
+      "code": "FORMULA_SYNTAX"
+    },
+    { "name": "empty formula", "expression": "", "code": "FORMULA_EMPTY" },
+    {
+      "name": "whitespace-only formula",
+      "expression": "   ",
+      "code": "FORMULA_EMPTY"
+    },
+    { "name": "unexpected end", "expression": "1 +", "code": "FORMULA_SYNTAX" },
+    {
+      "name": "unclosed parenthesis",
+      "expression": "(1 + 2",
+      "code": "FORMULA_SYNTAX"
+    },
+    {
+      "name": "trailing tokens",
+      "expression": "1 + 2 )",
+      "code": "FORMULA_SYNTAX"
+    },
+    {
+      "name": "missing operator",
+      "expression": "1 2",
+      "code": "FORMULA_SYNTAX"
+    },
+    {
+      "name": "too long",
+      "expression": "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
+      "code": "FORMULA_TOO_LONG"
+    },
+    {
+      "name": "too deeply nested",
+      "expression": "(((((((((((((((((((((((((((((((((((((((((((((((((((((1))))))))))))))))))))))))))))))))))))))))))))))))))))))",
+      "code": "FORMULA_SYNTAX"
+    }
+  ],
+  "dependencies": [
+    { "expression": "floor((str - 10) / 2)", "expected": ["str"] },
+    { "expression": "a + b * a", "expected": ["a", "b"] },
+    { "expression": "min(a, max(b, c))", "expected": ["a", "b", "c"] },
+    { "expression": "floor(1)", "expected": [] },
+    { "expression": "a + ", "expected": ["a"] },
+    { "expression": "1 + @", "expected": [] },
+    { "expression": "", "expected": [] }
+  ]
+}

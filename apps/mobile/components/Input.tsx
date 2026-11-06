@@ -28,8 +28,10 @@ export const Input = forwardRef<TextInput, InputProps>(
             {...props}
           />
         </View>
-        {error && <Text className="text-red-500 text-xs mt-1 ml-1">{error}</Text>}
+        {error && (
+          <Text className="text-red-500 text-xs mt-1 ml-1">{error}</Text>
+        )}
       </View>
     );
-  }
+  },
 );

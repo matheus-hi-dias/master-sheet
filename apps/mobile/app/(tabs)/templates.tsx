@@ -31,7 +31,7 @@ import { TemplatePreviewBottomSheet } from '../../components/TemplatePreviewBott
 
 const SYSTEM_CHIPS: { key: string; label: string; value: string }[] = [
   { key: 'all', label: 'Todos', value: '' },
-  ...DEFAULT_SYSTEMS.map(system => ({
+  ...DEFAULT_SYSTEMS.map((system) => ({
     key: system,
     label: SYSTEM_LABELS[system] ?? system,
     value: system,
@@ -58,9 +58,8 @@ export default function TemplatesScreen() {
   const [search, setSearch] = useState('');
   const [activeSystem, setActiveSystem] = useState('');
   const [scope, setScope] = useState<'public' | 'mine'>('public');
-  const [previewTemplate, setPreviewTemplate] = useState<TemplateSummary | null>(
-    null,
-  );
+  const [previewTemplate, setPreviewTemplate] =
+    useState<TemplateSummary | null>(null);
 
   const debouncedSearch = useDebouncedValue(search);
 
@@ -87,7 +86,7 @@ export default function TemplatesScreen() {
         page: pageParam,
         limit: 12,
       }),
-    getNextPageParam: lastPage =>
+    getNextPageParam: (lastPage) =>
       lastPage.meta.page < lastPage.meta.totalPages
         ? lastPage.meta.page + 1
         : undefined,
@@ -106,7 +105,7 @@ export default function TemplatesScreen() {
       });
       return response.data;
     },
-    onSuccess: data => {
+    onSuccess: (data) => {
       setPreviewTemplate(null);
       Alert.alert(
         'Ficha Criada! ✦',
@@ -130,7 +129,7 @@ export default function TemplatesScreen() {
     },
   });
 
-  const templates = data?.pages.flatMap(page => page.data) ?? [];
+  const templates = data?.pages.flatMap((page) => page.data) ?? [];
 
   const renderTemplateCard = ({ item }: { item: TemplateSummary }) => {
     const isOfficial = item.isOfficial || item.author?.name === 'Master-Sheet';
@@ -181,7 +180,7 @@ export default function TemplatesScreen() {
 
         {item.tags.length > 0 && (
           <View className="flex-row flex-wrap gap-1.5 mb-3">
-            {item.tags.map(tag => (
+            {item.tags.map((tag) => (
               <View
                 key={tag.id}
                 className="bg-bg-panel px-2 py-0.5 rounded border border-border"
@@ -235,10 +234,12 @@ export default function TemplatesScreen() {
         {/* Escopo: Explorar vs Meus modelos */}
         <View className="mt-4 flex-row items-center gap-2">
           <View className="flex-1 flex-row bg-bg-card border border-border rounded-card p-1">
-            {([
-              { key: 'public', label: 'Explorar' },
-              { key: 'mine', label: 'Meus modelos' },
-            ] as const).map(option => {
+            {(
+              [
+                { key: 'public', label: 'Explorar' },
+                { key: 'mine', label: 'Meus modelos' },
+              ] as const
+            ).map((option) => {
               const active = scope === option.key;
               return (
                 <Pressable
@@ -293,7 +294,7 @@ export default function TemplatesScreen() {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={{ paddingHorizontal: 16, gap: 8 }}
           >
-            {SYSTEM_CHIPS.map(chip => {
+            {SYSTEM_CHIPS.map((chip) => {
               const isActive = activeSystem === chip.value;
               return (
                 <Pressable
@@ -335,14 +336,13 @@ export default function TemplatesScreen() {
             Falha ao carregar modelos
           </Text>
           <Text className="text-xs text-text-muted text-center">
-            Não foi possível listar os modelos no momento. puxe para
-            recarregar.
+            Não foi possível listar os modelos no momento. puxe para recarregar.
           </Text>
         </View>
       ) : (
         <FlatList
           data={templates}
-          keyExtractor={item => item.id}
+          keyExtractor={(item) => item.id}
           renderItem={renderTemplateCard}
           contentContainerStyle={{ padding: 16, flexGrow: 1 }}
           refreshControl={
@@ -414,7 +414,7 @@ export default function TemplatesScreen() {
         creating={createSheetMutation.isPending}
         sheetsEnabled={SHEETS_ENABLED}
         onClose={() => setPreviewTemplate(null)}
-        onCreate={template => createSheetMutation.mutate(template)}
+        onCreate={(template) => createSheetMutation.mutate(template)}
       />
     </SafeAreaView>
   );

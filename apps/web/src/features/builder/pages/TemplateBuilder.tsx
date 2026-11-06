@@ -10,14 +10,18 @@ import {
   fetchTemplateDetail,
   updateTemplate,
 } from '../../templates/services/templatesApi';
-import type { TemplateStructure } from '../../templates/types/template-structure';
+import type { TemplateStructure } from '@master-sheet/contracts';
 import { BuilderHeader } from '../components/BuilderHeader';
 import { BuilderPreview } from '../components/BuilderPreview';
 import { JsonModal } from '../components/JsonModal';
 import { StructureCanvas } from '../components/StructureCanvas';
 import { useBuilder } from '../hooks/useBuilder';
-import { fieldLabelMap, dependencyCandidates, validateStructure } from '../lib/structureOps';
-import { structureDefaultValues } from '../../sheets/lib/defaults';
+import {
+  fieldLabelMap,
+  dependencyCandidates,
+  validateStructure,
+} from '../lib/structureOps';
+import { structureDefaultValues } from '@master-sheet/contracts';
 
 export function TemplateBuilder() {
   const navigate = useNavigate();
@@ -39,7 +43,7 @@ export function TemplateBuilder() {
       description: detailQuery.data.description ?? '',
       system: detailQuery.data.system,
       isPublic: detailQuery.data.isPublic,
-      tags: detailQuery.data.tags.map((tag) => tag.name),
+      tags: detailQuery.data.tags.map((tag) => tag.name).join(', '),
       structure: detailQuery.data.structure,
     });
     // Initialize the draft only once the remote template finishes loading.
@@ -50,7 +54,10 @@ export function TemplateBuilder() {
 
   const candidates = useMemo(
     () =>
-      dependencyCandidates(builder.draft.structure, builder.selection.fieldId ?? undefined),
+      dependencyCandidates(
+        builder.draft.structure,
+        builder.selection.fieldId ?? undefined,
+      ),
     [builder.draft.structure, builder.selection.fieldId],
   );
 
@@ -95,13 +102,17 @@ export function TemplateBuilder() {
   const saveMutation = useMutation({
     mutationFn: () => {
       const { draft } = builder;
+      const tags = draft.tags
+        .split(',')
+        .map((tag) => tag.trim())
+        .filter(Boolean);
       const payload = {
         name: draft.name,
         description: draft.description || undefined,
         structure: draft.structure,
         system: draft.system,
         isPublic: draft.isPublic,
-        tags: draft.tags.length > 0 ? draft.tags : undefined,
+        tags: tags.length > 0 ? tags : undefined,
       };
       return editMode && id
         ? updateTemplate(id, payload)
@@ -109,7 +120,7 @@ export function TemplateBuilder() {
     },
     onSuccess: () => {
       toast.success(editMode ? 'Template updated' : 'Template created');
-      navigate('/templates');
+      navigate('/templates?tab=mine');
     },
     onError: () => {
       toast.error('Could not save the template');
@@ -135,7 +146,11 @@ export function TemplateBuilder() {
         <p className="text-sm text-text-muted mb-6">
           It may have been deleted or you may not own it.
         </p>
-        <Button variant="outline" size="md" onClick={() => navigate('/templates')}>
+        <Button
+          variant="outline"
+          size="md"
+          onClick={() => navigate('/templates')}
+        >
           Back to templates
         </Button>
       </div>
@@ -168,7 +183,10 @@ export function TemplateBuilder() {
           labelById={labelById}
           previewContext={previewContext}
         />
-        <BuilderPreview structure={builder.draft.structure} shapeKey={shapeKey} />
+        <BuilderPreview
+          structure={builder.draft.structure}
+          shapeKey={shapeKey}
+        />
       </div>
 
       {jsonModal && (

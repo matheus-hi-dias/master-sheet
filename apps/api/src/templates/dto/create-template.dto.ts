@@ -1,23 +1,24 @@
 import {
+  Allow,
   ArrayMaxSize,
   IsArray,
   IsBoolean,
+  IsDefined,
   IsInt,
+  IsObject,
   IsOptional,
   IsString,
   MaxLength,
   Min,
-  ValidateNested,
 } from 'class-validator';
-import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { TemplateStructureDto } from './template-structure.dto';
+import type { TemplateStructure } from '@master-sheet/contracts';
 
 export class CreateTemplateDto {
   @ApiProperty({ example: 'D&D 5e Character Sheet', maxLength: 120 })
   @IsString()
   @MaxLength(120)
-  name: string;
+  name!: string;
 
   @ApiPropertyOptional({
     example: 'Standard D&D 5e sheet layout',
@@ -30,11 +31,12 @@ export class CreateTemplateDto {
 
   @ApiProperty({
     description: 'Structured DSL describing tabs, sections and fields',
-    type: TemplateStructureDto,
+    type: Object,
   })
-  @ValidateNested()
-  @Type(() => TemplateStructureDto)
-  structure: TemplateStructureDto;
+  @Allow()
+  @IsDefined()
+  @IsObject()
+  structure!: TemplateStructure;
 
   @ApiPropertyOptional({ example: 'dnd5e', maxLength: 64 })
   @IsString()

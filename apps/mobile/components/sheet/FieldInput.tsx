@@ -1,8 +1,11 @@
 import React from 'react';
 import { View, Text, TextInput, Pressable } from 'react-native';
-import { evaluateFormula } from '../../lib/formula';
-import type { FieldDefinition } from '../../types/template';
-import { toNumber, toStringValue } from '../../lib/defaults';
+import { evaluateFormula } from '@master-sheet/sheet-engine/formula';
+import {
+  toNumber,
+  toStringValue,
+  type FieldDefinition,
+} from '@master-sheet/contracts';
 import { NumberStepper } from './NumberStepper';
 import { DotTracker } from './DotTracker';
 import { RepeaterList } from './RepeaterList';
@@ -66,7 +69,7 @@ export function FieldInput({
     case 'select':
       return (
         <View className="flex-row flex-wrap" style={{ gap: 6 }}>
-          {(field.options ?? []).map(option => {
+          {(field.options ?? []).map((option) => {
             const active = toStringValue(value) === option.value;
             return (
               <Pressable
@@ -91,16 +94,16 @@ export function FieldInput({
     case 'checkbox':
       return (
         <Pressable
-          onPress={() => onChange(!Boolean(value))}
+          onPress={() => onChange(!value)}
           className="self-start items-center"
           hitSlop={8}
         >
           <View
             className={`w-6 h-6 rounded border items-center justify-center ${
-              Boolean(value) ? 'bg-gold border-gold' : 'bg-bg-panel border-border'
+              value ? 'bg-gold border-gold' : 'bg-bg-panel border-border'
             }`}
           >
-            {Boolean(value) ? (
+            {value ? (
               <Text className="text-[#121212] font-black text-sm">✓</Text>
             ) : null}
           </View>
@@ -130,9 +133,7 @@ export function FieldInput({
       return (
         <RepeaterList
           items={
-            Array.isArray(value)
-              ? (value as Record<string, unknown>[])
-              : []
+            Array.isArray(value) ? (value as Record<string, unknown>[]) : []
           }
           itemSchema={field.itemSchema}
           onChange={onChange as (items: Record<string, unknown>[]) => void}

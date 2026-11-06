@@ -8,33 +8,35 @@ Reconciled REST endpoint reference, cross-checked against `apps/api` source. DTO
 - **Refresh cookie (web):** `master-sheet-refresh-token`, set as HttpOnly, Secure, SameSite.
 - **Named throttles** (see `openspec/specs/api-rate-limiting/spec.md`): `strictAuth`, `tokenRefresh`, `passwordReset`, plus the general endpoint limit (120/min).
 - **Errors:** standard NestJS HTTP exceptions; throttled requests return `429` with `{ statusCode: 429, message: "Throttled" }`.
+- **Shared wire contracts:** request/response shapes live in `@master-sheet/contracts` (`packages/contracts/src/envelopes.ts`), with template/sheet schemas in `template.ts`/`sheet.ts`. The API validates `Template.structure` through `validateTemplateStructure` from `@master-sheet/sheet-engine`; web and mobile consume the same schemas, issue codes, and envelope types instead of redeclaring them.
+- **Validation errors:** structured template/sheet failures return HTTP `400` with `message` plus an `issues` array of `{ code, path, message }`, using the stable codes from `@master-sheet/contracts`.
 
 ## Auth Module
 
-| Method | Route                           | Description                                        | DTO / Protection                        | Throttle         |
-| :----- | :------------------------------ | :------------------------------------------------- | :-------------------------------------- | :--------------- |
-| `POST` | `/auth/register`                | Create user; bcrypt-hashed password; no `password` in response. | `RegisterDto` / Public         | `strictAuth` 3/min   |
-| `POST` | `/auth/login`                   | Verify credentials; issue access token; set refresh cookie (web). | `LoginDto` / Public             | `strictAuth` 5/min   |
-| `POST` | `/auth/refresh`                 | Rotate refresh token; return fresh access token.   | `RefreshTokenDto` / Public             | `tokenRefresh` 60/min |
-| `POST` | `/auth/logout`                  | Revoke session and clear refresh cookie.           | `RefreshTokenDto` / Public             | `strictAuth` 30/min  |
-| `POST` | `/auth/verify-email`            | Programmatic email verification.                   | `VerifyEmailDto` / Public              | `strictAuth` 5/min   |
-| `GET`  | `/auth/verify-email`            | One-click verify; redirects to `<base>/email-verified?status=success\|expired\|invalid`. | `token` query / Public | `strictAuth` 5/min   |
-| `POST` | `/auth/password-reset/request`  | Issue a one-time password reset token.             | `RequestPasswordResetDto` / Public      | `passwordReset` 3/hr |
-| `POST` | `/auth/password-reset/confirm`  | Apply new password with a single-use token.        | `ConfirmPasswordResetDto` / Public      | —                   |
-| `GET`  | `/auth/me`                      | Current user payload (`ActiveUser`).               | `JwtAuthGuard`                          | —                   |
+| Method | Route                          | Description                                                                              | DTO / Protection                   | Throttle              |
+| :----- | :----------------------------- | :--------------------------------------------------------------------------------------- | :--------------------------------- | :-------------------- |
+| `POST` | `/auth/register`               | Create user; bcrypt-hashed password; no `password` in response.                          | `RegisterDto` / Public             | `strictAuth` 3/min    |
+| `POST` | `/auth/login`                  | Verify credentials; issue access token; set refresh cookie (web).                        | `LoginDto` / Public                | `strictAuth` 5/min    |
+| `POST` | `/auth/refresh`                | Rotate refresh token; return fresh access token.                                         | `RefreshTokenDto` / Public         | `tokenRefresh` 60/min |
+| `POST` | `/auth/logout`                 | Revoke session and clear refresh cookie.                                                 | `RefreshTokenDto` / Public         | `strictAuth` 30/min   |
+| `POST` | `/auth/verify-email`           | Programmatic email verification.                                                         | `VerifyEmailDto` / Public          | `strictAuth` 5/min    |
+| `GET`  | `/auth/verify-email`           | One-click verify; redirects to `<base>/email-verified?status=success\|expired\|invalid`. | `token` query / Public             | `strictAuth` 5/min    |
+| `POST` | `/auth/password-reset/request` | Issue a one-time password reset token.                                                   | `RequestPasswordResetDto` / Public | `passwordReset` 3/hr  |
+| `POST` | `/auth/password-reset/confirm` | Apply new password with a single-use token.                                              | `ConfirmPasswordResetDto` / Public | —                     |
+| `GET`  | `/auth/me`                     | Current user payload (`ActiveUser`).                                                     | `JwtAuthGuard`                     | —                     |
 
 ## Templates Module
 
 Everything under `/templates` applies `JwtAuthGuard` at the controller level; ownership is enforced per-route.
 
-| Method   | Route               | Description                                           | DTO / Protection              |
-| :------- | :------------------ | :---------------------------------------------------- | :---------------------------- |
-| `POST`   | `/templates`        | Create a template skeleton (JSON) with tags.          | `CreateTemplateDto` / `JwtAuthGuard` + `TemplatePayloadGuard` |
-| `GET`    | `/templates`        | List templates (own + public by default). Query: `tags` (comma-separated), `isPublic`, `search`, `system`, `scope` (`public` \| `mine`), `page`, `limit` (max 100). | `JwtAuthGuard` |
-| `GET`    | `/templates/:id`    | Return full structure for dynamic rendering (public or owner). Cached by the guard, no second query. | `TemplateAccessGuard` |
-| `POST`   | `/templates/:id/fork` | Clone a public/owned template into a private one; returns `201` and sets `forkedFromId`. | `TemplateAccessGuard` |
-| `PATCH`  | `/templates/:id`    | Update template (owner only); bumps `version` and syncs `structure.version`. | `UpdateTemplateDto` / `OwnerGuard` + `TemplatePayloadGuard` |
-| `DELETE` | `/templates/:id`    | Delete template; returns `204`, or `409` when sheets depend on it (owner only). | `OwnerGuard`                  |
+| Method   | Route                 | Description                                                                                                                                                         | DTO / Protection                                              |
+| :------- | :-------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :------------------------------------------------------------ |
+| `POST`   | `/templates`          | Create a template skeleton (JSON) with tags.                                                                                                                        | `CreateTemplateDto` / `JwtAuthGuard` + `TemplatePayloadGuard` |
+| `GET`    | `/templates`          | List templates (own + public by default). Query: `tags` (comma-separated), `isPublic`, `search`, `system`, `scope` (`public` \| `mine`), `page`, `limit` (max 100). | `JwtAuthGuard`                                                |
+| `GET`    | `/templates/:id`      | Return full structure for dynamic rendering (public or owner). Cached by the guard, no second query.                                                                | `TemplateAccessGuard`                                         |
+| `POST`   | `/templates/:id/fork` | Clone a public/owned template into a private one; returns `201` and sets `forkedFromId`.                                                                            | `TemplateAccessGuard`                                         |
+| `PATCH`  | `/templates/:id`      | Update template (owner only); bumps `version` and syncs `structure.version`.                                                                                        | `UpdateTemplateDto` / `OwnerGuard` + `TemplatePayloadGuard`   |
+| `DELETE` | `/templates/:id`      | Delete template; returns `204`, or `409` when sheets depend on it (owner only).                                                                                     | `OwnerGuard`                                                  |
 
 ### Structure Id Convention
 
@@ -42,19 +44,19 @@ Field `id`s are the canonical reference for formula `expression` identifiers and
 
 ## Sheets Module — Planned
 
-The `Sheet` model exists in `apps/api/prisma/schema.prisma`, but no controller/service is implemented yet. Planned surface (per `openspec/changes/multi-system-rpg-template-engine/` and screen docs):
+The `Sheet` model exists in `apps/api/prisma/schema.prisma`, but no controller/service is implemented yet. Shared `validateSheetData` is ready in `@master-sheet/sheet-engine/validation` for the planned module and is already used by the web/mobile editors. Planned surface (per `openspec/changes/multi-system-rpg-template-engine/` and screen docs):
 
-| Method  | Route          | Description                                        | Protection          |
-| :------ | :------------- | :------------------------------------------------- | :------------------ |
-| `POST`  | `/sheets`      | Instantiate a Sheet from a `templateId`.           | `JwtAuthGuard`      |
-| `PATCH` | `/sheets/:id`  | Merge partial JSON updates into `Sheet.data`.      | `OwnerGuard`        |
-| `GET`   | `/sheets`      | List the current user's sheets.                    | `OwnerGuard`        |
+| Method  | Route         | Description                                   | Protection     |
+| :------ | :------------ | :-------------------------------------------- | :------------- |
+| `POST`  | `/sheets`     | Instantiate a Sheet from a `templateId`.      | `JwtAuthGuard` |
+| `PATCH` | `/sheets/:id` | Merge partial JSON updates into `Sheet.data`. | `OwnerGuard`   |
+| `GET`   | `/sheets`     | List the current user's sheets.               | `OwnerGuard`   |
 
 ## Root
 
-| Method | Route | Description            | Protection |
-| :----- | :---- | :--------------------- | :--------- |
-| `GET`  | `/`   | Greeting/health probe (plain text).   | Public |
+| Method | Route | Description                         | Protection |
+| :----- | :---- | :---------------------------------- | :--------- |
+| `GET`  | `/`   | Greeting/health probe (plain text). | Public     |
 
 ---
 

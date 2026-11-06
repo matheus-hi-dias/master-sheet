@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
+import { useWatch, type Control, type UseFormSetValue } from 'react-hook-form';
 import {
-  useWatch,
-  type Control,
-  type UseFormSetValue,
-} from 'react-hook-form';
-import { evaluateFormula, type FormulaContext } from '../../../lib/formula';
-import type { FormulaFieldDefinition } from '../../templates/types/template-structure';
+  evaluateFormula,
+  type FormulaContext,
+} from '@master-sheet/sheet-engine/formula';
+import type { FormulaFieldDefinition } from '@master-sheet/contracts';
 import type { SheetFormValues } from '../types/sheet.types';
 
 interface FormulaFieldProps {
@@ -27,7 +26,8 @@ export function FormulaField({ field, control, setValue }: FormulaFieldProps) {
       const context: FormulaContext = {};
       field.dependencies.forEach((dep, index) => {
         const value = raw[index];
-        context[dep] = typeof value === 'number' ? value : Number(value ?? 0) || 0;
+        context[dep] =
+          typeof value === 'number' ? value : Number(value ?? 0) || 0;
       });
 
       const value = evaluateFormula(field.expression, context);
