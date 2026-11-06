@@ -94,7 +94,10 @@ export default function SheetViewScreen() {
 
   const [activeTabId, setActiveTabId] = useState<string | null>(null);
   const [localData, setLocalData] = useState<Record<string, unknown>>({});
-  const [saveStatus, setSaveStatus] = useState<'saved' | 'saving'>('saved');
+  const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'error'>(
+    'saved',
+  );
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [rollOpen, setRollOpen] = useState(false);
 
   const isMock = typeof id === 'string' && id.startsWith('mock-');
@@ -162,22 +165,13 @@ export default function SheetViewScreen() {
   // Mutação para Auto-save com Optimistic UI
   const updateSheetMutation = useMutation({
     mutationFn: async (newData: Record<string, unknown>) => {
-      if (structure) {
-        const validation = validateSheetData(structure, newData);
-
-        if (!validation.ok) {
-          throw new Error(
-            validation.issues.map((item) => item.message).join('\n'),
-          );
-        }
-      }
-
       if (isMock) return newData;
       const response = await api.patch(`/sheets/${id}`, { data: newData });
       return response.data;
     },
     onMutate: async (newData) => {
       setSaveStatus('saving');
+      setSaveError(null);
       await queryClient.cancelQueries({ queryKey: ['sheet', id] });
       const previousSheet = queryClient.getQueryData<SheetData>(['sheet', id]);
 
@@ -191,24 +185,36 @@ export default function SheetViewScreen() {
     },
     onSuccess: () => {
       setSaveStatus('saved');
+      setSaveError(null);
     },
-    onError: (err, newData, context) => {
-      setSaveStatus('saved');
-      if (context?.previousSheet) {
-        queryClient.setQueryData(['sheet', id], context.previousSheet);
-      }
-      Alert.alert(
-        'Erro na sincronização',
+    onError: (err, _newData, context) => {
+      setSaveStatus('error');
+      setSaveError(
         err instanceof Error
           ? err.message
           : 'Não foi possível salvar as últimas alterações.',
       );
+      if (context?.previousSheet) {
+        queryClient.setQueryData(['sheet', id], context.previousSheet);
+      }
     },
   });
 
   const handleFieldChange = (key: string, value: unknown) => {
     const updated = { ...localData, [key]: value };
     setLocalData(updated);
+
+    if (structure) {
+      const validation = validateSheetData(structure, updated);
+
+      if (!validation.ok) {
+        setSaveStatus('error');
+        setSaveError(validation.issues.map((item) => item.message).join('\n'));
+        return;
+      }
+    }
+
+    setSaveError(null);
     updateSheetMutation.mutate(updated);
   };
 
@@ -262,10 +268,22 @@ export default function SheetViewScreen() {
 
           <View className="w-12 items-end">
             <View
-              className={`w-2 h-2 rounded-full ${saveStatus === 'saving' ? 'bg-warning animate-pulse' : 'bg-success'}`}
+              className={`w-2 h-2 rounded-full ${
+                saveStatus === 'saving'
+                  ? 'bg-warning animate-pulse'
+                  : saveStatus === 'error'
+                    ? 'bg-danger'
+                    : 'bg-success'
+              }`}
             />
           </View>
         </View>
+
+        {saveError ? (
+          <View className="mx-4 mt-3 px-3 py-2 rounded-card border border-danger/50 bg-danger/5">
+            <Text className="text-[11px] text-danger">{saveError}</Text>
+          </View>
+        ) : null}
 
         {isLoading ? (
           <View className="flex-1 items-center justify-center">
