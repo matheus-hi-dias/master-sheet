@@ -121,6 +121,40 @@ test('rejects unknown field types', () => {
   assert.equal(result.success, false);
 });
 
+test('rejects non-finite numeric bounds and oversized dependency lists', () => {
+  const structureWith = (fields: unknown[]) => ({
+    system: 'custom',
+    version: 1,
+    tabs: [
+      {
+        id: 'main',
+        label: 'Main',
+        sections: [{ id: 'core', title: 'Core', fields }],
+      },
+    ],
+  });
+
+  const nonFinite = templateStructureSchema.safeParse(
+    structureWith([
+      { id: 'n', label: 'N', type: 'number', min: Number.POSITIVE_INFINITY },
+    ]),
+  );
+  assert.equal(nonFinite.success, false);
+
+  const tooManyDependencies = templateStructureSchema.safeParse(
+    structureWith([
+      {
+        id: 'f',
+        label: 'F',
+        type: 'formula',
+        expression: '0',
+        dependencies: Array.from({ length: 501 }, (_, index) => `d${index}`),
+      },
+    ]),
+  );
+  assert.equal(tooManyDependencies.success, false);
+});
+
 test('buildDefaultValues applies field defaults and seeds values', () => {
   const fields: FieldDefinition[] = [
     { id: 'str', label: 'Strength', type: 'number', defaultValue: 10 },
@@ -155,6 +189,19 @@ test('buildDefaultValues applies field defaults and seeds values', () => {
     choice: 'a',
     total: undefined,
   });
+});
+
+test('buildDefaultValues creates own properties for prototype-like ids', () => {
+  const values = buildDefaultValues([
+    { id: '__proto__', label: 'Prototype', type: 'text' },
+    { id: 'toString', label: 'String', type: 'text' },
+  ]);
+
+  assert.equal(Object.hasOwn(values, '__proto__'), true);
+  assert.equal(values['__proto__'], '');
+  assert.equal(Object.hasOwn(values, 'toString'), true);
+  assert.equal(values['toString'], '');
+  assert.equal(Object.getPrototypeOf(values), Object.prototype);
 });
 
 test('buildItemDefaults uses the repeater schema', () => {

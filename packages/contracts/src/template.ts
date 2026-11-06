@@ -53,10 +53,10 @@ const fieldBase = {
 export const numberFieldSchema = z.strictObject({
   ...fieldBase,
   type: z.literal('number'),
-  min: z.number().optional(),
-  max: z.number().optional(),
-  step: z.number().optional(),
-  defaultValue: z.number().optional(),
+  min: z.number().finite().optional(),
+  max: z.number().finite().optional(),
+  step: z.number().finite().optional(),
+  defaultValue: z.number().finite().optional(),
 });
 
 export type NumberFieldDefinition = z.infer<typeof numberFieldSchema>;
@@ -73,8 +73,8 @@ export type TextFieldDefinition = z.infer<typeof textFieldSchema>;
 export const dotsFieldSchema = z.strictObject({
   ...fieldBase,
   type: z.literal('dots'),
-  maxDots: z.number(),
-  defaultValue: z.number().optional(),
+  maxDots: z.number().finite(),
+  defaultValue: z.number().finite().optional(),
 });
 
 export type DotsFieldDefinition = z.infer<typeof dotsFieldSchema>;
@@ -82,7 +82,7 @@ export type DotsFieldDefinition = z.infer<typeof dotsFieldSchema>;
 export const selectFieldSchema = z.strictObject({
   ...fieldBase,
   type: z.literal('select'),
-  options: z.array(selectOptionSchema),
+  options: z.array(selectOptionSchema).max(1000),
 });
 
 export type SelectFieldDefinition = z.infer<typeof selectFieldSchema>;
@@ -99,7 +99,7 @@ export const formulaFieldSchema = z.strictObject({
   ...fieldBase,
   type: z.literal('formula'),
   expression: z.string().max(MAX_FORMULA_LENGTH),
-  dependencies: z.array(z.string()),
+  dependencies: z.array(z.string().min(1).max(128)).max(500),
 });
 
 export type FormulaFieldDefinition = z.infer<typeof formulaFieldSchema>;

@@ -27,11 +27,17 @@ export function buildDefaultValues(
   const values: Record<string, unknown> = {};
 
   for (const field of fields) {
-    if (seed && field.id in seed) {
-      values[field.id] = seed[field.id];
-    } else {
-      values[field.id] = defaultFieldValue(field);
-    }
+    const value =
+      seed && Object.hasOwn(seed, field.id)
+        ? seed[field.id]
+        : defaultFieldValue(field);
+
+    Object.defineProperty(values, field.id, {
+      value,
+      enumerable: true,
+      configurable: true,
+      writable: true,
+    });
   }
 
   return values;
