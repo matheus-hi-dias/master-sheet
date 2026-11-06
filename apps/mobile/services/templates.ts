@@ -1,5 +1,9 @@
-import { api } from './api';
-import type { PaginatedResult, TemplateSummary } from '../types/template';
+import { getJson, patchJson, postJson } from './api';
+import type {
+  PaginatedResult,
+  TemplateSummary,
+  UpsertTemplatePayload,
+} from '@master-sheet/contracts';
 
 export interface ListTemplatesParams {
   search?: string;
@@ -21,39 +25,26 @@ export async function fetchTemplates(
   query.append('limit', String(params.limit ?? 12));
 
   const qs = query.toString();
-  const response = await api.get(qs ? `/templates?${qs}` : '/templates');
-  return response.data;
+  return getJson<PaginatedResult<TemplateSummary>>(
+    qs ? `/templates?${qs}` : '/templates',
+  );
 }
 
-export async function fetchTemplateDetail(
-  id: string,
-): Promise<TemplateSummary> {
-  const response = await api.get(`/templates/${id}`);
-  return response.data;
+export function fetchTemplateDetail(id: string): Promise<TemplateSummary> {
+  return getJson<TemplateSummary>(`/templates/${id}`);
 }
 
-export interface UpsertTemplatePayload {
-  name: string;
-  description?: string;
-  system?: string;
-  isPublic?: boolean;
-  tags?: string[];
-  structure: TemplateSummary['structure'];
-}
-
-export async function createTemplate(
+export function createTemplate(
   payload: UpsertTemplatePayload,
 ): Promise<TemplateSummary> {
-  const response = await api.post('/templates', payload);
-  return response.data;
+  return postJson<TemplateSummary>('/templates', payload);
 }
 
-export async function updateTemplate(
+export function updateTemplate(
   id: string,
   payload: Partial<UpsertTemplatePayload>,
 ): Promise<TemplateSummary> {
-  const response = await api.patch(`/templates/${id}`, payload);
-  return response.data;
+  return patchJson<TemplateSummary>(`/templates/${id}`, payload);
 }
 
 export function totalFields(template: TemplateSummary): number {

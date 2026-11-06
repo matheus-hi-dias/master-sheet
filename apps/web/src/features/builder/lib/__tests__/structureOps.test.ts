@@ -1,4 +1,4 @@
-import type { TemplateStructure } from '../../../templates/types/template-structure';
+import type { TemplateStructure } from '@master-sheet/contracts';
 import {
   addField,
   createField,

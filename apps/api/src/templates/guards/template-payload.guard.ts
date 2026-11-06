@@ -5,7 +5,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import type { Request } from 'express';
-import { MAX_REPEATER_DEPTH } from '../utils/template-structure.util';
+import { MAX_REPEATER_DEPTH } from '@master-sheet/contracts';
 
 /**
  * Runs before the validation pipe so malformed `structure` payloads cannot

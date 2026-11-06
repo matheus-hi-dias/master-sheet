@@ -1,8 +1,11 @@
 import React from 'react';
 import { View, Text, TextInput, Pressable } from 'react-native';
-import { evaluateFormula } from '../../lib/formula';
-import type { FieldDefinition } from '../../types/template';
-import { toNumber, toStringValue } from '../../lib/defaults';
+import { evaluateFormula } from '@master-sheet/sheet-engine/formula';
+import {
+  toNumber,
+  toStringValue,
+  type FieldDefinition,
+} from '@master-sheet/contracts';
 import { NumberStepper } from './NumberStepper';
 import { DotTracker } from './DotTracker';
 import { RepeaterList } from './RepeaterList';

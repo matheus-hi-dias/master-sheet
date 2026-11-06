@@ -1,11 +1,12 @@
-import { replaceIdentifier } from '../../../lib/formula';
+import { replaceIdentifier } from '@master-sheet/sheet-engine/formula';
+import { validateTemplateStructure } from '@master-sheet/sheet-engine/validation';
 import type {
   FieldDefinition,
   FieldType,
   SectionDefinition,
   TabDefinition,
   TemplateStructure,
-} from '../../templates/types/template-structure';
+} from '@master-sheet/contracts';
 
 export interface DepCandidate {
   id: string;
@@ -455,32 +456,7 @@ export function dependencyCandidates(
 }
 
 export function validateStructure(structure: TemplateStructure): string[] {
-  const errors: string[] = [];
-  const seen = new Set<string>();
-  const numericLike = new Set<string>();
+  const result = validateTemplateStructure(structure);
 
-  for (const field of collectTopLevelFields(structure)) {
-    if (NUMERIC_FIELD_TYPES.includes(field.type)) {
-      numericLike.add(field.id);
-    }
-  }
-
-  for (const field of collectTopLevelFields(structure)) {
-    if (seen.has(field.id)) {
-      errors.push(`Duplicate field id "${field.id}"`);
-    }
-    seen.add(field.id);
-
-    if (field.type === 'formula') {
-      for (const dep of field.dependencies) {
-        if (!numericLike.has(dep)) {
-          errors.push(
-            `Formula "${field.label}" references "${dep}", which is not a numeric field`,
-          );
-        }
-      }
-    }
-  }
-
-  return errors;
+  return result.ok ? [] : result.issues.map((item) => item.message);
 }

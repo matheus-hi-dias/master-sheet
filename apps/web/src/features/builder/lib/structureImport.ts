@@ -2,7 +2,7 @@ import type {
   FieldDefinition,
   FieldType,
   TemplateStructure,
-} from '../../templates/types/template-structure';
+} from '@master-sheet/contracts';
 
 const FIELD_TYPES: FieldType[] = [
   'number',

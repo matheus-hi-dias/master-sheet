@@ -6,6 +6,10 @@ jest.mock('@/services/api', () => ({
   api: {
     post: jest.fn(),
   },
+  getApiErrorMessage: (
+    error: { response?: { data?: { message?: string } } },
+    fallback: string,
+  ) => error.response?.data?.message ?? fallback,
 }));
 
 jest.mock('expo-router', () => ({

@@ -2,10 +2,7 @@ import { ArrowLeft, Download, Save, Upload, TriangleAlert } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../../components/ui/Button';
 import { cn } from '../../../lib/utils';
-import {
-  DEFAULT_SYSTEMS,
-  SYSTEM_LABELS,
-} from '../../templates/types/template-structure';
+import { DEFAULT_SYSTEMS, SYSTEM_LABELS } from '@master-sheet/contracts';
 import type { Builder } from '../hooks/useBuilder';
 
 interface BuilderHeaderProps {
@@ -123,16 +120,8 @@ export function BuilderHeader({
             Tags (comma separated)
           </span>
           <input
-            value={builder.draft.tags.join(', ')}
-            onChange={(e) =>
-              builder.updateMeta(
-                'tags',
-                e.target.value
-                  .split(',')
-                  .map((t) => t.trim())
-                  .filter(Boolean),
-              )
-            }
+            value={builder.draft.tags}
+            onChange={(e) => builder.updateMeta('tags', e.target.value)}
             className={inputClass}
             placeholder="fantasy, dark, 5e"
           />

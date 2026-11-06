@@ -1,5 +1,5 @@
 import { cn } from '../../../lib/utils';
-import type { FieldDefinition } from '../../templates/types/template-structure';
+import type { FieldDefinition } from '@master-sheet/contracts';
 import type { SheetForm } from '../types/sheet.types';
 import { DotTracker } from './DotTracker';
 import { FormulaField } from './FormulaField';

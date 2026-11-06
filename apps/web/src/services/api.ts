@@ -1,3 +1,9 @@
+import type {
+  AuthSessionResponse,
+  AuthUserResponse,
+  MessageResponse,
+} from '@master-sheet/contracts';
+
 const DEFAULT_API_BASE_URL = 'http://localhost:3000';
 
 function normalizeBaseUrl(baseUrl: string) {
@@ -43,17 +49,7 @@ export async function apiRequest<T>(
   return (await response.json()) as T;
 }
 
-export type AuthSessionResponse = {
-  access_token: string;
-  refresh_token?: string;
-  user: unknown;
-};
-
-export type AuthUserResponse = {
-  email: string;
-  id: string;
-  name?: string;
-};
+export type { AuthSessionResponse, AuthUserResponse };
 
 export const api = {
   auth: {
@@ -76,13 +72,13 @@ export const api = {
       });
     },
     logout(payload: { refreshToken?: string } = {}) {
-      return apiRequest<{ message: string }>('/auth/logout', {
+      return apiRequest<MessageResponse>('/auth/logout', {
         method: 'POST',
         body: payload,
       });
     },
     resendVerification(payload: { email: string }) {
-      return apiRequest<{ message: string }>('/auth/resend-verification', {
+      return apiRequest<MessageResponse>('/auth/resend-verification', {
         method: 'POST',
         body: payload,
       });

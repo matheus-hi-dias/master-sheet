@@ -17,9 +17,9 @@ import { DynamicFormMapper } from '../../sheets/components/DynamicFormMapper';
 import {
   buildItemDefaults,
   structureDefaultValues,
-} from '../../sheets/lib/defaults';
+} from '@master-sheet/contracts';
 import { fetchTemplateDetail } from '../services/templatesApi';
-import { SYSTEM_LABELS } from '../types/template-structure';
+import { SYSTEM_LABELS } from '@master-sheet/contracts';
 import type { TemplateSummary } from '../types/templates';
 import { useForkTemplate } from '../hooks/useForkTemplate';
 

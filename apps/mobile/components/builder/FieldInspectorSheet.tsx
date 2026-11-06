@@ -20,7 +20,7 @@ import {
   extractIdentifiers,
   renderExpressionWithLabels,
   type FormulaContext,
-} from '../../lib/formula';
+} from '@master-sheet/sheet-engine/formula';
 import {
   createField,
   slugify,
@@ -871,7 +871,8 @@ function useFormulaDiagnostics(
 
     let previewValue: string | null = null;
     try {
-      previewValue = String(evaluateFormula(field.expression, previewContext));
+      const evaluated = evaluateFormula(field.expression, previewContext);
+      previewValue = evaluated === null ? '—' : String(evaluated);
     } catch (error) {
       previewValue =
         error instanceof Error ? error.message : 'Fórmula inválida';

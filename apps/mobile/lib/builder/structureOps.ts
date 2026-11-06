@@ -1,4 +1,5 @@
-import { replaceIdentifier } from '../formula';
+import { replaceIdentifier } from '@master-sheet/sheet-engine/formula';
+import { validateTemplateStructure } from '@master-sheet/sheet-engine/validation';
 import type {
   FieldDefinition,
   FieldType,
@@ -478,36 +479,32 @@ export function dependencyCandidates(
 }
 
 export function validateStructure(structure: TemplateStructure): string[] {
-  const errors: string[] = [];
-  const seen = new Set<string>();
-  const numericLike = new Set<string>();
+  const result = validateTemplateStructure(structure);
 
-  for (const field of collectTopLevelFields(structure)) {
-    if (NUMERIC_FIELD_TYPES.includes(field.type)) {
-      numericLike.add(field.id);
-    }
+  if (
+    result.ok &&
+    structure.tabs.every((tab) =>
+      tab.sections.every((section) =>
+        section.fields.every(
+          (field) => field.type !== 'repeater' || field.itemSchema.length > 0,
+        ),
+      ),
+    )
+  ) {
+    return [];
   }
 
-  for (const field of collectTopLevelFields(structure)) {
-    if (seen.has(field.id)) {
-      errors.push(`ID de campo duplicado "${field.id}"`);
-    }
-    seen.add(field.id);
+  const errors = result.ok ? [] : result.issues.map((item) => item.message);
 
-    if (field.type === 'formula') {
-      for (const dep of field.dependencies) {
-        if (!numericLike.has(dep)) {
+  for (const tab of structure.tabs) {
+    for (const section of tab.sections) {
+      for (const field of section.fields) {
+        if (field.type === 'repeater' && field.itemSchema.length === 0) {
           errors.push(
-            `A fórmula "${field.label}" referencia "${dep}", que não é um campo numérico`,
+            `O repetidor "${field.label}" precisa de ao menos um campo interno`,
           );
         }
       }
-    }
-
-    if (field.type === 'repeater' && field.itemSchema.length === 0) {
-      errors.push(
-        `O repetidor "${field.label}" precisa de ao menos um campo interno`,
-      );
     }
   }
 

@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { cn } from '../../../lib/utils';
-import type { TemplateStructure } from '../../templates/types/template-structure';
-import { structureDefaultValues } from '../lib/defaults';
+import type { TemplateStructure } from '@master-sheet/contracts';
+import { structureDefaultValues } from '@master-sheet/contracts';
 import type { SheetForm, SheetFormValues } from '../types/sheet.types';
+import { createSheetResolver } from '../lib/sheetValidation';
 import { FieldInput } from './FieldInput';
 
 interface DynamicFormMapperProps {
@@ -24,7 +25,9 @@ export function DynamicFormMapper({
     [structure],
   );
 
-  const form = useForm<SheetFormValues>({ defaultValues });
+  const resolver = useMemo(() => createSheetResolver(structure), [structure]);
+
+  const form = useForm<SheetFormValues>({ defaultValues, resolver });
   const formRef = useRef<SheetForm>(form);
   formRef.current = form;
 

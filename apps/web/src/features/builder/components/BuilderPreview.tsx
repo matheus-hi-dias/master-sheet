@@ -1,5 +1,5 @@
 import { Eye } from 'lucide-react';
-import type { TemplateStructure } from '../../templates/types/template-structure';
+import type { TemplateStructure } from '@master-sheet/contracts';
 import { DynamicFormMapper } from '../../sheets/components/DynamicFormMapper';
 
 interface BuilderPreviewProps {

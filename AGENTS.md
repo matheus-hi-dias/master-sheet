@@ -28,7 +28,10 @@ Load these on a need-to-know basis for the task at hand (do not preload all of t
   - `apps/api`: NestJS 11 core API backend, Prisma 7 ORM and PostgreSQL Schemas (schema at `apps/api/prisma/schema.prisma`).
   - `apps/web`: React 19 + Vite 7 SPA (Dashboard, Template Creator, Sheet Editor).
   - `apps/mobile`: Expo / React Native Mobile app (Fast inspection, swipeable tabs, quick dice overlay).
+  - `packages/contracts`: `@master-sheet/contracts` — canonical Zod schemas, inferred domain types, validation issue codes, field defaults/coercion helpers, and API envelopes.
+  - `packages/sheet-engine`: `@master-sheet/sheet-engine` — formula parser/evaluator, dependency graph/cycle detection, structure evaluation, and template/sheet validation.
   - `packages/eslint-config`, `packages/typescript-config`: shared frontend/build configuration.
+- **Dependency direction:** applications depend on `@master-sheet/sheet-engine` (and/or `@master-sheet/contracts`); `sheet-engine` depends only on `contracts`; `contracts` is leaf-level. Applications must never import from one another. `pnpm verify:workspace` and ESLint enforce these boundaries.
 - **Data Identification:** All primary keys MUST use **UUID v4** (`@default(uuid())`).
 - **Dependencies:** Always use `pnpm` for installing, running, and managing monorepo scripts (`pnpm add`, `pnpm dev`, `pnpm --filter`). Never suggest `npm` or `yarn` commands.
 

@@ -1,4 +1,4 @@
-import type { FieldDefinition, TemplateStructure } from '../types/template';
+import type { FieldDefinition, TemplateStructure } from './template';
 
 export function defaultFieldValue(field: FieldDefinition): unknown {
   switch (field.type) {
@@ -12,7 +12,7 @@ export function defaultFieldValue(field: FieldDefinition): unknown {
     case 'textarea':
       return '';
     case 'select':
-      return field.options?.[0]?.value ?? '';
+      return field.options[0]?.value ?? '';
     case 'formula':
       return undefined;
     case 'repeater':
@@ -27,11 +27,17 @@ export function buildDefaultValues(
   const values: Record<string, unknown> = {};
 
   for (const field of fields) {
-    if (seed && field.id in seed) {
-      values[field.id] = seed[field.id];
-    } else {
-      values[field.id] = defaultFieldValue(field);
-    }
+    const value =
+      seed && Object.hasOwn(seed, field.id)
+        ? seed[field.id]
+        : defaultFieldValue(field);
+
+    Object.defineProperty(values, field.id, {
+      value,
+      enumerable: true,
+      configurable: true,
+      writable: true,
+    });
   }
 
   return values;

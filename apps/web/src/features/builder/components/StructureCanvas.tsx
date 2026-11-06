@@ -7,11 +7,8 @@ import {
   GripVertical,
 } from 'lucide-react';
 import { cn } from '../../../lib/utils';
-import type { FormulaContext } from '../../../lib/formula';
-import type {
-  FieldDefinition,
-  FieldType,
-} from '../../templates/types/template-structure';
+import type { FormulaContext } from '@master-sheet/sheet-engine/formula';
+import type { FieldDefinition, FieldType } from '@master-sheet/contracts';
 import type { Builder } from '../hooks/useBuilder';
 import type { DepCandidate } from '../lib/structureOps';
 import { FieldConfigForm } from './FieldConfigForm';
