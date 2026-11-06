@@ -15,6 +15,7 @@ const workspaceFile = join(root, 'pnpm-workspace.yaml');
 const errors = [];
 
 const APP_TASKS = ['lint', 'check-types', 'test'];
+const FULL_TASKS = [...APP_TASKS, 'build'];
 const MOBILE_APP = 'apps/mobile';
 const SHARED_PACKAGES = ['packages/contracts', 'packages/sheet-engine'];
 const APP_PACKAGES = {
@@ -38,7 +39,7 @@ const SKIPPED_DIRECTORIES = new Set([
   '.expo',
   '.turbo',
 ]);
-const FORBIDDEN_SHARED_IMPORTS = ['fs', 'path', 'react-native'];
+const FORBIDDEN_SHARED_IMPORTS = ['fs', 'path', 'os', 'crypto', 'react-native'];
 const IMPORT_RE = /(?:from\s+|import\s*\(\s*|require\s*\(\s*)['"]([^'"]+)['"]/g;
 
 function addError(message) {
@@ -188,12 +189,17 @@ function verifyWorkspace(dir) {
     return;
   }
 
-  if (!workspacePath.startsWith('apps/')) {
+  const isSharedPackage = SHARED_PACKAGES.includes(workspacePath);
+
+  if (!isSharedPackage && !workspacePath.startsWith('apps/')) {
     return;
   }
 
-  const requiredTasks =
-    workspacePath === MOBILE_APP ? APP_TASKS : [...APP_TASKS, 'build'];
+  const requiredTasks = isSharedPackage
+    ? FULL_TASKS
+    : workspacePath === MOBILE_APP
+      ? APP_TASKS
+      : FULL_TASKS;
   const scripts = manifest.scripts ?? {};
 
   for (const task of requiredTasks) {
@@ -300,7 +306,12 @@ function verifyBoundaries(dir) {
         }
 
         if (specifier.startsWith('@master-sheet/')) {
-          if (specifier !== allowedWorkspacePackage) {
+          const isAllowed =
+            allowedWorkspacePackage !== null &&
+            (specifier === allowedWorkspacePackage ||
+              specifier.startsWith(`${allowedWorkspacePackage}/`));
+
+          if (!isAllowed) {
             addError(
               `${filePath}: shared package must not import workspace package "${specifier}".`,
             );
