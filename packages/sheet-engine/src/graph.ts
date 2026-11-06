@@ -1,5 +1,6 @@
 import {
   collectFields,
+  type FieldDefinition,
   type FormulaFieldDefinition,
   type SheetData,
   type TemplateStructure,
@@ -80,15 +81,16 @@ export function detectCycles(graph: GraphInput): string[][] {
   );
 }
 
-export function evaluateStructure(
-  structure: TemplateStructure,
-  data: SheetData,
-): SheetData {
-  const fields = collectFields(structure);
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function evaluateFields(
+  fields: FieldDefinition[],
+  source: Record<string, unknown>,
+): Record<string, unknown> {
   const byId = new Map(fields.map((field) => [field.id, field]));
-  const values: FormulaValues = {
-    ...(typeof data === 'object' && data !== null ? data : {}),
-  };
+  const values: FormulaValues = { ...source };
   const visiting = new Set<string>();
   const resolved = new Set<string>();
 
@@ -104,6 +106,8 @@ export function evaluateStructure(
 
     visiting.add(field.id);
 
+    const context: FormulaValues = { ...values };
+
     for (const dependency of field.dependencies) {
       const target = byId.get(dependency);
 
@@ -112,7 +116,14 @@ export function evaluateStructure(
       }
 
       if (target.type === 'formula') {
-        values[dependency] = resolveFormula(target);
+        const result = resolveFormula(target);
+        values[dependency] = result;
+        context[dependency] = result;
+      } else if (
+        target.type === 'checkbox' &&
+        typeof context[dependency] === 'boolean'
+      ) {
+        context[dependency] = context[dependency] ? 1 : 0;
       }
     }
 
@@ -120,7 +131,7 @@ export function evaluateStructure(
     resolved.add(field.id);
 
     try {
-      const result = evaluateFormula(field.expression, values);
+      const result = evaluateFormula(field.expression, context);
       values[field.id] = result;
       return result;
     } catch (error) {
@@ -135,8 +146,27 @@ export function evaluateStructure(
   for (const field of fields) {
     if (field.type === 'formula') {
       resolveFormula(field);
+    } else if (field.type === 'repeater') {
+      const rows = values[field.id];
+
+      if (Array.isArray(rows)) {
+        values[field.id] = rows.map((row) =>
+          isRecord(row) ? evaluateFields(field.itemSchema, row) : row,
+        );
+      }
     }
   }
 
   return values;
+}
+
+export function evaluateStructure(
+  structure: TemplateStructure,
+  data: SheetData,
+): SheetData {
+  const fields = structure.tabs.flatMap((tab) =>
+    tab.sections.flatMap((section) => section.fields),
+  );
+
+  return evaluateFields(fields, isRecord(data) ? data : {});
 }

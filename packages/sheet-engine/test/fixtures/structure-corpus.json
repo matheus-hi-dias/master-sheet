@@ -100,6 +100,84 @@
       },
       "data": {},
       "expected": { "broken": null }
+    },
+    {
+      "name": "checkbox dependencies coerce to 1/0",
+      "structure": {
+        "system": "custom",
+        "version": 1,
+        "tabs": [
+          {
+            "id": "main",
+            "label": "Main",
+            "sections": [
+              {
+                "id": "core",
+                "title": "Core",
+                "fields": [
+                  {
+                    "id": "flag",
+                    "label": "Flag",
+                    "type": "checkbox"
+                  },
+                  {
+                    "id": "bonus",
+                    "label": "Bonus",
+                    "type": "formula",
+                    "expression": "flag + 1",
+                    "dependencies": ["flag"]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "data": { "flag": true },
+      "expected": { "flag": true, "bonus": 2 }
+    },
+    {
+      "name": "repeater formulas evaluate per row",
+      "structure": {
+        "system": "custom",
+        "version": 1,
+        "tabs": [
+          {
+            "id": "main",
+            "label": "Main",
+            "sections": [
+              {
+                "id": "inventory",
+                "title": "Inventory",
+                "fields": [
+                  {
+                    "id": "items",
+                    "label": "Items",
+                    "type": "repeater",
+                    "itemSchema": [
+                      { "id": "count", "label": "Count", "type": "number" },
+                      {
+                        "id": "total_weight",
+                        "label": "Total weight",
+                        "type": "formula",
+                        "expression": "count * 2",
+                        "dependencies": ["count"]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "data": { "items": [{ "count": 2 }, { "count": 3 }] },
+      "expected": {
+        "items": [
+          { "count": 2, "total_weight": 4 },
+          { "count": 3, "total_weight": 6 }
+        ]
+      }
     }
   ],
   "cycles": [
