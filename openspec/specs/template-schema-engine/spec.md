@@ -3,9 +3,7 @@
 ## Purpose
 
 Defines the standardized JSON template DSL, its server-side validation rules, and sandboxed formula evaluation shared by every client.
-
 ## Requirements
-
 ### Requirement: Standardized Template DSL Schema
 
 The system SHALL enforce a structured JSON DSL for all template structures, consisting of top-level system metadata, version, and an array of tabs containing sections with configurable grid columns and typed field definitions.
@@ -22,7 +20,7 @@ The system SHALL enforce a structured JSON DSL for all template structures, cons
 
 ### Requirement: Safe Mathematical Formula Evaluation
 
-The system SHALL support formula fields that derive values dynamically from other numeric fields using sandboxed arithmetic and standard math functions (`floor`, `ceil`, `round`, `abs`, `min`, `max`), preventing arbitrary code execution.
+The system SHALL support formula fields that derive values dynamically from other numeric fields using sandboxed arithmetic and standard math functions (`floor`, `ceil`, `round`, `abs`, `min`, `max`), preventing arbitrary code execution. Formula parsing, dependency resolution, cycle detection, and evaluation SHALL be provided by a single shared workspace package consumed by the API and both frontends; no application SHALL maintain an independent formula implementation.
 
 #### Scenario: Formula Recalculation on Dependency Change
 
@@ -33,6 +31,16 @@ The system SHALL support formula fields that derive values dynamically from othe
 
 - **WHEN** a template structure defines circular formula dependencies (e.g., A depends on B and B depends on A)
 - **THEN** template validation fails with HTTP 400 Bad Request indicating a circular dependency loop
+
+#### Scenario: Identical Result Across Server and Clients
+
+- **WHEN** the same template structure, formula expression, and field values are evaluated on the API, the web app, and the mobile app
+- **THEN** all three produce the same numeric result or the same null result for missing dependencies
+
+#### Scenario: No Independent Evaluation Implementation
+
+- **WHEN** the workspace is inspected for formula evaluation code
+- **THEN** exactly one implementation exists in the shared engine package and applications only call it
 
 ### Requirement: Readable, Stable Field Identifiers
 
@@ -52,3 +60,4 @@ Field `id`s SHALL remain the canonical reference used by formula expressions and
 
 - **WHEN** a formula declares a dependency on a non-numeric field (e.g. `text` or `select`)
 - **THEN** client-side builder validation flags the dependency as invalid
+
