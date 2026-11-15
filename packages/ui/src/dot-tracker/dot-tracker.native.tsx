@@ -1,4 +1,4 @@
-import { Pressable, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { joinClasses } from '../shared/cn';
 import { clampDotValue, toggleDotValue } from '../shared/dot';
@@ -41,6 +41,9 @@ export function DotTracker({
           </Pressable>
         );
       })}
+      <Text className="ml-1 text-[11px] text-text-muted">
+        {current}/{maxDots}
+      </Text>
     </View>
   );
 }

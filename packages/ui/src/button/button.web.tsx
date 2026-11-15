@@ -1,3 +1,5 @@
+import { forwardRef } from 'react';
+
 import { joinClasses } from '../shared/cn';
 import { buttonWebVariantClasses } from './classes';
 import type { ButtonProps, ButtonSize } from './types';
@@ -11,33 +13,39 @@ const sizes: Record<ButtonSize, string> = {
   lg: 'text-[13px] px-6 py-3',
 };
 
-export function Button({
-  variant = 'gold',
-  size = 'md',
-  className,
-  children,
-  disabled,
-  onClick,
-  onPress,
-  type = 'button',
-  accessibilityLabel,
-  testID,
-}: ButtonProps) {
-  return (
-    <button
-      type={type}
-      disabled={disabled}
-      onClick={onClick ?? onPress}
-      aria-label={accessibilityLabel}
-      data-testid={testID}
-      className={joinClasses(
-        base,
-        sizes[size],
-        buttonWebVariantClasses[variant],
-        className,
-      )}
-    >
-      {children}
-    </button>
-  );
-}
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  function Button(
+    {
+      variant = 'gold',
+      size = 'md',
+      className,
+      children,
+      disabled,
+      onClick,
+      onPress,
+      type = 'button',
+      accessibilityLabel,
+      testID,
+    },
+    ref,
+  ) {
+    return (
+      <button
+        ref={ref}
+        type={type}
+        disabled={disabled}
+        onClick={onClick ?? onPress}
+        aria-label={accessibilityLabel}
+        data-testid={testID}
+        className={joinClasses(
+          base,
+          sizes[size],
+          buttonWebVariantClasses[variant],
+          className,
+        )}
+      >
+        {children}
+      </button>
+    );
+  },
+);

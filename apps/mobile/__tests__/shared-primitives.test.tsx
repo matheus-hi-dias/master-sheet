@@ -78,6 +78,7 @@ describe('shared native DotTracker', () => {
 
     render(<DotTracker value={2} maxDots={5} onChange={onChange} />);
 
+    expect(screen.getByText('2/5')).toBeTruthy();
     expect(
       screen.getByLabelText('Dot 1 of 5').props.accessibilityState,
     ).toEqual({ selected: true });

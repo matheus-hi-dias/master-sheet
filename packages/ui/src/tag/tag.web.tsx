@@ -25,18 +25,29 @@ export function Tag({
 }: TagProps) {
   const isDisplay = variant === 'display';
 
+  if (isDisplay) {
+    return (
+      <span
+        aria-label={accessibilityLabel}
+        data-testid={testID}
+        className={joinClasses(displayBase, className)}
+      >
+        {children}
+      </span>
+    );
+  }
+
   return (
     <button
       type="button"
       disabled={disabled}
       onClick={onClick ?? onPress}
-      aria-pressed={isDisplay ? undefined : active}
+      aria-pressed={active}
       aria-label={accessibilityLabel}
       data-testid={testID}
       className={joinClasses(
-        isDisplay
-          ? displayBase
-          : joinClasses(filterBase, active ? filterActive : filterInactive),
+        filterBase,
+        active ? filterActive : filterInactive,
         className,
       )}
     >

@@ -44,6 +44,7 @@ export function Button({
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
       testID={testID}
+      hitSlop={size === 'sm' ? 10 : undefined}
       className={joinClasses(
         base,
         sizes[size],

@@ -49,12 +49,11 @@ describe('shared Tag', () => {
     expect(onClick).toHaveBeenCalledTimes(1);
   });
 
-  it('renders the display variant without a pressed state', () => {
-    render(<Tag variant="display">official</Tag>);
+  it('renders the display variant as non-interactive metadata', () => {
+    const { container } = render(<Tag variant="display">official</Tag>);
 
-    expect(
-      screen.getByRole('button', { name: 'official' }),
-    ).not.toHaveAttribute('aria-pressed');
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    expect(container.querySelector('span')).toHaveTextContent('official');
   });
 });
 

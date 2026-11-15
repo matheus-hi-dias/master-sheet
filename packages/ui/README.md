@@ -53,8 +53,33 @@ button/
   classes.ts         # token-backed class lookups (optional)
   button.web.tsx     # DOM implementation
   button.native.tsx  # React Native implementation
-  index.ts           # type re-exports
 ```
+
+The per-directory `index.ts` re-export files were removed: `exports` already
+maps `types` straight to `types.ts`, so they were dead code.
+
+## Build and consumption
+
+The `exports` map points every runtime entry at `src/**`, so consumers compile
+the package sources with their own toolchain:
+
+- Vite (web) and Metro/Expo (mobile) transform `src/**` on the fly — there is no
+  dev-time build step and no stale `dist` to invalidate.
+- `build` still emits `dist/**` (gitignored) because it is the only artifact the
+  Node unit tests can import (`test/dot.test.mjs` loads `../dist/shared/dot.js`
+  so the same code runs on Node 20 without a TypeScript loader).
+
+Consequence: **the package must be listed in the consumer's styling scan.**
+Tailwind/NativeWind only generate utilities for files they read, so both apps
+include `packages/ui/src`:
+
+- web: `@source '../../../packages/ui/src';` in `apps/web/src/index.css`
+- mobile: `content: ['../../packages/ui/src/**/*.{ts,tsx}']` in
+  `apps/mobile/tailwind.config.js`
+
+`scripts/check-web-bundle.mjs` asserts that utilities only defined here (for
+example `.text-on-gold`) make it into the web build, so a missing `@source` fails
+CI instead of shipping unstyled primitives.
 
 ## Contract rules
 
@@ -69,6 +94,13 @@ button/
   radii) are shared.
 - React, React Native and `react-native-svg` are peer dependencies. The package
   never vendors React.
+- **Platform-specific props are not forwarded.** The shared `Button` contract
+  does not spread `ButtonHTMLAttributes` or `PressableProps`: `ref`, `form`,
+  `title`, `aria-describedby`, `onLongPress` and `hitSlop` are intentionally
+  unreachable. If a consumer needs one, add it to the shared `types.ts` so both
+  renderers can honour it. The web `Button` keeps `forwardRef` at runtime (so
+  focus management keeps working) but `ref` is not part of the shared contract
+  until a cross-platform handle is defined.
 
 ## Adding a primitive
 
