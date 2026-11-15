@@ -20,7 +20,9 @@
   },
   "dependencies": {
     "@master-sheet/contracts": "workspace:*",
+    "@master-sheet/design-tokens": "workspace:*",
     "@master-sheet/sheet-engine": "workspace:*",
+    "@master-sheet/ui": "workspace:*",
     "@react-navigation/native": "^7.3.14",
     "@tanstack/react-query": "^5.62.0",
     "axios": "^1.17.0",
