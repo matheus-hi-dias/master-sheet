@@ -148,7 +148,7 @@ function buildWebThemeCss() {
     }
   }
 
-  return `${HEADER}@theme {
+  return `${HEADER}@theme static {
 ${themeLines.join('\n')}
 }
 
@@ -252,10 +252,16 @@ function buildTailwindPreset() {
 }
 
 function buildFontManifest() {
+  const imports = fontAssets
+    .map(
+      (font, index) =>
+        `import font${index} from '../fonts/${font.file}';`,
+    )
+    .join('\n');
   const entries = fontAssets
     .map(
-      (font) =>
-        `  ${JSON.stringify(font.family)}: require('../fonts/${font.file}'),`,
+      (font, index) =>
+        `  ${JSON.stringify(font.family)}: font${index},`,
     )
     .join('\n');
   const families = fontAssets
@@ -269,7 +275,9 @@ function buildFontManifest() {
     )
     .join('\n');
 
-  return `${HEADER}export const fontAssets = {
+  return `${HEADER}${imports}
+
+export const fontAssets = {
 ${entries}
 };
 

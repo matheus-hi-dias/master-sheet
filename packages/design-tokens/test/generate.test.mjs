@@ -1,10 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import {
-  buildArtifacts,
-  checkArtifacts,
-} from '../scripts/generate.mjs';
+import { buildArtifacts, checkArtifacts } from '../scripts/generate.mjs';
 
 test('generation is deterministic and idempotent', () => {
   const first = buildArtifacts();
@@ -22,7 +19,9 @@ test('committed generated artifacts match the token source', () => {
 });
 
 function artifactEndingWith(artifacts, suffix) {
-  const entry = [...artifacts.entries()].find(([path]) => path.endsWith(suffix));
+  const entry = [...artifacts.entries()].find(([path]) =>
+    path.endsWith(suffix),
+  );
 
   assert.ok(entry, `missing generated artifact ${suffix}`);
 
@@ -39,10 +38,21 @@ test('generated CSS exposes dark defaults and light overrides', () => {
   assert.match(tokensCss, /--color-bg-app: #faf9f6;/);
   assert.match(tokensCss, /--color-gold: #b8860b;/);
 
-  assert.match(webThemeCss, /@theme \{/);
+  assert.match(webThemeCss, /@theme static \{/);
   assert.match(webThemeCss, /--color-gold: #d4af37;/);
   assert.match(webThemeCss, /:root\.light \{/);
   assert.match(webThemeCss, /--color-gold: #b8860b;/);
+});
+
+test('web theme emits every token, even ones with no utility class', () => {
+  const webThemeCss = artifactEndingWith(buildArtifacts(), 'web-theme.css');
+
+  // Tailwind v4 prunes `@theme` variables that no utility references; `static`
+  // keeps the full token surface available as CSS custom properties.
+  assert.match(webThemeCss, /--color-success: #27ae60;/);
+  assert.match(webThemeCss, /--color-link: #2e78b7;/);
+  assert.match(webThemeCss, /--background-image-aura:/);
+  assert.match(webThemeCss, /--radius-pill:/);
 });
 
 test('spacing tokens do not shadow Tailwind container utilities', () => {
@@ -69,6 +79,9 @@ test('generated font manifest lists every shared font asset', () => {
   assert.match(manifest, /Cinzel-VariableFont_wght\.ttf/);
   assert.match(manifest, /Lato-Regular\.ttf/);
   assert.match(manifest, /SpaceMono-Regular\.ttf/);
+  // The package is `"type": "module"`; `require()` would only work inside Metro.
+  assert.match(manifest, /import font0 from '\.\.\/fonts\//);
+  assert.doesNotMatch(manifest, /require\(/);
 });
 
 test('generated JSON snapshot matches the typed token source', () => {
