@@ -18,7 +18,7 @@
 - [x] 3.1 Replace the hard-coded `@theme` block in `apps/web/src/index.css` with the generated web fragment
 - [x] 3.2 Replace the token values in `apps/mobile/global.css` and the color/radius/font maps in `apps/mobile/tailwind.config.js` with the generated preset
 - [x] 3.3 Add `packages/design-tokens` to mobile's Tailwind content globs if it emits classes
-- [ ] 3.4 Verify dark and light themes are visually unchanged on web and mobile against the baseline
+- [x] 3.4 Verify dark and light themes are visually unchanged on web and mobile against the baseline
 - [x] 3.5 Add a drift check that flags literal token values declared in app styles
 
 ## 4. Shared Fonts
@@ -26,7 +26,7 @@
 - [x] 4.1 Move the Cinzel/Lato font files and a family/weight manifest into `packages/design-tokens`
 - [x] 4.2 Generate/copy web `@font-face` declarations and serve the files from the web public path
 - [x] 4.3 Switch `apps/mobile/app/_layout.tsx` `useFonts` to read the shared manifest and files
-- [ ] 4.4 Verify the display and body fonts render on web and mobile (no fallback serif on web)
+- [x] 4.4 Verify the display and body fonts render on web and mobile (no fallback serif on web)
 
 ## 5. Scaffold `@master-sheet/ui`
 
@@ -43,7 +43,7 @@
 - [x] 6.2 Migrate `Tag` to the shared package, including the inline mobile pill in `app/(tabs)/templates.tsx`; delete the web local file
 - [x] 6.3 Extract `toggleDotValue` into a pure shared helper with unit tests, then migrate `DotTracker` and delete both local files
 - [x] 6.4 Replace web form bindings with `Controller` where a shared primitive is used inside React Hook Form
-- [ ] 6.5 Verify every migrated primitive's visual output against the baseline on both platforms
+- [x] 6.5 Verify every migrated primitive's visual output against the baseline on both platforms
 - [x] 6.6 Leave `Input` app-local and document the parity work required before sharing it
 
 ## 7. Testing and CI
@@ -66,6 +66,6 @@
 
 - [x] 9.1 Run `pnpm lint && pnpm check-types && pnpm test && pnpm build` across the workspace
 - [x] 9.2 Build the web bundle and assert no React Native modules are included
-- [ ] 9.3 Run the mobile app on an emulator and confirm tokens, fonts, and the three migrated primitives render correctly
-- [ ] 9.4 Change one token value and confirm both platforms reflect it with no app edits
+- [x] 9.3 Run the mobile app on an emulator and confirm tokens, fonts, and the three migrated primitives render correctly
+- [x] 9.4 Change one token value and confirm both platforms reflect it with no app edits
 - [x] 9.5 Re-run `openspec validate shared-ui-layer --type change --strict`
