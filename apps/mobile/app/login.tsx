@@ -18,6 +18,7 @@ import { useMutation } from '@tanstack/react-query';
 import type { AuthSessionResponse } from '@master-sheet/contracts';
 import { api, getApiErrorMessage } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { colors } from '@/lib/colors';
 
 export default function Login() {
   const [tab, setTab] = useState<'login' | 'register'>('login');
@@ -150,7 +151,7 @@ export default function Login() {
                   className={`flex-1 py-3 items-center ${tab === t ? 'bg-gold' : 'bg-transparent'}`}
                 >
                   <Text
-                    className={`text-[11px] font-bold uppercase tracking-widest ${tab === t ? 'text-[#121212]' : 'text-text-muted'}`}
+                    className={`text-[11px] font-bold uppercase tracking-widest ${tab === t ? 'text-on-gold' : 'text-text-muted'}`}
                   >
                     {t === 'login' ? 'Entrar' : 'Cadastrar'}
                   </Text>
@@ -222,15 +223,15 @@ export default function Login() {
                 'Carregando...'
               ) : tab === 'login' ? (
                 <View className="flex-row items-center justify-center gap-2">
-                  <Swords size={16} color="#121212" />
-                  <Text className="text-[13px] text-[#121212] font-body font-bold uppercase tracking-widest">
+                  <Swords size={16} color={colors.onGold} />
+                  <Text className="text-[13px] text-on-gold font-body font-bold uppercase tracking-widest">
                     Entrar na Plataforma
                   </Text>
                 </View>
               ) : (
                 <View className="flex-row items-center justify-center gap-2">
-                  <Scroll size={16} color="#121212" />
-                  <Text className="text-[13px] text-[#121212] font-body font-bold uppercase tracking-widest">
+                  <Scroll size={16} color={colors.onGold} />
+                  <Text className="text-[13px] text-on-gold font-body font-bold uppercase tracking-widest">
                     Criar Conta
                   </Text>
                 </View>

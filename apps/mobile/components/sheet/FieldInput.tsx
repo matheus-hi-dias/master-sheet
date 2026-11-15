@@ -9,6 +9,7 @@ import {
 import { NumberStepper } from './NumberStepper';
 import { DotTracker } from '@master-sheet/ui/dot-tracker';
 import { RepeaterList } from './RepeaterList';
+import { colors } from '@/lib/colors';
 
 interface FieldInputProps {
   field: FieldDefinition;
@@ -40,7 +41,7 @@ export function FieldInput({
           value={toStringValue(value)}
           onChangeText={onChange}
           placeholder={field.placeholder}
-          placeholderTextColor="#888888"
+          placeholderTextColor={colors.textMuted}
           maxLength={field.maxLength}
           className="bg-bg-panel border border-border rounded-card px-3 py-2.5 text-text-main font-body text-sm"
         />
@@ -51,7 +52,7 @@ export function FieldInput({
           value={toStringValue(value)}
           onChangeText={onChange}
           placeholder={field.placeholder}
-          placeholderTextColor="#888888"
+          placeholderTextColor={colors.textMuted}
           multiline
           numberOfLines={3}
           textAlignVertical="top"
@@ -81,7 +82,7 @@ export function FieldInput({
               >
                 <Text
                   className={`text-[10px] font-bold uppercase tracking-wider ${
-                    active ? 'text-[#121212]' : 'text-text-muted'
+                    active ? 'text-on-gold' : 'text-text-muted'
                   }`}
                 >
                   {option.label}
@@ -104,7 +105,7 @@ export function FieldInput({
             }`}
           >
             {value ? (
-              <Text className="text-[#121212] font-black text-sm">✓</Text>
+              <Text className="text-on-gold font-black text-sm">✓</Text>
             ) : null}
           </View>
         </Pressable>

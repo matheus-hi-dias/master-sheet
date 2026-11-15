@@ -3,6 +3,7 @@ import { View, Text, ActivityIndicator } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Button } from '@master-sheet/ui/button';
 import { api, getApiErrorMessage } from '@/services/api';
+import { colors } from '@/lib/colors';
 
 export default function VerifyEmailScreen() {
   const { token } = useLocalSearchParams<{ token: string }>();
@@ -32,20 +33,20 @@ export default function VerifyEmailScreen() {
   };
 
   return (
-    <View className="flex-1 items-center justify-center bg-[#121212] p-6">
-      <View className="w-full max-w-sm rounded-lg border border-[#3D3D3D] bg-[#242424] p-8 items-center">
-        <Text className="text-2xl font-bold text-[#E0E0E0] mb-4">
+    <View className="flex-1 items-center justify-center bg-bg-app p-6">
+      <View className="w-full max-w-sm rounded-lg border border-border bg-bg-card p-8 items-center">
+        <Text className="text-2xl font-bold text-text-main mb-4">
           Verificando...
         </Text>
 
         {loading ? (
           <>
-            <ActivityIndicator size="large" color="#D4AF37" />
-            <Text className="text-[#888888] mt-4">Aguarde um momento</Text>
+            <ActivityIndicator size="large" color={colors.gold} />
+            <Text className="text-text-muted mt-4">Aguarde um momento</Text>
           </>
         ) : success ? (
           <>
-            <Text className="text-[#E0E0E0] text-center mb-6">
+            <Text className="text-text-main text-center mb-6">
               E-mail verificado com sucesso!
             </Text>
             <Button onPress={() => router.replace('/login')} variant="gold">

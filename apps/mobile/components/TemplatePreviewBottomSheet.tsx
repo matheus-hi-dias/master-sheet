@@ -11,6 +11,7 @@ import { X, Layers, Sparkles, Dices } from 'lucide-react-native';
 import type { TemplateSummary } from '../types/template';
 import { SYSTEM_LABELS } from '../types/template';
 import { collectTabFieldLabels, totalFields } from '../services/templates';
+import { colors } from '@/lib/colors';
 
 interface TemplatePreviewBottomSheetProps {
   template: TemplateSummary | null;
@@ -69,7 +70,7 @@ export function TemplatePreviewBottomSheet({
                 className="p-1.5 active:opacity-60"
                 hitSlop={8}
               >
-                <X size={20} color="#888888" />
+                <X size={20} color={colors.textMuted} />
               </Pressable>
             </View>
 
@@ -80,7 +81,7 @@ export function TemplatePreviewBottomSheet({
                 </Text>
               </View>
               <View className="bg-bg-card border border-border px-2.5 py-1 rounded-full flex-row items-center gap-1">
-                <Layers size={11} color="#888888" />
+                <Layers size={11} color={colors.textMuted} />
                 <Text className="text-[10px] text-text-muted font-bold uppercase tracking-widest">
                   {template.structure.tabs.length} abas ·{' '}
                   {totalFields(template)} campos
@@ -111,7 +112,7 @@ export function TemplatePreviewBottomSheet({
 
             <View className="mt-4 border border-border rounded-card overflow-hidden">
               <View className="bg-bg-card px-3 py-2 border-b border-border flex-row items-center gap-2">
-                <Sparkles size={13} color="#D4AF37" />
+                <Sparkles size={13} color={colors.gold} />
                 <Text className="text-[10px] font-bold text-text-main uppercase tracking-widest">
                   Estrutura do modelo
                 </Text>
@@ -159,11 +160,11 @@ export function TemplatePreviewBottomSheet({
                 className="mt-6 bg-gold py-3.5 rounded-card items-center justify-center active:bg-gold-dim flex-row gap-2"
               >
                 {creating ? (
-                  <ActivityIndicator size="small" color="#121212" />
+                  <ActivityIndicator size="small" color={colors.onGold} />
                 ) : (
-                  <Dices size={16} color="#121212" />
+                  <Dices size={16} color={colors.onGold} />
                 )}
-                <Text className="text-[#121212] font-bold text-xs uppercase tracking-widest">
+                <Text className="text-on-gold font-bold text-xs uppercase tracking-widest">
                   {creating ? 'Instanciando...' : '✦ Criar Ficha'}
                 </Text>
               </Pressable>
