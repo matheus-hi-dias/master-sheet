@@ -1,6 +1,6 @@
 import React from 'react';
-import { Tag } from '../../../components/ui/Tag';
-import { Button } from '../../../components/ui/Button';
+import { Tag } from '@master-sheet/ui/tag';
+import { Button } from '@master-sheet/ui/button';
 import { FileText, Copy, Pencil, Trash2 } from 'lucide-react';
 import { SYSTEM_LABELS } from '@master-sheet/contracts';
 

@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { AlertTriangle, Loader2 } from 'lucide-react';
 
-import { Button } from '../../../components/ui/Button';
+import { Button } from '@master-sheet/ui/button';
 import {
   createTemplate,
   fetchTemplateDetail,

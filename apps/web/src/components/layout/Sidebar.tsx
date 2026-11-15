@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useThemeStore } from '../../store/useThemeStore';
-import { GemLogo } from '../ui/GemLogo';
+import { GemLogo } from '@master-sheet/ui/gem-logo';
 import { LogOut, Sun, Moon, FileText, FolderOpen, Wrench } from 'lucide-react';
 
 const NAV_LINKS = [

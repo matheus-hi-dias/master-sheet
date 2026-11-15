@@ -11,8 +11,8 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { Button } from '../../../components/ui/Button';
-import { Tag } from '../../../components/ui/Tag';
+import { Button } from '@master-sheet/ui/button';
+import { Tag } from '@master-sheet/ui/tag';
 import { DynamicFormMapper } from '../../sheets/components/DynamicFormMapper';
 import {
   buildItemDefaults,

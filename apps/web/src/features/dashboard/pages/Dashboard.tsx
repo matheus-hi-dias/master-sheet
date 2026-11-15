@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Button } from '../../../components/ui/Button';
+import { Button } from '@master-sheet/ui/button';
 import { PageHeader } from '../../../components/ui/PageHeader';
 
 import { FileText } from 'lucide-react';

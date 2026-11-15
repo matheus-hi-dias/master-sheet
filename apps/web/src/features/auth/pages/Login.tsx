@@ -5,9 +5,9 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Swords, Scroll } from 'lucide-react';
 
-import { GemLogo } from '../../../components/ui/GemLogo';
+import { GemLogo } from '@master-sheet/ui/gem-logo';
 import { Input } from '../../../components/ui/Input';
-import { Button } from '../../../components/ui/Button';
+import { Button } from '@master-sheet/ui/button';
 import { useAuthStore } from '../../../store/useAuthStore';
 import {
   loginSchema,

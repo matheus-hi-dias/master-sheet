@@ -1,6 +1,6 @@
 import { ArrowLeft, Download, Save, Upload, TriangleAlert } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '../../../components/ui/Button';
+import { Button } from '@master-sheet/ui/button';
 import { cn } from '../../../lib/utils';
 import { DEFAULT_SYSTEMS, SYSTEM_LABELS } from '@master-sheet/contracts';
 import type { Builder } from '../hooks/useBuilder';
