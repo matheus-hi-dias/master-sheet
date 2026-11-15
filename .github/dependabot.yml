@@ -77,6 +77,30 @@ updates:
       - 'dependencies'
       - 'typescript-config'
 
+  - package-ecosystem: 'npm'
+    directory: '/packages/design-tokens'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '09:00'
+      timezone: 'America/Sao_Paulo'
+    open-pull-requests-limit: 10
+    labels:
+      - 'dependencies'
+      - 'design-tokens'
+
+  - package-ecosystem: 'npm'
+    directory: '/packages/ui'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '09:00'
+      timezone: 'America/Sao_Paulo'
+    open-pull-requests-limit: 10
+    labels:
+      - 'dependencies'
+      - 'ui'
+
   # Github Actions
   - package-ecosystem: 'github-actions'
     directory: '/'

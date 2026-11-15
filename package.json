@@ -10,6 +10,12 @@
     "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,md,json}\"",
     "check-types": "turbo run check-types",
+    "tokens:generate": "pnpm --filter @master-sheet/design-tokens generate",
+    "tokens:check": "pnpm --filter @master-sheet/design-tokens check",
+    "check:token-drift": "node scripts/check-token-drift.mjs",
+    "check:shared-primitives": "node scripts/check-shared-primitives.mjs",
+    "check:web-bundle": "node scripts/check-web-bundle.mjs",
+    "verify:design-system": "pnpm tokens:check && pnpm check:token-drift && pnpm check:shared-primitives",
     "verify:workspace": "node scripts/verify-workspace.mjs"
   },
   "devDependencies": {
