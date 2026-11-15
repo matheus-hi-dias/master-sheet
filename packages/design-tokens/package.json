@@ -35,7 +35,7 @@
     "build": "pnpm generate",
     "check-types": "tsc -p tsconfig.json --noEmit",
     "lint": "eslint \"src/**/*.ts\"",
-    "test": "pnpm build && node --test test/*.test.mjs",
+    "test": "pnpm build && node ../../scripts/run-node-tests.mjs test",
     "check": "tsc -p tsconfig.json && node scripts/generate.mjs --check"
   },
   "devDependencies": {

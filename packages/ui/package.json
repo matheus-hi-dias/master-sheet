@@ -42,7 +42,7 @@
     "build": "tsc -p tsconfig.build.json",
     "check-types": "tsc -p tsconfig.json --noEmit",
     "lint": "eslint \"src/**/*.{ts,tsx}\"",
-    "test": "pnpm build && node --test test/*.test.mjs"
+    "test": "pnpm build && node ../../scripts/run-node-tests.mjs test"
   },
   "dependencies": {
     "@master-sheet/design-tokens": "workspace:*"

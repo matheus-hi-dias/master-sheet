@@ -12,6 +12,12 @@ updates:
     labels:
       - 'dependencies'
       - 'js'
+    groups:
+      minor-and-patch:
+        applies-to: 'version-updates'
+        update-types:
+          - 'minor'
+          - 'patch'
 
   # API (NestJS)
   - package-ecosystem: 'npm'
@@ -25,6 +31,12 @@ updates:
     labels:
       - 'dependencies'
       - 'api'
+    groups:
+      minor-and-patch:
+        applies-to: 'version-updates'
+        update-types:
+          - 'minor'
+          - 'patch'
 
   # Web (React)
   - package-ecosystem: 'npm'
@@ -38,6 +50,12 @@ updates:
     labels:
       - 'dependencies'
       - 'web'
+    groups:
+      minor-and-patch:
+        applies-to: 'version-updates'
+        update-types:
+          - 'minor'
+          - 'patch'
 
   # Mobile (Expo)
   - package-ecosystem: 'npm'
@@ -51,6 +69,12 @@ updates:
     labels:
       - 'dependencies'
       - 'mobile'
+    groups:
+      minor-and-patch:
+        applies-to: 'version-updates'
+        update-types:
+          - 'minor'
+          - 'patch'
 
   # Pacotes compartilhados
   - package-ecosystem: 'npm'
@@ -64,6 +88,12 @@ updates:
     labels:
       - 'dependencies'
       - 'eslint-config'
+    groups:
+      minor-and-patch:
+        applies-to: 'version-updates'
+        update-types:
+          - 'minor'
+          - 'patch'
 
   - package-ecosystem: 'npm'
     directory: '/packages/typescript-config'
@@ -76,6 +106,12 @@ updates:
     labels:
       - 'dependencies'
       - 'typescript-config'
+    groups:
+      minor-and-patch:
+        applies-to: 'version-updates'
+        update-types:
+          - 'minor'
+          - 'patch'
 
   - package-ecosystem: 'npm'
     directory: '/packages/design-tokens'
@@ -88,6 +124,12 @@ updates:
     labels:
       - 'dependencies'
       - 'design-tokens'
+    groups:
+      minor-and-patch:
+        applies-to: 'version-updates'
+        update-types:
+          - 'minor'
+          - 'patch'
 
   - package-ecosystem: 'npm'
     directory: '/packages/ui'
@@ -100,6 +142,12 @@ updates:
     labels:
       - 'dependencies'
       - 'ui'
+    groups:
+      minor-and-patch:
+        applies-to: 'version-updates'
+        update-types:
+          - 'minor'
+          - 'patch'
 
   # Github Actions
   - package-ecosystem: 'github-actions'
@@ -113,3 +161,9 @@ updates:
     labels:
       - 'dependencies'
       - 'github_actions'
+    groups:
+      minor-and-patch:
+        applies-to: 'version-updates'
+        update-types:
+          - 'minor'
+          - 'patch'
