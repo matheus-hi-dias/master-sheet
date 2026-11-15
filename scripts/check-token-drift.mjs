@@ -1,4 +1,4 @@
-import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, extname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -11,8 +11,15 @@ const tokensPath = join(
   'tokens.json',
 );
 const APP_DIRS = ['apps/web', 'apps/mobile'];
-const STYLE_EXTENSIONS = new Set(['.css']);
-const STYLE_FILE_RE = /^tailwind\.config\.(?:js|cjs|mjs|ts)$/;
+const SOURCE_EXTENSIONS = new Set([
+  '.css',
+  '.js',
+  '.jsx',
+  '.ts',
+  '.tsx',
+  '.cjs',
+  '.mjs',
+]);
 const SKIPPED_DIRECTORIES = new Set([
   'node_modules',
   '.expo',
@@ -45,7 +52,7 @@ if (!existsSync(tokensPath)) {
   const errors = [];
 
   for (const appDir of APP_DIRS) {
-    for (const file of listStyleFiles(join(root, appDir))) {
+    for (const file of listSourceFiles(join(root, appDir))) {
       const filePath = relative(root, file).split(sep).join('/');
       const lines = readFileSync(file, 'utf8').split(/\r?\n/);
 
@@ -60,7 +67,7 @@ if (!existsSync(tokensPath)) {
 
           if (tokenColors.has(normalized)) {
             errors.push(
-              `${filePath}:${index + 1}: literal token color "${literal}" found; use the generated CSS variable instead.`,
+              `${filePath}:${index + 1}: literal token color "${literal}" found; use the generated token (utility class, CSS variable or typed constant) instead.`,
             );
           }
         }
@@ -75,11 +82,13 @@ if (!existsSync(tokensPath)) {
 
     process.exitCode = 1;
   } else {
-    console.log('App style files contain no literal design-token colors.');
+    console.log(
+      'App sources contain no literal design-token colors (CSS and TS/TSX).',
+    );
   }
 }
 
-function listStyleFiles(dir) {
+function listSourceFiles(dir) {
   if (!existsSync(dir)) {
     return [];
   }
@@ -89,15 +98,12 @@ function listStyleFiles(dir) {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     if (entry.isDirectory()) {
       if (!SKIPPED_DIRECTORIES.has(entry.name)) {
-        files.push(...listStyleFiles(join(dir, entry.name)));
+        files.push(...listSourceFiles(join(dir, entry.name)));
       }
       continue;
     }
 
-    if (
-      STYLE_EXTENSIONS.has(extname(entry.name)) ||
-      STYLE_FILE_RE.test(entry.name)
-    ) {
+    if (SOURCE_EXTENSIONS.has(extname(entry.name))) {
       files.push(join(dir, entry.name));
     }
   }
