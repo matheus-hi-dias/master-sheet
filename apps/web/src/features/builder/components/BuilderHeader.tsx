@@ -146,7 +146,7 @@ export function BuilderHeader({
               <span
                 className={cn(
                   'w-[16px] h-[16px] rounded-full transition-colors duration-200',
-                  builder.draft.isPublic ? 'bg-[#121212]' : 'bg-text-muted',
+                  builder.draft.isPublic ? 'bg-bg-app' : 'bg-text-muted',
                 )}
               />
             </span>

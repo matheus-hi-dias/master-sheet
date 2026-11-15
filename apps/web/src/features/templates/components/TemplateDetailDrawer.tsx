@@ -137,7 +137,7 @@ export function TemplateDetailDrawer({
               </h3>
               <div className="flex flex-wrap gap-1.5">
                 {template.tags.map((t) => (
-                  <Tag key={t.id} className="pointer-events-none">
+                  <Tag key={t.id} variant="display">
                     {t.name}
                   </Tag>
                 ))}

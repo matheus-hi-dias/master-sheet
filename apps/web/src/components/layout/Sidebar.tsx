@@ -74,7 +74,7 @@ export function Sidebar() {
               'text-[13px] font-bold uppercase tracking-[0.05em] border transition-all duration-200 ' +
               'cursor-pointer ' +
               (activeMatch === l.id
-                ? 'text-gold bg-[rgba(212,175,55,0.08)] border-[rgba(212,175,55,0.2)]'
+                ? 'text-gold bg-gold-tint border-gold/20'
                 : 'text-text-muted border-transparent hover:text-text-main hover:bg-bg-card')
             }
           >
@@ -87,7 +87,7 @@ export function Sidebar() {
       {/* Profile */}
       <div className="flex flex-col px-3 py-4 border-t border-border">
         <div className="flex items-center gap-2.5">
-          <div className="w-[34px] h-[34px] rounded-full bg-gradient-to-br from-gold-dim to-gold border-2 border-gold flex items-center justify-center font-display font-bold text-[14px] text-[#121212] shrink-0">
+          <div className="w-[34px] h-[34px] rounded-full bg-gradient-to-br from-gold-dim to-gold border-2 border-gold flex items-center justify-center font-display font-bold text-[14px] text-on-gold shrink-0">
             {userInitial}
           </div>
           <div className="flex-1 min-w-0">

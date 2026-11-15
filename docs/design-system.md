@@ -11,7 +11,7 @@ Generated artifacts (do not edit by hand):
 | Artifact                                          | Consumer                                               |
 | :------------------------------------------------ | :----------------------------------------------------- |
 | `generated/tokens.css`                            | Mobile `global.css`                                    |
-| `generated/web-theme.css`                         | Web `index.css` Tailwind `@theme` fragment             |
+| `generated/web-theme.css`                         | Web `index.css` Tailwind `@theme static` fragment      |
 | `generated/fonts.css` + `apps/web/public/fonts/*` | Web `@font-face` and served font files                 |
 | `generated/tailwind-preset.cjs`                   | Mobile `tailwind.config.js`                            |
 | `generated/tokens.ts`                             | Typed constants (`@master-sheet/design-tokens/tokens`) |
@@ -22,7 +22,7 @@ Commands:
 
 - Regenerate: `pnpm tokens:generate`
 - Verify freshness: `pnpm tokens:check`
-- Verify app styles contain no literal token colors: `pnpm check:token-drift`
+- Verify app sources (CSS and TS/TSX) contain no literal token colors: `pnpm check:token-drift`
 
 ## Visual Language
 
@@ -39,6 +39,17 @@ Semantic groups are defined in `packages/design-tokens/src/tokens.ts` and expose
 
 Both themes are generated from the same source: dark values are the `:root` defaults and light values are `.light` overrides. Apps must reference the variables or generated utilities, never literal hex/rgb values.
 
+The web theme is emitted as `@theme static`, so **every** token is always present as a CSS custom property even when no utility class references it (`--color-success`, `--radius-pill`, `--background-image-aura`, …). That keeps non-utility consumers such as `fill="var(--color-gold-tint)"` working, and it is what `check-token-drift` assumes.
+
+Because Tailwind/NativeWind only generate classes for files they scan, both apps must list the shared package explicitly:
+
+- Web: `@source '../../../packages/ui/src';` in `apps/web/src/index.css` (Tailwind v4 has no config file for workspace globs).
+- Mobile: `content: ['../../packages/ui/src/**/*.{ts,tsx}']` in `apps/mobile/tailwind.config.js`.
+
+Without those entries the primitives' token utilities are silently dropped from the stylesheet.
+
+Values that cannot be expressed as a class (icon `color`, `placeholderTextColor`, navigator options, shadows) come from typed constants, never inline literals: `colorTokens` from `@master-sheet/design-tokens/tokens` or, in mobile code, the app-local `colors` constant in `apps/mobile/lib/colors.ts` (dark-first today; resolve per theme when light mode lands).
+
 Rules:
 
 - Interactive components (`Button variant="gold"`, focused `Input`) adopt gold.
@@ -48,7 +59,7 @@ Rules:
 
 - **Cinzel** — display/hero text and RPG numeric readouts.
 - **Lato** — body and base UI text.
-- Font families, weights, and files come from the generated font manifest; web serves the files from `apps/web/public/fonts` and mobile loads them through `useFonts`.
+- Font families, weights, and files come from the generated font manifest; web serves the files from `apps/web/public/fonts` and mobile loads them through `useFonts`. The manifest imports the `.ttf` assets (ESM) so Metro resolves them as assets; `tokens:check` fails if `packages/design-tokens/fonts` and `apps/web/public/fonts` ever diverge. The binaries are therefore committed twice (~295 KB each) — intentional duplication, not a stale copy.
 - Small labels (`SectionLabel`) are always `uppercase` with wide spacing (`tracking-[0.1em]`).
 
 ## Motion & Animation

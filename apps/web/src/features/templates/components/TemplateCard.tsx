@@ -111,7 +111,7 @@ export function TemplateCard({
         {tmpl.tags.length > 0 && (
           <div className="flex flex-wrap gap-1 mt-3">
             {tmpl.tags.map((t) => (
-              <Tag key={t} className="pointer-events-none">
+              <Tag key={t} variant="display">
                 {t}
               </Tag>
             ))}

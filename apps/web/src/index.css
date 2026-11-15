@@ -1,6 +1,9 @@
 @import 'tailwindcss';
 @import '@master-sheet/design-tokens/web-theme.css';
 @import '@master-sheet/design-tokens/fonts.css';
+/* Tailwind v4 does not scan workspace packages outside the app root; without this the
+   utilities used only by @master-sheet/ui (e.g. text-on-gold, shadow-tag-glow) are never emitted. */
+@source '../../../packages/ui/src';
 
 @custom-variant light (&:is(.light, .light *));
 
@@ -51,6 +54,6 @@
 }
 
 .animate-drawer-in {
-  animation: drawer-in var(--motion-duration-drawer)
-    var(--motion-easing-drawer) forwards;
+  animation: drawer-in var(--motion-duration-drawer) var(--motion-easing-drawer)
+    forwards;
 }

@@ -75,7 +75,7 @@ export function Login() {
     <div className="min-h-screen flex items-center justify-center bg-bg-app relative overflow-hidden">
       {/* Background glassmorphism effects */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <div className="w-[600px] h-[600px] rounded-full bg-[radial-gradient(circle,rgba(212,175,55,0.05)_0%,transparent_70%)]" />
+        <div className="w-[600px] h-[600px] rounded-full bg-aura opacity-5" />
       </div>
 
       <div className="relative z-10 w-full max-w-sm mx-4 bg-bg-card border border-border border-t-[3px] border-t-gold rounded-xl px-9 py-10 shadow-card animate-fade-in">
@@ -97,7 +97,7 @@ export function Login() {
               className={
                 'flex-1 py-2.5 text-[12px] font-bold uppercase tracking-[0.08em] cursor-pointer border-none transition-all duration-200 ' +
                 (tab === t
-                  ? 'bg-gold text-text-main'
+                  ? 'bg-gold text-on-gold'
                   : 'bg-transparent text-text-muted hover:text-text-main')
               }
             >
