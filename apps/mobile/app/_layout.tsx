@@ -5,6 +5,7 @@ import {
 } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
+import { fontAssets } from '@master-sheet/design-tokens/fonts';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { useColorScheme } from 'nativewind'; // Use o hook do nativewind para o tema
@@ -17,12 +18,7 @@ SplashScreen.preventAutoHideAsync();
 const queryClient = new QueryClient();
 
 export default function RootLayout() {
-  const [loaded, error] = useFonts({
-    // Adicionando as fontes do seu projeto Master-Sheet
-    Cinzel: require('../assets/fonts/Cinzel-VariableFont_wght.ttf'), // Ajuste o caminho/nome se necessário
-    Lato: require('../assets/fonts/Lato-Regular.ttf'),
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
+  const [loaded, error] = useFonts(fontAssets);
 
   useEffect(() => {
     if (error) throw error;

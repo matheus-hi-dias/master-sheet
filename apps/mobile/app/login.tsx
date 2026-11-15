@@ -9,9 +9,9 @@ import {
   TextInput,
   Alert,
 } from 'react-native';
-import { GemLogo } from '../components/GemLogo';
+import { GemLogo } from '@master-sheet/ui/gem-logo';
 import { Input } from '../components/Input';
-import { Button } from '../components/Button';
+import { Button } from '@master-sheet/ui/button';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Swords, Scroll } from 'lucide-react-native';
 import { useMutation } from '@tanstack/react-query';

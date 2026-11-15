@@ -7,7 +7,7 @@ import {
   type FieldDefinition,
 } from '@master-sheet/contracts';
 import { NumberStepper } from './NumberStepper';
-import { DotTracker } from './DotTracker';
+import { DotTracker } from '@master-sheet/ui/dot-tracker';
 import { RepeaterList } from './RepeaterList';
 
 interface FieldInputProps {

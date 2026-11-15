@@ -28,6 +28,7 @@ import { fetchTemplates } from '../../services/templates';
 import { DEFAULT_SYSTEMS, SYSTEM_LABELS } from '../../types/template';
 import type { TemplateSummary } from '../../types/template';
 import { TemplatePreviewBottomSheet } from '../../components/TemplatePreviewBottomSheet';
+import { Tag } from '@master-sheet/ui/tag';
 
 const SYSTEM_CHIPS: { key: string; label: string; value: string }[] = [
   { key: 'all', label: 'Todos', value: '' },
@@ -181,14 +182,9 @@ export default function TemplatesScreen() {
         {item.tags.length > 0 && (
           <View className="flex-row flex-wrap gap-1.5 mb-3">
             {item.tags.map((tag) => (
-              <View
-                key={tag.id}
-                className="bg-bg-panel px-2 py-0.5 rounded border border-border"
-              >
-                <Text className="text-[9px] text-gold uppercase tracking-wider font-bold">
-                  {tag.name}
-                </Text>
-              </View>
+              <Tag key={tag.id} variant="display">
+                {tag.name}
+              </Tag>
             ))}
           </View>
         )}

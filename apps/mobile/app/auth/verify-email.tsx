@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, ActivityIndicator } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Button } from '@/components/Button';
+import { Button } from '@master-sheet/ui/button';
 import { api, getApiErrorMessage } from '@/services/api';
 
 export default function VerifyEmailScreen() {

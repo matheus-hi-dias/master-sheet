@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Button } from '../components/Button';
+import { Button } from '@master-sheet/ui/button';
 
 export default function EmailVerifiedScreen() {
   const { status, message } = useLocalSearchParams<{

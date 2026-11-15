@@ -2,7 +2,7 @@ import React from 'react';
 import { View, ActivityIndicator, Text } from 'react-native';
 import { Redirect } from 'expo-router';
 import { useAuth } from '../context/AuthContext';
-import { GemLogo } from '../components/GemLogo';
+import { GemLogo } from '@master-sheet/ui/gem-logo';
 
 export default function Index() {
   const { isAuthenticated, isLoading } = useAuth();
