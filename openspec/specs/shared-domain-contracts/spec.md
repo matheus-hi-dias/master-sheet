@@ -5,6 +5,7 @@
 Defines the canonical, platform-neutral domain packages shared by the API, web, and mobile apps: the single source of truth for template, sheet, tag, and envelope schemas, their runtime validation and normalized issues, canonical field defaults and coercion helpers, and the enforced workspace dependency direction.
 
 ## Requirements
+
 ### Requirement: Single Source of Truth for Domain Schemas
 
 Template structure definitions, sheet data payloads, tag shapes, shared enums (systems and field types), and API request/response envelopes SHALL be defined exactly once in a shared workspace package. Applications SHALL NOT declare parallel interfaces, types, or validators for the same domain shapes.
@@ -97,4 +98,3 @@ Request and response envelopes for template, sheet, tag, and auth endpoints SHAL
 
 - **WHEN** an API response envelope field is renamed or removed in the shared contract
 - **THEN** web and mobile typechecks fail at the affected call sites instead of failing at runtime
-

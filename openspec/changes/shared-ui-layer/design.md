@@ -2,19 +2,19 @@
 
 Verified duplication (component-level diff):
 
-| Concern | Web | Mobile | Shareable |
-|---|---|---|---|
-| Tokens | `apps/web/src/index.css:4-24` (`@theme`) | `apps/mobile/global.css:8-34` + `tailwind.config.js:10-24` | Yes — data only |
-| Fonts | `--font-display`/`--font-body` declared, never loaded | `assets/fonts/*.ttf` + `useFonts` (`app/_layout.tsx:20`) | Yes — assets + manifest |
-| GemLogo | inline SVG, `GemLogo.tsx:11` | `react-native-svg`, `GemLogo.tsx:32`, same points | Yes — platform split |
-| Button | `<button>` + `cn` | `<Pressable>` + `<Text>` | Yes — platform split |
-| Tag | `components/ui/Tag.tsx` | inline pill (`app/(tabs)/templates.tsx:184`) | Yes — platform split |
-| DotTracker | DOM buttons, same `setDot` (`:14`) | Pressable, same `setDot` (`:14`) | Yes — platform split |
-| Input | `<input>`, password/tooltip | `<TextInput>`, no parity | Later — contract only |
-| FieldInput / DynamicFormMapper | RHF `register` | controlled `value/onChange` | No |
-| FormulaField / Repeater / NumberStepper | per-platform | per-platform | No |
-| Layouts, Toast | per-platform | per-platform | No |
-| Icons | `lucide-react` | `lucide-react-native` | Optional — not in scope |
+| Concern                                 | Web                                                   | Mobile                                                     | Shareable               |
+| --------------------------------------- | ----------------------------------------------------- | ---------------------------------------------------------- | ----------------------- |
+| Tokens                                  | `apps/web/src/index.css:4-24` (`@theme`)              | `apps/mobile/global.css:8-34` + `tailwind.config.js:10-24` | Yes — data only         |
+| Fonts                                   | `--font-display`/`--font-body` declared, never loaded | `assets/fonts/*.ttf` + `useFonts` (`app/_layout.tsx:20`)   | Yes — assets + manifest |
+| GemLogo                                 | inline SVG, `GemLogo.tsx:11`                          | `react-native-svg`, `GemLogo.tsx:32`, same points          | Yes — platform split    |
+| Button                                  | `<button>` + `cn`                                     | `<Pressable>` + `<Text>`                                   | Yes — platform split    |
+| Tag                                     | `components/ui/Tag.tsx`                               | inline pill (`app/(tabs)/templates.tsx:184`)               | Yes — platform split    |
+| DotTracker                              | DOM buttons, same `setDot` (`:14`)                    | Pressable, same `setDot` (`:14`)                           | Yes — platform split    |
+| Input                                   | `<input>`, password/tooltip                           | `<TextInput>`, no parity                                   | Later — contract only   |
+| FieldInput / DynamicFormMapper          | RHF `register`                                        | controlled `value/onChange`                                | No                      |
+| FormulaField / Repeater / NumberStepper | per-platform                                          | per-platform                                               | No                      |
+| Layouts, Toast                          | per-platform                                          | per-platform                                               | No                      |
+| Icons                                   | `lucide-react`                                        | `lucide-react-native`                                      | Optional — not in scope |
 
 Constraints: web is a Tailwind 4 DOM SPA (Vite); mobile is NativeWind + Expo/Metro; `apps/mobile/.npmrc` uses hoisted node_modules for Metro; both already share the Tailwind class vocabulary but differ in interaction variants (`hover:` vs `active:`) and layout defaults.
 
@@ -81,7 +81,7 @@ Rejected alternative: convert web to `react-native-web` and share RN components 
 - TypeScript resolves `types`, so both platforms are checked against one prop interface.
 - Surface this with a single documented import: `import { Button } from '@master-sheet/ui/button'`.
 
-Alternative considered: `.web.tsx`/`.native.tsx` inside the *app* and a Vite `resolve.extensions` override. Rejected because it duplicates the component in both apps, which is exactly the problem being solved.
+Alternative considered: `.web.tsx`/`.native.tsx` inside the _app_ and a Vite `resolve.extensions` override. Rejected because it duplicates the component in both apps, which is exactly the problem being solved.
 
 ### D4 — Phased primitive adoption
 

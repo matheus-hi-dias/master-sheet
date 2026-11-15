@@ -3,7 +3,9 @@
 ## Purpose
 
 Defines the dynamic template/sheet JSON duality, partial `Sheet.data` merge semantics, read-time calculated fields, structural validation parity between backend and clients, and the editing behavior expected of sheet editors (autosave, optimistic updates, rollback).
+
 ## Requirements
+
 ### Requirement: Dynamic JSON Duality (Template vs Sheet)
 
 A `Template.structure` (JSONB) defines the layout, sectioning, field types, and formulas of a character sheet. A `Sheet.data` (JSONB) stores the values a player actually enters. The system MUST derive dynamic UIs and validation from `structure` and persist only `data`.
@@ -67,4 +69,3 @@ Edits MUST apply optimistically in the UI before the API responds. When the requ
 
 - **WHEN** a user edits a field and the subsequent request fails
 - **THEN** the UI reverts to the previously confirmed server data and surfaces an error notification.
-
