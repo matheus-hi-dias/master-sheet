@@ -39,7 +39,7 @@ Semantic groups are defined in `packages/design-tokens/src/tokens.ts` and expose
 
 Both themes are generated from the same source: dark values are the `:root` defaults and light values are `.light` overrides. Apps must reference the variables or generated utilities, never literal hex/rgb values.
 
-The web theme is emitted as `@theme static`, so **every** token is always present as a CSS custom property even when no utility class references it (`--color-success`, `--radius-pill`, `--background-image-aura`, …). That keeps non-utility consumers such as `fill="var(--color-gold-tint)"` working, and it is what `check-token-drift` assumes.
+The web theme is emitted as `@theme static`, so **every** token is always present as a CSS custom property even when no utility class references it (`--color-success`, `--radius-pill`, `--background-image-aura`, …). That keeps non-utility consumers such as `fill="var(--color-gold-tint)"` working and honours the design-tokens contract that the full token surface stays available through `:root.light` overrides.
 
 Because Tailwind/NativeWind only generate classes for files they scan, both apps must list the shared package explicitly:
 
