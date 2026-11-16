@@ -1,4 +1,5 @@
 import { View } from 'react-native';
+import { colors } from '@/lib/colors';
 
 export function AuraBackground() {
   return (
@@ -13,7 +14,7 @@ export function AuraBackground() {
       <View
         className="absolute w-[600px] h-[600px] rounded-full bg-gold/10"
         style={{
-          shadowColor: '#d4af37',
+          shadowColor: colors.gold,
           shadowOffset: { width: 0, height: 0 },
           shadowOpacity: 0.5,
           shadowRadius: 100,

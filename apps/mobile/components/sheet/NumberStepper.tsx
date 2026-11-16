@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { Minus, Plus } from 'lucide-react-native';
+import { colors } from '@/lib/colors';
 
 interface NumberStepperProps {
   value: number;
@@ -47,7 +48,7 @@ export function NumberStepper({
         className="w-12 h-11 items-center justify-center active:bg-gold/10 disabled:opacity-30"
         hitSlop={4}
       >
-        <Minus size={16} color="#D4AF37" />
+        <Minus size={16} color={colors.gold} />
       </Pressable>
 
       <Text className="font-display font-bold text-lg text-gold tabular-nums">
@@ -60,7 +61,7 @@ export function NumberStepper({
         className="w-12 h-11 items-center justify-center active:bg-gold/10 disabled:opacity-30"
         hitSlop={4}
       >
-        <Plus size={16} color="#D4AF37" />
+        <Plus size={16} color={colors.gold} />
       </Pressable>
     </View>
   );

@@ -1,51 +1,19 @@
 @import 'tailwindcss';
-
-@theme {
-  --font-display: 'Cinzel', serif;
-  --font-body: 'Lato', sans-serif;
-
-  --color-bg-app: #121212;
-  --color-bg-panel: #1a1a1b;
-  --color-bg-card: #242424;
-  --color-text-main: #e0e0e0;
-  --color-text-muted: #888888;
-  --color-gold: #d4af37;
-  --color-gold-dim: #9a7d26;
-  --color-border: #3d3d3d;
-  --color-danger: #c0392b;
-  --color-success: #27ae60;
-  --color-warning: #e67e22;
-
-  --radius-card: 8px;
-  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.5);
-  --background-image-aura: radial-gradient(
-    circle,
-    var(--color-gold) 0%,
-    transparent 70%
-  );
-}
+@import '@master-sheet/design-tokens/web-theme.css';
+@import '@master-sheet/design-tokens/fonts.css';
+/* Tailwind v4 does not scan workspace packages outside the app root; without this the
+   utilities used only by @master-sheet/ui (e.g. text-on-gold, shadow-tag-glow) are never emitted. */
+@source '../../../packages/ui/src';
 
 @custom-variant light (&:is(.light, .light *));
 
 @layer base {
-  :root.light {
-    --color-bg-app: #faf9f6;
-    --color-bg-panel: #f0efea;
-    --color-bg-card: #ffffff;
-    --color-text-main: #2d3436;
-    --color-text-muted: #636e72;
-    --color-gold: #b8860b;
-    --color-gold-dim: #8b6914;
-    --color-border: #dcd7c9;
-    --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.1);
-  }
-
   body {
     font-family: var(--font-body);
     background-color: var(--color-bg-app);
     color: var(--color-text-main);
     transition-property: background-color, color, border-color;
-    transition-duration: 300ms;
+    transition-duration: var(--motion-duration-theme);
   }
 
   input:-webkit-autofill,
@@ -70,7 +38,8 @@
 }
 
 .animate-dice-in {
-  animation: dice-in 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  animation: dice-in var(--motion-duration-dice) var(--motion-easing-dice)
+    forwards;
 }
 
 @keyframes drawer-in {
@@ -85,5 +54,6 @@
 }
 
 .animate-drawer-in {
-  animation: drawer-in 0.3s cubic-bezier(0.28, 0.75, 0.25, 1) forwards;
+  animation: drawer-in var(--motion-duration-drawer) var(--motion-easing-drawer)
+    forwards;
 }

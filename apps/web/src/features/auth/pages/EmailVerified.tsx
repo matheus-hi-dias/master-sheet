@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 import { api } from '../../../services/api';
-import { Button } from '../../../components/ui/Button';
+import { Button } from '@master-sheet/ui/button';
 
 function useQuery() {
   const { search } = useLocation();

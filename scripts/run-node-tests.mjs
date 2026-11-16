@@ -20,7 +20,7 @@ function collect(directory) {
       continue;
     }
 
-    if (entry.isFile() && entry.name.endsWith('.test.js')) {
+    if (entry.isFile() && /\.test\.(?:js|mjs)$/.test(entry.name)) {
       testFiles.push(path);
     }
   }

@@ -21,6 +21,7 @@ import { structureDefaultValues, toNumber } from '@master-sheet/contracts';
 import { evaluateFormula } from '@master-sheet/sheet-engine/formula';
 import { validateSheetData } from '@master-sheet/sheet-engine/validation';
 import { DynamicSheetRenderer } from '@/components/sheet/DynamicSheetRenderer';
+import { colors } from '@/lib/colors';
 
 interface SheetData {
   id: string;
@@ -287,7 +288,7 @@ export default function SheetViewScreen() {
 
         {isLoading ? (
           <View className="flex-1 items-center justify-center">
-            <ActivityIndicator size="large" color="#D4AF37" />
+            <ActivityIndicator size="large" color={colors.gold} />
           </View>
         ) : isError ? (
           <View className="flex-1 items-center justify-center p-6">
@@ -306,7 +307,7 @@ export default function SheetViewScreen() {
           </View>
         ) : tabs.length === 0 ? (
           <View className="flex-1 items-center justify-center p-6">
-            <AlertTriangle size={40} color="#D4AF37" className="mb-3" />
+            <AlertTriangle size={40} color={colors.gold} className="mb-3" />
             <Text className="font-display font-bold text-base text-text-main text-center mb-1">
               Modelo sem estrutura
             </Text>
@@ -367,7 +368,7 @@ export default function SheetViewScreen() {
             onPress={() => setRollOpen(true)}
             className="absolute bottom-6 right-6 w-16 h-16 rounded-full bg-gold items-center justify-center shadow-card border-2 border-gold-dim active:scale-95 transition-all"
           >
-            <Dices size={28} color="#121212" />
+            <Dices size={28} color={colors.onGold} />
           </Pressable>
         )}
 
@@ -388,7 +389,7 @@ export default function SheetViewScreen() {
                 <View className="w-10 h-1 rounded-full bg-border" />
               </View>
               <View className="flex-row items-center px-5 pb-3">
-                <Dices size={16} color="#D4AF37" />
+                <Dices size={16} color={colors.gold} />
                 <Text className="ml-2 font-display font-bold text-sm text-text-main uppercase tracking-widest">
                   Roletar Atributo
                 </Text>
@@ -397,7 +398,7 @@ export default function SheetViewScreen() {
                   className="ml-auto p-1"
                   hitSlop={8}
                 >
-                  <X size={18} color="#888888" />
+                  <X size={18} color={colors.textMuted} />
                 </Pressable>
               </View>
 

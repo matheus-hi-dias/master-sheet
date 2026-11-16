@@ -17,7 +17,21 @@ const errors = [];
 const APP_TASKS = ['lint', 'check-types', 'test'];
 const FULL_TASKS = [...APP_TASKS, 'build'];
 const MOBILE_APP = 'apps/mobile';
-const SHARED_PACKAGES = ['packages/contracts', 'packages/sheet-engine'];
+const SHARED_PACKAGES = [
+  'packages/contracts',
+  'packages/sheet-engine',
+  'packages/design-tokens',
+  'packages/ui',
+];
+const SHARED_PACKAGE_ALLOWED_WORKSPACE_DEPS = {
+  'packages/contracts': [],
+  'packages/sheet-engine': ['@master-sheet/contracts'],
+  'packages/design-tokens': [],
+  'packages/ui': ['@master-sheet/design-tokens'],
+};
+const SHARED_PACKAGE_ALLOWED_PLATFORM_IMPORTS = {
+  'packages/ui': ['react-native', 'react-native-svg'],
+};
 const APP_PACKAGES = {
   'apps/api': '@master-sheet/api',
   'apps/mobile': '@master-sheet/mobile',
@@ -39,7 +53,14 @@ const SKIPPED_DIRECTORIES = new Set([
   '.expo',
   '.turbo',
 ]);
-const FORBIDDEN_SHARED_IMPORTS = ['fs', 'path', 'os', 'crypto', 'react-native'];
+const FORBIDDEN_SHARED_IMPORTS = [
+  'fs',
+  'path',
+  'os',
+  'crypto',
+  'react-native',
+  'react-native-svg',
+];
 const IMPORT_RE = /(?:from\s+|import\s*\(\s*|require\s*\(\s*)['"]([^'"]+)['"]/g;
 
 function addError(message) {
@@ -242,11 +263,12 @@ function isInside(parent, target) {
   return path !== '' && !path.startsWith('..') && !isAbsolute(path);
 }
 
-function isForbiddenSharedImport(specifier) {
+function isForbiddenSharedImport(specifier, allowedPlatformImports = []) {
   return (
     specifier.startsWith('node:') ||
     specifier.startsWith('@nestjs/') ||
-    FORBIDDEN_SHARED_IMPORTS.includes(specifier)
+    (FORBIDDEN_SHARED_IMPORTS.includes(specifier) &&
+      !allowedPlatformImports.includes(specifier))
   );
 }
 
@@ -269,22 +291,24 @@ function verifyBoundaries(dir) {
   const sourceFiles = listSourceFiles(join(dir, 'src'));
 
   if (SHARED_PACKAGES.includes(workspacePath)) {
-    const allowedWorkspacePackage =
-      workspacePath === 'packages/sheet-engine'
-        ? '@master-sheet/contracts'
-        : null;
-    const dependencies = {
-      ...(manifest.dependencies ?? {}),
-      ...(manifest.devDependencies ?? {}),
-    };
+    const allowedWorkspacePackages =
+      SHARED_PACKAGE_ALLOWED_WORKSPACE_DEPS[workspacePath] ?? [];
+    const allowedPlatformImports =
+      SHARED_PACKAGE_ALLOWED_PLATFORM_IMPORTS[workspacePath] ?? [];
+    const runtimeDependencies = manifest.dependencies ?? {};
 
-    if (
-      workspacePath === 'packages/contracts' &&
-      '@master-sheet/sheet-engine' in dependencies
-    ) {
-      addError(
-        `${workspacePath}: contracts must not depend on the sheet engine.`,
-      );
+    for (const dependency of Object.keys(runtimeDependencies)) {
+      if (!dependency.startsWith('@master-sheet/')) {
+        continue;
+      }
+
+      const isAllowed = allowedWorkspacePackages.includes(dependency);
+
+      if (!isAllowed) {
+        addError(
+          `${workspacePath}: shared package must not depend on workspace package "${dependency}".`,
+        );
+      }
     }
 
     for (const file of sourceFiles) {
@@ -298,7 +322,7 @@ function verifyBoundaries(dir) {
       }
 
       for (const specifier of readImports(file)) {
-        if (isForbiddenSharedImport(specifier)) {
+        if (isForbiddenSharedImport(specifier, allowedPlatformImports)) {
           addError(
             `${filePath}: shared packages must not import platform module "${specifier}".`,
           );
@@ -306,10 +330,11 @@ function verifyBoundaries(dir) {
         }
 
         if (specifier.startsWith('@master-sheet/')) {
-          const isAllowed =
-            allowedWorkspacePackage !== null &&
-            (specifier === allowedWorkspacePackage ||
-              specifier.startsWith(`${allowedWorkspacePackage}/`));
+          const isAllowed = allowedWorkspacePackages.some(
+            (packageName) =>
+              specifier === packageName ||
+              specifier.startsWith(`${packageName}/`),
+          );
 
           if (!isAllowed) {
             addError(

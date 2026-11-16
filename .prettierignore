@@ -6,3 +6,4 @@ coverage
 pnpm-lock.yaml
 apps/api/src/generated
 apps/mobile/expo-env.d.ts
+packages/design-tokens/generated

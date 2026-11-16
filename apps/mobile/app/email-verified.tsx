@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Button } from '../components/Button';
+import { Button } from '@master-sheet/ui/button';
 
 export default function EmailVerifiedScreen() {
   const { status, message } = useLocalSearchParams<{
@@ -13,15 +13,15 @@ export default function EmailVerifiedScreen() {
   const isSuccess = status === 'success';
 
   return (
-    <View className="flex-1 items-center justify-center bg-[#121212] p-6">
-      <View className="w-full max-w-sm rounded-lg border border-[#3D3D3D] bg-[#242424] p-8 items-center">
-        <Text className="text-2xl font-bold text-[#E0E0E0] mb-4">
+    <View className="flex-1 items-center justify-center bg-bg-app p-6">
+      <View className="w-full max-w-sm rounded-lg border border-border bg-bg-card p-8 items-center">
+        <Text className="text-2xl font-bold text-text-main mb-4">
           Verificação de E-mail
         </Text>
 
         {isSuccess ? (
           <>
-            <Text className="text-[#E0E0E0] text-center mb-6">
+            <Text className="text-text-main text-center mb-6">
               Seu e-mail foi verificado com sucesso! Agora você pode acessar sua
               conta.
             </Text>
@@ -35,11 +35,11 @@ export default function EmailVerifiedScreen() {
               Status: {status}
             </Text>
             {message ? (
-              <Text className="text-[#888888] text-center mb-6 text-sm">
+              <Text className="text-text-muted text-center mb-6 text-sm">
                 {message}
               </Text>
             ) : null}
-            <Text className="text-[#E0E0E0] text-center mb-6">
+            <Text className="text-text-main text-center mb-6">
               Não foi possível verificar seu e-mail. O link pode ter expirado ou
               ser inválido.
             </Text>

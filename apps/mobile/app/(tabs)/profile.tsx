@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Alert, ScrollView } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
-import { Button } from '../../components/Button';
+import { Button } from '@master-sheet/ui/button';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as SecureStore from 'expo-secure-store';
 import { jwtDecode } from 'jwt-decode';

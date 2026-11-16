@@ -27,6 +27,7 @@ import {
   type DepCandidate,
 } from '../../lib/builder/structureOps';
 import type { FieldDefinition, FieldType } from '../../types/template';
+import { colors } from '@/lib/colors';
 
 interface FieldInspectorSheetProps {
   field: FieldDefinition | null;
@@ -84,7 +85,7 @@ function TextField({
         value={value}
         onChangeText={onChange}
         placeholder={placeholder}
-        placeholderTextColor="#888888"
+        placeholderTextColor={colors.textMuted}
         multiline={multiline}
         textAlignVertical={multiline ? 'top' : undefined}
         className={`${defaultInput} ${multiline ? 'min-h-[72px]' : ''} ${
@@ -113,7 +114,7 @@ function NumberField({
           onChange(text === '' ? undefined : Number(text))
         }
         keyboardType="numeric"
-        placeholderTextColor="#888888"
+        placeholderTextColor={colors.textMuted}
         className={defaultInput}
       />
     </View>
@@ -146,7 +147,7 @@ function TypeChips({
           >
             <Text
               className={`text-[10px] font-bold uppercase tracking-wider ${
-                active ? 'text-[#121212]' : 'text-text-muted'
+                active ? 'text-on-gold' : 'text-text-muted'
               }`}
             >
               {type}
@@ -211,7 +212,7 @@ export function FieldInspectorSheet({
                   hitSlop={8}
                   className="p-1 active:opacity-60"
                 >
-                  <ChevronLeft size={20} color="#888888" />
+                  <ChevronLeft size={20} color={colors.textMuted} />
                 </Pressable>
               ) : null}
               <Text className="font-display font-bold text-base text-text-main">
@@ -228,7 +229,7 @@ export function FieldInspectorSheet({
               className="p-1.5 active:opacity-60"
               hitSlop={8}
             >
-              <X size={20} color="#888888" />
+              <X size={20} color={colors.textMuted} />
             </Pressable>
           </View>
 
@@ -288,7 +289,7 @@ export function FieldInspectorSheet({
                   <TextInput
                     value={field.label}
                     onChangeText={(label) => patch({ label })}
-                    placeholderTextColor="#888888"
+                    placeholderTextColor={colors.textMuted}
                     className={defaultInput}
                   />
                 </View>
@@ -314,7 +315,7 @@ export function FieldInspectorSheet({
                     <TextInput
                       value={field.id}
                       onChangeText={(id) => patch({ id })}
-                      placeholderTextColor="#888888"
+                      placeholderTextColor={colors.textMuted}
                       autoCapitalize="none"
                       autoCorrect={false}
                       className={`${defaultInput} font-mono flex-1`}
@@ -324,7 +325,7 @@ export function FieldInspectorSheet({
                       hitSlop={8}
                       className="px-3 justify-center border border-border rounded-card active:bg-gold/10"
                     >
-                      <Sparkles size={15} color="#D4AF37" />
+                      <Sparkles size={15} color={colors.gold} />
                     </Pressable>
                   </View>
                 </View>
@@ -433,7 +434,7 @@ export function FieldInspectorSheet({
                       }`}
                     >
                       <View
-                        className={`w-5 h-5 rounded-full bg-[#121212] ${
+                        className={`w-5 h-5 rounded-full bg-bg-app ${
                           field.defaultValue ? 'self-end' : 'self-start'
                         }`}
                       />
@@ -482,7 +483,7 @@ function FormulaConfig({
             patch({ expression, dependencies: deps });
           }}
           placeholder="floor((forca + destreza) / 2)"
-          placeholderTextColor="#888888"
+          placeholderTextColor={colors.textMuted}
           multiline
           textAlignVertical="top"
           autoCapitalize="none"
@@ -637,7 +638,7 @@ function RepeaterConfig({
             className="px-3 py-1.5 rounded-card border border-gold active:bg-gold/10"
             hitSlop={8}
           >
-            <Plus size={14} color="#D4AF37" />
+            <Plus size={14} color={colors.gold} />
           </Pressable>
         </View>
         <Text className="text-[11px] text-text-muted mt-2">
@@ -734,7 +735,7 @@ function ChildConfig({
           }`}
         >
           <View
-            className={`w-5 h-5 rounded-full bg-[#121212] ${
+            className={`w-5 h-5 rounded-full bg-bg-app ${
               field.defaultValue ? 'self-end' : 'self-start'
             }`}
           />
@@ -792,7 +793,7 @@ function SelectConfig({
                 })
               }
               placeholder="Rótulo"
-              placeholderTextColor="#888888"
+              placeholderTextColor={colors.textMuted}
               className={`${defaultInput} flex-1`}
             />
             <TextInput
@@ -805,7 +806,7 @@ function SelectConfig({
                 })
               }
               placeholder="Valor"
-              placeholderTextColor="#888888"
+              placeholderTextColor={colors.textMuted}
               autoCapitalize="none"
               className={`${defaultInput} flex-1`}
             />
@@ -816,7 +817,7 @@ function SelectConfig({
               className="px-2 justify-center active:opacity-60"
               hitSlop={6}
             >
-              <Trash2 size={15} color="#888888" />
+              <Trash2 size={15} color={colors.textMuted} />
             </Pressable>
           </View>
         ))}
@@ -826,14 +827,14 @@ function SelectConfig({
             value={newOption.label}
             onChangeText={(label) => setNewOption({ ...newOption, label })}
             placeholder="Novo rótulo"
-            placeholderTextColor="#888888"
+            placeholderTextColor={colors.textMuted}
             className={`${defaultInput} flex-1`}
           />
           <TextInput
             value={newOption.value}
             onChangeText={(value) => setNewOption({ ...newOption, value })}
             placeholder="Valor"
-            placeholderTextColor="#888888"
+            placeholderTextColor={colors.textMuted}
             autoCapitalize="none"
             className={`${defaultInput} flex-1`}
           />
@@ -846,7 +847,7 @@ function SelectConfig({
             className="px-3 border border-gold rounded-card justify-center active:bg-gold/10"
             hitSlop={6}
           >
-            <Plus size={15} color="#D4AF37" />
+            <Plus size={15} color={colors.gold} />
           </Pressable>
         </View>
       </View>

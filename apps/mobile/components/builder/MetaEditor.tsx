@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, TextInput, Pressable } from 'react-native';
 import { DEFAULT_SYSTEMS, SYSTEM_LABELS } from '../../types/template';
 import type { BuilderDraft } from '../../hooks/useBuilder';
+import { colors } from '@/lib/colors';
 
 const inputClass =
   'bg-bg-panel border border-border rounded-card px-3 py-2.5 text-text-main font-body text-sm';
@@ -50,7 +51,7 @@ export function MetaEditor({
           value={draft.name}
           onChangeText={(value) => updateMeta('name', value)}
           placeholder="Nome do modelo"
-          placeholderTextColor="#888888"
+          placeholderTextColor={colors.textMuted}
           className={inputClass}
         />
       </View>
@@ -61,7 +62,7 @@ export function MetaEditor({
           value={draft.description}
           onChangeText={(value) => updateMeta('description', value)}
           placeholder="Breve descrição das regras"
-          placeholderTextColor="#888888"
+          placeholderTextColor={colors.textMuted}
           multiline
           numberOfLines={3}
           textAlignVertical="top"
@@ -84,7 +85,7 @@ export function MetaEditor({
               >
                 <Text
                   className={`text-[10px] font-bold uppercase tracking-wider ${
-                    active ? 'text-[#121212]' : 'text-text-muted'
+                    active ? 'text-on-gold' : 'text-text-muted'
                   }`}
                 >
                   {SYSTEM_LABELS[system] ?? system}
@@ -109,7 +110,7 @@ export function MetaEditor({
             )
           }
           placeholder="ex.: d&d, fantasia, grupo"
-          placeholderTextColor="#888888"
+          placeholderTextColor={colors.textMuted}
           autoCapitalize="none"
           className={inputClass}
         />
@@ -128,7 +129,7 @@ export function MetaEditor({
           }`}
         >
           <View
-            className={`w-5 h-5 rounded-full bg-[#121212] ${
+            className={`w-5 h-5 rounded-full bg-bg-app ${
               draft.isPublic ? 'self-end' : 'self-start'
             }`}
           />

@@ -32,6 +32,30 @@ jobs:
         env:
           NODE_ENV: ${{ matrix.task == 'test' && 'test' || 'production' }}
 
+      - name: Assert web bundle has no React Native modules
+        if: matrix.task == 'build'
+        run: pnpm check:web-bundle
+
+  design-system:
+    name: Design system / tokens and primitives
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup workspace
+        uses: ./.github/actions/setup
+
+      - name: Verify generated tokens are fresh
+        run: pnpm tokens:check
+
+      - name: Check app styles for literal token values
+        run: pnpm check:token-drift
+
+      - name: Check shared primitives have no local duplicates
+        run: pnpm check:shared-primitives
+
   format:
     name: Format / prettier
     runs-on: ubuntu-latest

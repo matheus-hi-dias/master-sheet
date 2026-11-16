@@ -12,6 +12,7 @@ import {
   Trash2,
   ChevronRight,
 } from 'lucide-react-native';
+import { colors } from '@/lib/colors';
 
 interface BuilderRowProps {
   label: React.ReactNode;
@@ -57,7 +58,7 @@ export function BuilderRow({
       </Pressable>
 
       <View className="flex-row items-center px-1.5">
-        {onPress ? <ChevronRight size={16} color="#888888" /> : null}
+        {onPress ? <ChevronRight size={16} color={colors.textMuted} /> : null}
         {onUp ? (
           <Pressable
             onPress={onUp}
@@ -65,7 +66,7 @@ export function BuilderRow({
             hitSlop={6}
             className={`px-1.5 py-2 ${isFirst ? 'opacity-25' : 'active:opacity-60'}`}
           >
-            <ChevronUp size={16} color="#D4AF37" />
+            <ChevronUp size={16} color={colors.gold} />
           </Pressable>
         ) : null}
         {onDown ? (
@@ -75,7 +76,7 @@ export function BuilderRow({
             hitSlop={6}
             className={`px-1.5 py-2 ${isLast ? 'opacity-25' : 'active:opacity-60'}`}
           >
-            <ChevronDown size={16} color="#D4AF37" />
+            <ChevronDown size={16} color={colors.gold} />
           </Pressable>
         ) : null}
         {onDelete ? (

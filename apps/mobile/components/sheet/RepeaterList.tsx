@@ -9,7 +9,8 @@ import {
   type FieldDefinition,
 } from '@master-sheet/contracts';
 import { NumberStepper } from './NumberStepper';
-import { DotTracker } from './DotTracker';
+import { DotTracker } from '@master-sheet/ui/dot-tracker';
+import { colors } from '@/lib/colors';
 
 interface RepeaterListProps {
   items: Record<string, unknown>[];
@@ -61,7 +62,7 @@ function ItemField({
           value={toStringValue(value)}
           onChangeText={onValue}
           placeholder={field.placeholder}
-          placeholderTextColor="#888888"
+          placeholderTextColor={colors.textMuted}
           className="bg-bg-panel border border-border rounded-card px-3 py-2.5 text-text-main font-body text-sm"
         />
       );
@@ -71,7 +72,7 @@ function ItemField({
           value={toStringValue(value)}
           onChangeText={onValue}
           placeholder={field.placeholder}
-          placeholderTextColor="#888888"
+          placeholderTextColor={colors.textMuted}
           multiline
           numberOfLines={2}
           className="bg-bg-panel border border-border rounded-card px-3 py-2.5 text-text-main font-body text-sm min-h-[60px]"
@@ -100,7 +101,7 @@ function ItemField({
               >
                 <Text
                   className={`text-[10px] font-bold uppercase tracking-wider ${
-                    active ? 'text-[#121212]' : 'text-text-muted'
+                    active ? 'text-on-gold' : 'text-text-muted'
                   }`}
                 >
                   {option.label}
@@ -123,7 +124,7 @@ function ItemField({
             }`}
           >
             {value ? (
-              <Text className="text-[#121212] font-black text-sm">✓</Text>
+              <Text className="text-on-gold font-black text-sm">✓</Text>
             ) : null}
           </View>
         </Pressable>
@@ -214,7 +215,7 @@ export function RepeaterList({
         onPress={addItem}
         className="flex-row items-center justify-center gap-2 py-2.5 border border-dashed border-border rounded-card active:border-gold/60"
       >
-        <Plus size={14} color="#D4AF37" />
+        <Plus size={14} color={colors.gold} />
         <Text className="text-[10px] font-bold uppercase tracking-widest text-gold">
           Adicionar item
         </Text>

@@ -1,0 +1,48 @@
+{
+  "name": "@master-sheet/design-tokens",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Single source of truth for Master-Sheet visual tokens, themes, fonts and generated platform artifacts.",
+  "main": "./generated/tokens.ts",
+  "types": "./generated/tokens.ts",
+  "files": [
+    "dist",
+    "fonts",
+    "generated"
+  ],
+  "exports": {
+    ".": {
+      "types": "./generated/tokens.ts",
+      "default": "./generated/tokens.ts"
+    },
+    "./tokens": {
+      "types": "./generated/tokens.ts",
+      "default": "./generated/tokens.ts"
+    },
+    "./tailwind-preset": "./generated/tailwind-preset.cjs",
+    "./tokens.css": "./generated/tokens.css",
+    "./web-theme.css": "./generated/web-theme.css",
+    "./fonts.css": "./generated/fonts.css",
+    "./fonts": {
+      "types": "./generated/font-manifest.d.ts",
+      "default": "./generated/font-manifest.js"
+    },
+    "./fonts/*": "./fonts/*"
+  },
+  "scripts": {
+    "generate": "tsc -p tsconfig.json && node scripts/generate.mjs",
+    "build": "pnpm generate",
+    "check-types": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint \"src/**/*.ts\"",
+    "test": "pnpm build && node ../../scripts/run-node-tests.mjs test",
+    "check": "tsc -p tsconfig.json && node scripts/generate.mjs --check"
+  },
+  "devDependencies": {
+    "@master-sheet/eslint-config": "workspace:*",
+    "@master-sheet/typescript-config": "workspace:*",
+    "@types/node": "^24.10.1",
+    "eslint": "^9.39.1",
+    "typescript": "5.9.2"
+  }
+}

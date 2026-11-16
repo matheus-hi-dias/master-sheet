@@ -7,7 +7,7 @@ import type {
   RepeaterFieldDefinition,
 } from '@master-sheet/contracts';
 import { buildItemDefaults } from '@master-sheet/contracts';
-import { DotTracker } from './DotTracker';
+import { DotTracker } from '@master-sheet/ui/dot-tracker';
 
 interface RepeaterFieldProps {
   field: RepeaterFieldDefinition;
@@ -83,9 +83,9 @@ function ItemFieldInput({
     case 'dots':
       return (
         <DotTracker
-          initial={(item[field.id] as number | undefined) ?? 0}
+          value={(item[field.id] as number | undefined) ?? 0}
           maxDots={field.maxDots ?? 5}
-          onValue={onChange}
+          onChange={onChange}
         />
       );
     case 'select':

@@ -7,6 +7,7 @@ import {
   structureDefaultValues,
 } from '@master-sheet/contracts';
 import type { TemplateStructure } from '../../types/template';
+import { colors } from '@/lib/colors';
 
 interface PreviewModalProps {
   visible: boolean;
@@ -62,7 +63,7 @@ export function PreviewModal({
 
           <View className="flex-row items-center justify-between px-5 pb-2">
             <View className="flex-row items-center gap-2">
-              <Eye size={16} color="#D4AF37" />
+              <Eye size={16} color={colors.gold} />
               <Text className="font-display font-bold text-base text-text-main">
                 Preview da ficha
               </Text>
@@ -72,7 +73,7 @@ export function PreviewModal({
               className="p-1.5 active:opacity-60"
               hitSlop={8}
             >
-              <X size={20} color="#888888" />
+              <X size={20} color={colors.textMuted} />
             </Pressable>
           </View>
 
@@ -97,7 +98,7 @@ export function PreviewModal({
                     >
                       <Text
                         className={`text-[10px] font-bold uppercase tracking-wider ${
-                          active ? 'text-[#121212]' : 'text-text-muted'
+                          active ? 'text-on-gold' : 'text-text-muted'
                         }`}
                       >
                         {candidate.label}
