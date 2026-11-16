@@ -4,7 +4,7 @@ export type TagVariant = 'filter' | 'display';
 
 export interface TagProps {
   active?: boolean;
-  /** `filter` is the interactive chip; `display` is the compact metadata pill. */
+  /** `filter` is the interactive chip; `display` is the compact, non-interactive metadata pill. */
   variant?: TagVariant;
   className?: string;
   children?: ReactNode;

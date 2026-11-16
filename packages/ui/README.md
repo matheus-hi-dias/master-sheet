@@ -84,6 +84,8 @@ CI instead of shipping unstyled primitives.
 ## Contract rules
 
 - Primitives are controlled: `value` / `onChange`, or `onPress` / `onClick`.
+- `Tag variant="display"` is non-interactive metadata: `onPress` / `onClick` are
+  ignored on both platforms, and it renders without a button role or tab stop.
 - No React Hook Form, React Query, Zustand or application imports.
 - Web form bindings use `<Controller>` in the app; the primitive never imports
   the form library.

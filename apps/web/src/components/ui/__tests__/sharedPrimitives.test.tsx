@@ -50,10 +50,21 @@ describe('shared Tag', () => {
   });
 
   it('renders the display variant as non-interactive metadata', () => {
-    const { container } = render(<Tag variant="display">official</Tag>);
+    const onClick = jest.fn();
+    const { container } = render(
+      <Tag variant="display" onClick={onClick}>
+        official
+      </Tag>,
+    );
+
+    const pill = container.querySelector('span');
 
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
-    expect(container.querySelector('span')).toHaveTextContent('official');
+    expect(pill).toHaveTextContent('official');
+
+    fireEvent.click(pill as HTMLElement);
+
+    expect(onClick).not.toHaveBeenCalled();
   });
 });
 

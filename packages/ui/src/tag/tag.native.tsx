@@ -32,13 +32,13 @@ export function Tag({
   testID,
 }: TagProps) {
   const isDisplay = variant === 'display';
-  const interactive = Boolean(onPress ?? onClick);
+  const isInteractive = !isDisplay && Boolean(onPress ?? onClick);
 
   return (
     <Pressable
-      onPress={onPress ?? onClick}
-      disabled={disabled}
-      accessibilityRole={interactive ? 'button' : 'text'}
+      onPress={isDisplay ? undefined : (onPress ?? onClick)}
+      disabled={isDisplay ? undefined : disabled}
+      accessibilityRole={isInteractive ? 'button' : 'text'}
       accessibilityLabel={accessibilityLabel}
       accessibilityState={isDisplay ? undefined : { selected: active }}
       testID={testID}

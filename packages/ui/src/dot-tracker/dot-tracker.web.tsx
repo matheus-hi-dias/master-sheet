@@ -14,7 +14,7 @@ export function DotTracker({
   return (
     <div
       className={joinClasses(
-        'flex items-center gap-1.5 min-h-[34px]',
+        'flex items-center gap-1.5 min-h-[44px]',
         className,
       )}
       data-testid={testID}
@@ -30,7 +30,7 @@ export function DotTracker({
             aria-pressed={filled}
             onClick={() => onChange(toggleDotValue(current, index, maxDots))}
             className={joinClasses(
-              'w-5 h-5 rounded-full border transition-all duration-[var(--motion-duration-fast)] cursor-pointer',
+              'w-8 h-8 rounded-full border transition-all duration-[var(--motion-duration-fast)] cursor-pointer',
               filled
                 ? 'bg-gold border-gold shadow-dot-glow'
                 : 'bg-bg-panel border-border hover:border-gold',

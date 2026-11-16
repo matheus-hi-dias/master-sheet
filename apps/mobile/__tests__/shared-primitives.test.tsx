@@ -46,8 +46,12 @@ describe('shared native Tag', () => {
     expect(onPress).toHaveBeenCalledTimes(1);
   });
 
-  it('renders the display variant without a selected state', () => {
-    render(<Tag variant="display">official</Tag>);
+  it('renders the display variant as non-interactive metadata', () => {
+    render(
+      <Tag variant="display" onPress={jest.fn()}>
+        official
+      </Tag>,
+    );
 
     expect(screen.getByText('official')).toBeTruthy();
     expect(screen.queryByRole('button', { name: 'official' })).toBeNull();
