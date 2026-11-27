@@ -28,6 +28,8 @@ import { fetchTemplates } from '../../services/templates';
 import { DEFAULT_SYSTEMS, SYSTEM_LABELS } from '../../types/template';
 import type { TemplateSummary } from '../../types/template';
 import { TemplatePreviewBottomSheet } from '../../components/TemplatePreviewBottomSheet';
+import { Tag } from '@master-sheet/ui/tag';
+import { colors } from '@/lib/colors';
 
 const SYSTEM_CHIPS: { key: string; label: string; value: string }[] = [
   { key: 'all', label: 'Todos', value: '' },
@@ -154,7 +156,7 @@ export default function TemplatesScreen() {
               Por {item.author?.name || 'Comunidade'} {isOfficial ? '✦' : ''}
             </Text>
           </View>
-          <FolderOpen size={20} color="#D4AF37" />
+          <FolderOpen size={20} color={colors.gold} />
         </View>
 
         <Text
@@ -181,14 +183,9 @@ export default function TemplatesScreen() {
         {item.tags.length > 0 && (
           <View className="flex-row flex-wrap gap-1.5 mb-3">
             {item.tags.map((tag) => (
-              <View
-                key={tag.id}
-                className="bg-bg-panel px-2 py-0.5 rounded border border-border"
-              >
-                <Text className="text-[9px] text-gold uppercase tracking-wider font-bold">
-                  {tag.name}
-                </Text>
-              </View>
+              <Tag key={tag.id} variant="display">
+                {tag.name}
+              </Tag>
             ))}
           </View>
         )}
@@ -198,14 +195,14 @@ export default function TemplatesScreen() {
             <Text className="text-gold font-bold text-[11px] uppercase tracking-widest">
               Ver modelo
             </Text>
-            <ChevronRight size={14} color="#D4AF37" />
+            <ChevronRight size={14} color={colors.gold} />
           </View>
           {scope === 'mine' ? (
             <Pressable
               onPress={() => router.push(BUILDER_EDIT_HREF(item.id))}
               className="flex-row items-center gap-1.5 px-2.5 py-1.5 rounded-card border border-border active:border-gold/60 active:bg-gold/5"
             >
-              <Pencil size={12} color="#D4AF37" />
+              <Pencil size={12} color={colors.gold} />
               <Text className="text-[10px] font-bold uppercase tracking-wider text-text-muted">
                 Editar
               </Text>
@@ -251,7 +248,7 @@ export default function TemplatesScreen() {
                 >
                   <Text
                     className={`text-[11px] font-bold uppercase tracking-wider ${
-                      active ? 'text-[#121212]' : 'text-text-muted'
+                      active ? 'text-on-gold' : 'text-text-muted'
                     }`}
                   >
                     {option.label}
@@ -266,7 +263,7 @@ export default function TemplatesScreen() {
               hitSlop={8}
               className="p-2 border border-gold/60 rounded-card flex-row items-center gap-1 active:bg-gold/10"
             >
-              <Plus size={14} color="#D4AF37" />
+              <Plus size={14} color={colors.gold} />
               <Text className="text-[10px] font-bold uppercase tracking-wider text-gold">
                 Novo
               </Text>
@@ -276,12 +273,12 @@ export default function TemplatesScreen() {
 
         {/* Busca */}
         <View className="mt-4 flex-row items-center bg-bg-card border border-border rounded-card px-3">
-          <Search size={16} color="#888888" />
+          <Search size={16} color={colors.textMuted} />
           <TextInput
             value={search}
             onChangeText={setSearch}
             placeholder="Buscar modelos..."
-            placeholderTextColor="#888888"
+            placeholderTextColor={colors.textMuted}
             returnKeyType="search"
             className="flex-1 py-2.5 pl-2 text-text-main font-body text-sm"
           />
@@ -308,7 +305,7 @@ export default function TemplatesScreen() {
                 >
                   <Text
                     className={`text-[11px] font-bold uppercase tracking-wider ${
-                      isActive ? 'text-[#121212]' : 'text-text-muted'
+                      isActive ? 'text-on-gold' : 'text-text-muted'
                     }`}
                   >
                     {chip.label}
@@ -323,7 +320,7 @@ export default function TemplatesScreen() {
       {/* Lista */}
       {isLoading ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#D4AF37" />
+          <ActivityIndicator size="large" color={colors.gold} />
         </View>
       ) : isError ? (
         <View className="flex-1 items-center justify-center p-6">
@@ -349,8 +346,8 @@ export default function TemplatesScreen() {
             <RefreshControl
               refreshing={isRefetching}
               onRefresh={refetch}
-              tintColor="#D4AF37"
-              colors={['#D4AF37']}
+              tintColor={colors.gold}
+              colors={[colors.gold]}
             />
           }
           onEndReached={() => {
@@ -360,7 +357,7 @@ export default function TemplatesScreen() {
           ListFooterComponent={
             isFetchingNextPage ? (
               <View className="py-4 items-center">
-                <ActivityIndicator size="small" color="#D4AF37" />
+                <ActivityIndicator size="small" color={colors.gold} />
               </View>
             ) : null
           }
@@ -369,7 +366,7 @@ export default function TemplatesScreen() {
               <View className="flex-1 items-center justify-center py-12">
                 <Compass
                   size={48}
-                  color="#D4AF37"
+                  color={colors.gold}
                   opacity={0.5}
                   className="mb-4 animate-pulse"
                 />
@@ -383,7 +380,7 @@ export default function TemplatesScreen() {
                   onPress={() => router.push(BUILDER_HREF)}
                   className="bg-gold px-5 py-3 rounded-card items-center active:bg-gold-dim"
                 >
-                  <Text className="text-[#121212] font-bold text-xs uppercase tracking-widest">
+                  <Text className="text-on-gold font-bold text-xs uppercase tracking-widest">
                     + Criar modelo
                   </Text>
                 </Pressable>
@@ -392,7 +389,7 @@ export default function TemplatesScreen() {
               <View className="flex-1 items-center justify-center py-12">
                 <Compass
                   size={48}
-                  color="#D4AF37"
+                  color={colors.gold}
                   opacity={0.5}
                   className="mb-4 animate-pulse"
                 />

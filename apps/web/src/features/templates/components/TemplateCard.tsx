@@ -1,6 +1,6 @@
 import React from 'react';
-import { Tag } from '../../../components/ui/Tag';
-import { Button } from '../../../components/ui/Button';
+import { Tag } from '@master-sheet/ui/tag';
+import { Button } from '@master-sheet/ui/button';
 import { FileText, Copy, Pencil, Trash2 } from 'lucide-react';
 import { SYSTEM_LABELS } from '@master-sheet/contracts';
 
@@ -111,7 +111,7 @@ export function TemplateCard({
         {tmpl.tags.length > 0 && (
           <div className="flex flex-wrap gap-1 mt-3">
             {tmpl.tags.map((t) => (
-              <Tag key={t} className="pointer-events-none">
+              <Tag key={t} variant="display">
                 {t}
               </Tag>
             ))}

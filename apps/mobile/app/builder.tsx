@@ -36,6 +36,7 @@ import { BuilderRow, AddRow } from '../components/builder/BuilderRow';
 import { FieldInspectorSheet } from '../components/builder/FieldInspectorSheet';
 import { PreviewModal } from '../components/builder/PreviewModal';
 import { Toast, type ToastState } from '../components/builder/Toast';
+import { colors } from '@/lib/colors';
 
 type Level =
   | { kind: 'tabs' }
@@ -213,7 +214,7 @@ export default function BuilderScreen() {
         edges={['top']}
         className="flex-1 bg-bg-app items-center justify-center"
       >
-        <ActivityIndicator size="large" color="#D4AF37" />
+        <ActivityIndicator size="large" color={colors.gold} />
         <Text className="text-xs text-text-muted mt-3">Carregando modelo…</Text>
       </SafeAreaView>
     );
@@ -229,7 +230,7 @@ export default function BuilderScreen() {
               hitSlop={8}
               className="p-1 active:opacity-60"
             >
-              <ChevronLeft size={22} color="#D4AF37" />
+              <ChevronLeft size={22} color={colors.gold} />
             </Pressable>
             <Text
               className="font-display font-bold text-base text-text-main flex-1"
@@ -245,7 +246,7 @@ export default function BuilderScreen() {
               hitSlop={6}
               className="p-2 border border-border rounded-card active:bg-gold/10"
             >
-              <Eye size={18} color="#D4AF37" />
+              <Eye size={18} color={colors.gold} />
             </Pressable>
             <Pressable
               onPress={handleSave}
@@ -253,11 +254,11 @@ export default function BuilderScreen() {
               className="bg-gold px-3.5 py-2 rounded-card items-center justify-center flex-row gap-1.5 active:bg-gold-dim"
             >
               {saving ? (
-                <ActivityIndicator size="small" color="#121212" />
+                <ActivityIndicator size="small" color={colors.onGold} />
               ) : (
-                <Save size={15} color="#121212" />
+                <Save size={15} color={colors.onGold} />
               )}
-              <Text className="text-[#121212] font-bold text-[11px] uppercase tracking-widest">
+              <Text className="text-on-gold font-bold text-[11px] uppercase tracking-widest">
                 Salvar
               </Text>
             </Pressable>
@@ -384,7 +385,7 @@ function TabsLevel({
                 value={tab.label}
                 onChangeText={(label) => builder.handleRenameTab(tab.id, label)}
                 placeholder="Nome da aba"
-                placeholderTextColor="#888888"
+                placeholderTextColor={colors.textMuted}
                 className="text-text-main font-body text-sm py-0"
               />
             }
@@ -433,7 +434,7 @@ function SectionsLevel({
                   builder.handlePatchSection(tab.id, section.id, { title })
                 }
                 placeholder="Título da seção"
-                placeholderTextColor="#888888"
+                placeholderTextColor={colors.textMuted}
                 className="text-text-main font-body text-sm py-0"
               />
             }
@@ -493,7 +494,7 @@ function FieldsLevel({
               >
                 <Text
                   className={`text-[10px] font-bold uppercase tracking-wider ${
-                    active ? 'text-[#121212]' : 'text-text-muted'
+                    active ? 'text-on-gold' : 'text-text-muted'
                   }`}
                 >
                   {count}

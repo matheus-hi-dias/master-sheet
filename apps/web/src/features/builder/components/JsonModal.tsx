@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Check, Copy, Download, TriangleAlert, X } from 'lucide-react';
-import { Button } from '../../../components/ui/Button';
+import { Button } from '@master-sheet/ui/button';
 import { cn } from '../../../lib/utils';
 import { parseTemplateStructure } from '../lib/structureImport';
 import type { TemplateStructure } from '@master-sheet/contracts';

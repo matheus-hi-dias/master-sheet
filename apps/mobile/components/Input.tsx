@@ -1,5 +1,6 @@
 import React, { forwardRef } from 'react';
 import { View, Text, TextInput, TextInputProps } from 'react-native';
+import { colors } from '@/lib/colors';
 
 interface InputProps extends TextInputProps {
   label?: string;
@@ -21,7 +22,7 @@ export const Input = forwardRef<TextInput, InputProps>(
           {icon && <View className="absolute left-3 z-10">{icon}</View>}
           <TextInput
             ref={ref}
-            placeholderTextColor="#888888"
+            placeholderTextColor={colors.textMuted}
             className={`w-full bg-bg-panel border rounded-card py-3 px-3 text-text-main font-body text-[13px] ${
               icon ? 'pl-10' : 'px-3'
             } ${error ? 'border-red-500' : 'border-border'} ${className}`}

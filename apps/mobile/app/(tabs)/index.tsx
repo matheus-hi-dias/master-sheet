@@ -13,6 +13,7 @@ import { api } from '../../services/api';
 import { SHEETS_ENABLED } from '../../services/featureFlags';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { FileText, Dices, AlertTriangle } from 'lucide-react-native';
+import { colors } from '@/lib/colors';
 
 interface SheetItem {
   id: string;
@@ -70,7 +71,7 @@ export default function SheetsScreen() {
           </Text>
         </View>
         <View className="w-10 h-10 rounded-full bg-bg-panel items-center justify-center border border-border">
-          <Dices size={20} color="#D4AF37" />
+          <Dices size={20} color={colors.gold} />
         </View>
       </Pressable>
     );
@@ -89,7 +90,7 @@ export default function SheetsScreen() {
 
       {isLoading ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#D4AF37" />
+          <ActivityIndicator size="large" color={colors.gold} />
         </View>
       ) : isError ? (
         <View className="flex-1 items-center justify-center p-6">
@@ -115,15 +116,15 @@ export default function SheetsScreen() {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={onRefresh}
-              tintColor="#D4AF37"
-              colors={['#D4AF37']}
+              tintColor={colors.gold}
+              colors={[colors.gold]}
             />
           }
           ListEmptyComponent={
             <View className="flex-1 items-center justify-center py-12">
               <FileText
                 size={48}
-                color="#D4AF37"
+                color={colors.gold}
                 opacity={0.5}
                 className="mb-4 animate-pulse"
               />
@@ -137,7 +138,7 @@ export default function SheetsScreen() {
                 onPress={() => router.push('/(tabs)/templates')}
                 className="bg-gold px-5 py-3 rounded-card active:opacity-80"
               >
-                <Text className="text-[#121212] font-bold text-xs uppercase tracking-widest text-center">
+                <Text className="text-on-gold font-bold text-xs uppercase tracking-widest text-center">
                   Explorar Modelos
                 </Text>
               </Pressable>

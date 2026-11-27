@@ -1,7 +1,8 @@
 import { cn } from '../../../lib/utils';
 import type { FieldDefinition } from '@master-sheet/contracts';
 import type { SheetForm } from '../types/sheet.types';
-import { DotTracker } from './DotTracker';
+import { Controller } from 'react-hook-form';
+import { DotTracker } from '@master-sheet/ui/dot-tracker';
 import { FormulaField } from './FormulaField';
 import { RepeaterField } from './RepeaterField';
 
@@ -51,17 +52,21 @@ function renderInput(field: FieldDefinition, form: SheetForm) {
           className={cn(inputClass, 'resize-y')}
         />
       );
-    case 'dots': {
-      const initial = Number(getValues(field.id)) || 0;
+    case 'dots':
       return (
-        <DotTracker
+        <Controller
           key={field.id}
-          initial={initial}
-          maxDots={field.maxDots ?? 5}
-          onValue={(v) => setValue(field.id, v)}
+          control={form.control}
+          name={field.id}
+          render={({ field: controlled }) => (
+            <DotTracker
+              value={Number(controlled.value) || 0}
+              maxDots={field.maxDots ?? 5}
+              onChange={controlled.onChange}
+            />
+          )}
         />
       );
-    }
     case 'select':
       return (
         <select

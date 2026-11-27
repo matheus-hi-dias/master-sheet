@@ -14,9 +14,9 @@ import {
 import { useQuery } from '@tanstack/react-query';
 
 import { PageHeader } from '../../../components/ui/PageHeader';
-import { Button } from '../../../components/ui/Button';
+import { Button } from '@master-sheet/ui/button';
 import { Input } from '../../../components/ui/Input';
-import { Tag } from '../../../components/ui/Tag';
+import { Tag } from '@master-sheet/ui/tag';
 import { TemplateCard, type TemplateData } from '../components/TemplateCard';
 import { TemplateDetailDrawer } from '../components/TemplateDetailDrawer';
 import { fetchTemplates } from '../services/templatesApi';
